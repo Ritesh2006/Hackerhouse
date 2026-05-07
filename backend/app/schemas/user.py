@@ -24,8 +24,8 @@ class UserUpdate(BaseModel):
 
 class UserResponse(UserBase):
     id: str = Field(alias="_id")
-    is_active: bool
-    created_at: datetime
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=datetime.utcnow)
     distance_km: Optional[float] = None
 
     class Config:
