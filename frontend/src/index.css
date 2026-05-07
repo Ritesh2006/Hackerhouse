@@ -20,6 +20,8 @@
   html {
     scroll-behavior: smooth;
     overflow-x: hidden;
+    width: 100%;
+    position: relative;
   }
   body {
     background-color: #030712;
@@ -28,8 +30,14 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
+    width: 100%;
+    position: relative;
     /* Prevent mobile double-tap zoom on buttons */
     touch-action: manipulation;
+  }
+  #root {
+    width: 100%;
+    overflow-x: hidden;
   }
   ::selection {
     background-color: rgba(99, 102, 241, 0.3);
