@@ -29,11 +29,13 @@ def create_access_token(subject: Union[str, Any], expires_delta: timedelta = Non
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
     Verify a password against a hash.
-    Bcrypt has a 72-byte limit, so we truncate if necessary.
+    Bcrypt has a 72-byte limit. We truncate by byte length to match hashing logic.
     """
     try:
-        if plain_password and len(plain_password) > 72:
-            plain_password = plain_password[:72]
+        if plain_password:
+            password_bytes = plain_password.encode('utf-8')
+            if len(password_bytes) > 72:
+                plain_password = password_bytes[:72].decode('utf-8', errors='ignore')
         return pwd_context.verify(plain_password, hashed_password)
     except Exception as e:
         logger.error(f"Password verification error: {e}")
@@ -42,15 +44,20 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 def get_password_hash(password: str) -> str:
     """
     Generate a password hash.
-    Bcrypt has a 72-byte limit, so we truncate if necessary to prevent crashes.
+    Bcrypt has a 72-byte limit. We truncate by byte length to ensure stability
+    with multi-byte UTF-8 characters.
     """
     try:
-        # Bcrypt has a 72-byte limit. We truncate to ensure stability.
-        if password and len(password) > 72:
+        if not password:
+            return ""
+            
+        # Truncate by byte length (72 bytes is the limit for bcrypt)
+        password_bytes = password.encode('utf-8')
+        if len(password_bytes) > 72:
             logger.warning("Password longer than 72 bytes detected. Truncating for bcrypt compatibility.")
-            password = password[:72]
+            password = password_bytes[:72].decode('utf-8', errors='ignore')
+            
         return pwd_context.hash(password)
     except Exception as e:
         logger.error(f"Password hashing error: {e}")
-        # Fallback to something if it fails, though it shouldn't
         raise e
