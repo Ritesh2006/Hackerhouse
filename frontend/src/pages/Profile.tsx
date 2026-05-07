@@ -4,43 +4,39 @@ import { MapPin, Briefcase, Terminal, Code2, Star, GitBranch, Users, ExternalLin
 import { useState, useEffect } from 'react';
 import { usersApi, githubApi, linkedinApi, chatApi } from '../lib/api';
 
-function MessageModal({ isOpen, onClose, recipientName, recipientId, recipientEmail }: any) {
-  const [message, setMessage] = useState('');
+function HireModal({ isOpen, onClose, developerName, developerId }: any) {
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    budget: '',
+    deadline: ''
+  });
   const [sending, setSending] = useState(false);
-  const [contactMethod, setContactMethod] = useState(recipientEmail ? 'email' : 'linkedin');
   const navigate = useNavigate();
 
-  const handleSend = async () => {
-    if (!message.trim()) return;
-    
-    if (contactMethod === 'email' && recipientEmail) {
-       window.open(`mailto:${recipientEmail}?subject=Professional Inquiry via HackerHouse&body=${encodeURIComponent(message)}`, '_blank');
-       onClose();
-       return;
+  const handleHire = async () => {
+    if (!formData.title || !formData.description || !formData.budget || !formData.deadline) {
+      alert("Please fill all fields");
+      return;
     }
-
+    
     setSending(true);
     try {
-      const userId = localStorage.getItem('chat_user_id') || localStorage.getItem('user_id') || `anon_${Math.floor(Math.random() * 10000)}`;
-      localStorage.setItem('chat_user_id', userId);
-      
-      const roomId = recipientId;
-      console.log(`Sending message to Room: ${roomId}, Sender: ${userId}`);
-      
-      const response = await chatApi.sendMessage({
-        room_id: roomId,
-        sender_id: userId,
-        message: message.trim()
+      const response = await usersApi.hireDeveloper({
+        developer_id: developerId,
+        title: formData.title,
+        description: formData.description,
+        budget: parseFloat(formData.budget),
+        deadline: new Date(formData.deadline).toISOString()
       });
       
-      console.log("Server response:", response.data);
-      alert("Message sent via HackerHouse Relay!");
-      
+      const { contract_id } = response.data;
+      alert("Hiring request sent successfully!");
       onClose();
-      navigate(`/chat/${roomId}`);
+      navigate(`/chat/${contract_id}`);
     } catch (err: any) {
-      console.error("Failed to send message:", err);
-      alert(`Failed to send message: ${err?.response?.data?.detail || err.message}`);
+      console.error("Failed to hire developer:", err);
+      alert(`Failed: ${err?.response?.data?.detail || err.message}`);
     } finally {
       setSending(false);
     }
@@ -61,53 +57,66 @@ function MessageModal({ isOpen, onClose, recipientName, recipientId, recipientEm
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             className="relative w-full max-w-md glass rounded-3xl overflow-hidden border border-white/10 shadow-2xl"
           >
-            <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
+            <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-indigo-600/10">
               <div>
-                <h3 className="text-lg font-bold text-white">Message {recipientName}</h3>
-                <p className="text-[10px] text-indigo-400 font-medium">Smart Contact Intelligence Active</p>
+                <h3 className="text-lg font-bold text-white">Hire {developerName}</h3>
+                <p className="text-[10px] text-indigo-400 font-medium">Enterprise Contract Marketplace</p>
               </div>
               <button onClick={onClose} className="text-slate-500 hover:text-white transition-colors">
                 <X size={20} />
               </button>
             </div>
-            <div className="p-6">
-              <div className="flex gap-2 mb-4 p-1 bg-white/5 rounded-xl border border-white/5">
-                {recipientEmail && (
-                  <button 
-                    onClick={() => setContactMethod('email')}
-                    className={`flex-1 py-2 text-[10px] font-bold rounded-lg transition-all ${contactMethod === 'email' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-slate-400 hover:text-white'}`}
-                  >
-                    Email Method
-                  </button>
-                )}
-                <button 
-                  onClick={() => setContactMethod('linkedin')}
-                  className={`flex-1 py-2 text-[10px] font-bold rounded-lg transition-all ${contactMethod === 'linkedin' ? 'bg-[#0a66c2] text-white shadow-lg shadow-blue-500/20' : 'text-slate-400 hover:text-white'}`}
-                >
-                  LinkedIn Method
-                </button>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="text-[10px] uppercase font-bold text-slate-500 mb-1.5 block">Project Title</label>
+                <input
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) => setFormData({...formData, title: e.target.value})}
+                  placeholder="e.g. Build a Modern Landing Page"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm text-slate-200 outline-none focus:border-indigo-500/50 transition-all"
+                />
               </div>
-
-              <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder={contactMethod === 'email' ? "Type your email content here..." : "Type your LinkedIn message..."}
-                className="w-full h-32 bg-white/5 border border-white/10 rounded-2xl p-4 text-slate-200 placeholder-slate-600 outline-none focus:border-indigo-500/50 transition-all resize-none"
-                autoFocus
-              />
+              <div>
+                <label className="text-[10px] uppercase font-bold text-slate-500 mb-1.5 block">Description</label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({...formData, description: e.target.value})}
+                  placeholder="Describe the project requirements..."
+                  className="w-full h-24 bg-white/5 border border-white/10 rounded-xl p-3 text-sm text-slate-200 outline-none focus:border-indigo-500/50 transition-all resize-none"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[10px] uppercase font-bold text-slate-500 mb-1.5 block">Budget ($)</label>
+                  <input
+                    type="number"
+                    value={formData.budget}
+                    onChange={(e) => setFormData({...formData, budget: e.target.value})}
+                    placeholder="500"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm text-slate-200 outline-none focus:border-indigo-500/50 transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase font-bold text-slate-500 mb-1.5 block">Deadline</label>
+                  <input
+                    type="date"
+                    value={formData.deadline}
+                    onChange={(e) => setFormData({...formData, deadline: e.target.value})}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm text-slate-200 outline-none focus:border-indigo-500/50 transition-all"
+                  />
+                </div>
+              </div>
               
               <button
-                onClick={handleSend}
-                disabled={sending || !message.trim()}
-                className={`w-full mt-4 flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all disabled:opacity-50 ${contactMethod === 'email' ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : 'bg-[#0a66c2] hover:bg-[#004182] text-white'}`}
+                onClick={handleHire}
+                disabled={sending}
+                className="w-full mt-2 flex items-center justify-center gap-2 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-all disabled:opacity-50 shadow-lg shadow-indigo-600/20"
               >
-                {sending ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Send size={18} />}
-                <span>{sending ? 'Sending...' : contactMethod === 'email' ? 'Send via Personal Email' : 'Send via Direct LinkedIn'}</span>
+                {sending ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Briefcase size={18} />}
+                <span>{sending ? 'Sending Request...' : 'Send Hire Request'}</span>
               </button>
-              
-              {contactMethod === 'linkedin' && (
-                 <p className="mt-3 text-[10px] text-slate-500 text-center">Note: LinkedIn bridge will copy your text and open their profile portal.</p>
-              )}
+              <p className="text-[10px] text-slate-500 text-center">By clicking, you agree to HackerHouse terms and contract protocols.</p>
             </div>
           </motion.div>
         </div>
@@ -139,7 +148,9 @@ export default function Profile() {
   const [profile, setProfile] = useState<any>(null);
   const [githubData, setGithubData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [isHireModalOpen, setIsHireModalOpen] = useState(false);
+  const [activeContractId, setActiveContractId] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -150,19 +161,23 @@ export default function Profile() {
         const user = userRes.data;
         setProfile(user);
 
+        // Check for active contracts
+        try {
+            const contractsRes = await usersApi.getMyContracts();
+            const existingContract = contractsRes.data.find((c: any) => 
+                (c.client_id === localStorage.getItem('user_id') && c.developer_id === id) ||
+                (c.developer_id === localStorage.getItem('user_id') && c.client_id === id)
+            );
+            if (existingContract) {
+                setActiveContractId(existingContract.id);
+            }
+        } catch (e) {
+            console.warn("Failed to fetch contracts:", e);
+        }
+
         if (user.github_username) {
           const ghRes = await githubApi.getProfile(user.github_username);
           setGithubData(ghRes.data);
-        }
-
-        try {
-          const lnRes = await linkedinApi.getProfile();
-          // Merging LinkedIn data if it matches or as supplementary info
-          if (lnRes.data) {
-            setProfile((prev: any) => ({ ...prev, linkedin_data: lnRes.data }));
-          }
-        } catch (err) {
-          console.warn("LinkedIn fetch failed (token might be expired):", err);
         }
       } catch (err) {
         console.error("Failed to fetch profile:", err);
@@ -237,12 +252,6 @@ export default function Profile() {
                   <span className={`w-2 h-2 rounded-full bg-green-400 animate-pulse`} />
                   Available for hire
                 </div>
-                {profile.linkedin_data && (
-                  <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20`}>
-                    <Globe size={14} className="text-blue-400" />
-                    LinkedIn Verified
-                  </div>
-                )}
               </div>
 
               <div className="flex flex-wrap gap-3 text-sm text-slate-400 mb-4 sm:mb-5">
@@ -263,21 +272,26 @@ export default function Profile() {
               </div>
 
               <div className="flex flex-wrap gap-2 sm:gap-3">
-                <motion.button 
-                  whileHover={{ scale: 1.03 }} 
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => setIsMessageModalOpen(true)}
-                  className="btn-primary flex items-center gap-2 text-sm py-2.5 px-4 sm:px-5"
-                >
-                  <MessageCircle size={16} /> Send Real Message
-                </motion.button>
-                <a href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(profile.name)}`} target="_blank" rel="noreferrer">
-                  <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm glass transition-all hover:border-blue-500/30 text-blue-400 bg-blue-500/5"
-                    style={{ border: '1px solid rgba(59,130,246,0.2)' }}>
-                    <ExternalLink size={16} /> Contact via LinkedIn
-                  </motion.button>
-                </a>
+                {activeContractId ? (
+                   <motion.button 
+                   whileHover={{ scale: 1.03 }} 
+                   whileTap={{ scale: 0.97 }}
+                   onClick={() => navigate(`/chat/${activeContractId}`)}
+                   className="btn-primary flex items-center gap-2 text-sm py-2.5 px-4 sm:px-5"
+                 >
+                   <MessageCircle size={16} /> Start Chat
+                 </motion.button>
+                ) : (
+                    <motion.button 
+                    whileHover={{ scale: 1.03 }} 
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => setIsHireModalOpen(true)}
+                    className="btn-primary flex items-center gap-2 text-sm py-2.5 px-4 sm:px-5"
+                    >
+                    <Briefcase size={16} /> Hire Developer
+                    </motion.button>
+                )}
+                
                 {profile.github_username && (
                   <a href={`https://github.com/${profile.github_username}`} target="_blank" rel="noreferrer">
                     <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
@@ -345,12 +359,11 @@ export default function Profile() {
         </div>
       </div>
 
-      <MessageModal 
-        isOpen={isMessageModalOpen} 
-        onClose={() => setIsMessageModalOpen(false)} 
-        recipientName={profile?.name}
-        recipientId={profile?.id}
-        recipientEmail={profile?.email}
+      <HireModal 
+        isOpen={isHireModalOpen} 
+        onClose={() => setIsHireModalOpen(false)} 
+        developerName={profile?.name}
+        developerId={id}
       />
     </div>
   );

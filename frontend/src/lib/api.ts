@@ -25,31 +25,29 @@ api.interceptors.request.use((config) => {
 export const usersApi = {
   getUsers: (params?: { location?: string; skill?: string; name?: string; lat?: number; lon?: number }) => api.get('/users/', { params }),
   getUser: (id: string) => api.get(`/users/${id}`),
+  getProfile: () => api.get('/auth/me'),
+  hireDeveloper: (data: any) => api.post('/hire', data),
+  getMyProjects: () => api.get('/projects/me'),
+  getMyContracts: () => api.get('/contracts/me'),
 };
 
 export const githubApi = {
   getProfile: (username: string) => api.get(`/github/${username}`),
 };
 
-export const linkedinApi = {
-  getProfile: (token?: string) => token ? api.get(`/linkedin/profile?token=${token}`) : api.get('/linkedin/me'),
-};
-
-export const projectsApi = {
-  getProjects: () => api.get('/projects'),
-  createProject: (data: any) => api.post('/projects', data),
-  applyToProject: (data: any) => api.post('/projects/contracts', data),
+export const authApi = {
+  login: (data: any) => {
+    const formData = new FormData();
+    formData.append('username', data.email);
+    formData.append('password', data.password);
+    return api.post('/auth/login', formData);
+  },
+  register: (data: any) => api.post('/auth/register', data),
+  getMe: () => api.get('/auth/me'), // Updated path
 };
 
 export const chatApi = {
-  sendMessage: (data: { room_id: string; sender_id: string; message: string }) => api.post('/chat/send', data),
-  getHistory: (roomId: string) => api.get(`/chat/history/${roomId}`),
-};
-
-export const authApi = {
-  login: (data: any) => api.post('/auth/login', data),
-  register: (data: any) => api.post('/auth/register', data),
-  getMe: () => api.get('/users/me/profile'),
+  getHistory: (contractId: string) => api.get(`/chat/contract/${contractId}`),
 };
 
 export default api;

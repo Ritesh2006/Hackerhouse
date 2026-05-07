@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Query
-from ..services.linkedin_service import get_linkedin_profile, get_linkedin_access_token
+from app.services.linkedin_service import get_linkedin_profile, get_linkedin_access_token
 
 router = APIRouter()
 
@@ -27,7 +27,3 @@ async def get_my_linkedin_profile():
     if not profile:
         raise HTTPException(status_code=400, detail="Could not fetch LinkedIn profile from stored token")
     return profile
-
-
-
-

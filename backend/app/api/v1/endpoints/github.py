@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from ..services.github_service import get_github_user_data
+from app.services.github_service import get_github_user_data
 
 router = APIRouter()
 

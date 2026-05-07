@@ -25,36 +25,28 @@ function TypingIndicator() {
 
 // Force reload
 export default function Chat() {
-  const { roomId } = useParams();
+  const { contractId } = useParams();
   const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const socketRef = useRef<WebSocket | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const token = localStorage.getItem('token');
+  const userId = localStorage.getItem('user_id');
   
-  // Consolidate userId logic to be consistent
-  const [userId] = useState(() => {
-    const saved = localStorage.getItem('chat_user_id') || localStorage.getItem('user_id');
-    if (saved) {
-      localStorage.setItem('chat_user_id', saved);
-      return saved;
-    }
-    const newId = `anon_${Math.floor(Math.random() * 10000)}`;
-    localStorage.setItem('chat_user_id', newId);
-    return newId;
-  });
-
   useEffect(() => {
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+    const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1').replace('/api/v1', '');
     const WS_URL = API_URL.replace('http', 'ws');
 
     const fetchHistory = async () => {
       try {
-        const res = await axios.get(`${API_URL}/chat/history/${roomId}`);
-        if (Array.isArray(res.data)) {
-          setMessages(res.data.map((m: any) => ({
-            id: m.id,
-            text: m.message,
+        const res = await axios.get(`${API_URL}/api/v1/chat/contract/${contractId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.data && res.data.messages) {
+          setMessages(res.data.messages.map((m: any, i: number) => ({
+            id: i,
+            text: m.text,
             sender: m.sender_id === userId ? 'me' : 'other',
             time: new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
           })));
@@ -68,39 +60,31 @@ export default function Chat() {
     let reconnectTimeout: any;
 
     const connect = () => {
-      socket = new WebSocket(`${WS_URL}/chat/ws/${roomId}?user_id=${userId}`);
+      if (!token) return;
+      socket = new WebSocket(`${WS_URL}/ws/chat/${contractId}?token=${token}`);
       socketRef.current = socket;
 
       socket.onopen = () => {
-        console.log("Connected to Chat Relay");
+        console.log("Connected to Chat WebSocket");
         fetchHistory();
       };
 
       socket.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          if (data.type === 'text') {
-            setMessages(prev => {
-              // Avoid duplicate messages from history vs real-time if IDs match
-              if (prev.some(m => m.id === data.id)) return prev;
-              return [...prev, {
-                id: data.id || Date.now(),
-                text: data.message,
-                sender: data.sender_id === userId ? 'me' : 'other',
-                time: new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-              }];
-            });
-          } else if (data.type === 'typing' && data.sender_id !== userId) {
-            setIsTyping(true);
-            setTimeout(() => setIsTyping(false), 3000);
-          }
+          setMessages(prev => [...prev, {
+            id: Date.now(),
+            text: data.text,
+            sender: data.sender_id === userId ? 'me' : 'other',
+            time: new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          }]);
         } catch (e) {
           console.warn("Received non-JSON message:", event.data);
         }
       };
 
       socket.onclose = () => {
-        console.warn("Disconnected from Chat Relay. Reconnecting...");
+        console.warn("WebSocket disconnected. Reconnecting...");
         reconnectTimeout = setTimeout(connect, 3000);
       };
 
@@ -116,29 +100,21 @@ export default function Chat() {
       if (socket) socket.close();
       if (reconnectTimeout) clearTimeout(reconnectTimeout);
     };
-  }, [roomId, userId]);
+  }, [contractId, userId, token]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isTyping]);
+  }, [messages]);
 
   const handleSend = () => {
     if (!input.trim() || !socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) return;
     
     const msg = {
-      message: input,
-      type: 'text'
+      text: input
     };
     
     socketRef.current.send(JSON.stringify(msg));
     setInput('');
-  };
-
-  const handleTyping = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInput(e.target.value);
-    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-      socketRef.current.send(JSON.stringify({ type: 'typing' }));
-    }
   };
 
   return (
@@ -154,31 +130,24 @@ export default function Chat() {
               <ArrowLeft size={18} />
             </Link>
             <div className="min-w-0">
-              <h3 className="font-bold text-white text-xs md:text-sm truncate" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Collaborative Workspace</h3>
-              <p className="text-[10px] md:text-xs text-green-400 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" /> Secure & Encrypted
+              <h3 className="font-bold text-white text-xs md:text-sm truncate" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>HackerHouse Project Workspace</h3>
+              <p className="text-[10px] md:text-xs text-indigo-400 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" /> Active Contract Room
               </p>
             </div>
           </div>
           
-          <button 
-            onClick={() => {
-              if (input) {
-                navigator.clipboard.writeText(input);
-                alert("Message copied to clipboard! Opening LinkedIn...");
-              }
-              window.open(`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(roomId || 'developer')}&origin=GLOBAL_SEARCH_HEADER`, '_blank');
-            }}
-            className="px-4 py-1.5 rounded-full bg-[#0a66c2]/10 border border-[#0a66c2]/30 text-[#0a66c2] text-[10px] md:text-xs font-bold hover:bg-[#0a66c2] hover:text-white transition-all flex items-center gap-2"
-          >
-            <Users size={14} /> Direct LinkedIn Message
-          </button>
+          <div className="flex items-center gap-2">
+            <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] text-slate-400">
+                Project ID: {contractId?.substring(0, 8)}...
+            </div>
+          </div>
         </motion.div>
 
         <div className="flex-1 overflow-y-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 space-y-3 sm:space-y-4">
-          {messages.map((msg) => (
+          {messages.map((msg, i) => (
             <motion.div
-              key={msg.id}
+              key={i}
               initial={{ opacity: 0, y: 16, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.25 }}
@@ -204,10 +173,6 @@ export default function Chat() {
             </motion.div>
           ))}
 
-          <AnimatePresence>
-            {isTyping && <TypingIndicator />}
-          </AnimatePresence>
-
           <div ref={bottomRef} />
         </div>
 
@@ -221,7 +186,7 @@ export default function Chat() {
             <input
               type="text"
               value={input}
-              onChange={handleTyping}
+              onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
               placeholder="Type a message..."
               className="flex-1 bg-transparent text-sm text-slate-200 placeholder-slate-600 outline-none py-2"

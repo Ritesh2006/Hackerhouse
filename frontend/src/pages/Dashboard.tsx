@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
-import { LayoutDashboard, MessageSquare, FileText, Activity, TrendingUp, Users, ArrowRight, Zap, GitBranch, Clock } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { LayoutDashboard, MessageSquare, FileText, Activity, TrendingUp, Users, ArrowRight, Zap, GitBranch, Clock, ExternalLink } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { usersApi } from '../lib/api';
 import AIAgent from '../components/AIAgent';
 
 const containerVariants = {
@@ -40,27 +42,54 @@ function MetricCard({ icon: Icon, label, value, delta, color, bg }: any) {
   );
 }
 
-const activityFeed: any[] = [];
-
-const projects: any[] = [];
-
-const recentMessages: any[] = [];
-
 export default function Dashboard() {
+  const [user, setUser] = useState<any>(null);
+  const [projects, setProjects] = useState<any[]>([]);
+  const [contracts, setContracts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const userRes = await usersApi.getProfile();
+        setUser(userRes.data);
+
+        const [projectsRes, contractsRes] = await Promise.all([
+          usersApi.getMyProjects(),
+          usersApi.getMyContracts()
+        ]);
+        setProjects(projectsRes.data);
+        setContracts(contractsRes.data);
+      } catch (err) {
+        console.error("Dashboard fetch failed:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDashboardData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#030712]">
+        <div className="w-12 h-12 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen pt-20 sm:pt-24 pb-16 px-4" style={{ background: '#030712' }}>
-      {/* Ambient light */}
       <div className="fixed top-0 left-0 right-0 h-[400px] pointer-events-none"
         style={{ background: 'radial-gradient(ellipse at 70% -10%, rgba(99,102,241,0.08), transparent 60%)' }} />
 
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-8 md:mb-10">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
             <div>
               <p className="text-slate-500 text-sm mb-1">Welcome back,</p>
               <h1 className="text-2xl md:text-3xl font-black text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                Good evening, <span className="text-gradient">Alex</span> 👋
+                Good evening, <span className="text-gradient">{user?.full_name?.split(' ')[0] || 'Member'}</span> 👋
               </h1>
             </div>
             <Link to="/search" className="w-full sm:w-auto">
@@ -71,172 +100,100 @@ export default function Dashboard() {
           </div>
         </motion.div>
 
-        {/* Metric Cards */}
         <motion.div
           variants={containerVariants} initial="hidden" animate="visible"
           className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8"
         >
-          <MetricCard icon={Activity} label="Active Projects" value="0" color="#6366f1" bg="rgba(99,102,241,0.08)" />
-          <MetricCard icon={MessageSquare} label="Unread Messages" value="0" color="#22c55e" bg="rgba(34,197,94,0.06)" />
-          <MetricCard icon={FileText} label="Contracts" value="0" color="#f59e0b" bg="rgba(245,158,11,0.06)" />
-          <MetricCard icon={Users} label="Collaborators" value="0" color="#818cf8" bg="rgba(129,140,248,0.06)" />
+          <MetricCard icon={Activity} label="Active Projects" value={projects.length} color="#6366f1" bg="rgba(99,102,241,0.08)" />
+          <MetricCard icon={FileText} label="Contracts" value={contracts.length} color="#f59e0b" bg="rgba(245,158,11,0.06)" />
+          <MetricCard icon={Users} label="Role" value={user?.role?.toUpperCase()} color="#818cf8" bg="rgba(129,140,248,0.06)" />
+          <MetricCard icon={TrendingUp} label="Completion" value="100%" color="#22c55e" bg="rgba(34,197,94,0.06)" />
         </motion.div>
 
-        <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
-          {/* Projects */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-            className="lg:col-span-2 glass rounded-2xl overflow-hidden"
+        {projects.length === 0 && contracts.length === 0 ? (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="glass rounded-3xl p-12 text-center flex flex-col items-center gap-6"
             style={{ border: '1px solid rgba(255,255,255,0.06)' }}
           >
-            <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-              <h2 className="font-bold text-white flex items-center gap-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                <LayoutDashboard size={18} className="text-indigo-400" /> Projects
-              </h2>
-              <button className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1">
-                View all <ArrowRight size={12} />
-              </button>
+            <div className="w-20 h-20 rounded-full bg-indigo-500/10 flex items-center justify-center">
+                <Zap size={40} className="text-indigo-500" />
             </div>
-            <div className="divide-y" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
-              {projects.length === 0 && (
-                <div className="px-6 py-12 text-center">
-                  <p className="text-slate-500 text-sm">No active projects</p>
-                </div>
-              )}
-              {projects.map((proj, i) => (
-                <motion.div
-                  key={i}
-                  whileHover={{ backgroundColor: 'rgba(255,255,255,0.02)' }}
-                  className="px-6 py-5 cursor-pointer"
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-3">
-                      <div>
-                        <h3 className="font-semibold text-white text-sm">{proj.name}</h3>
-                        <div className="flex flex-wrap gap-1.5 mt-1.5">
-                          {proj.tags.map((t: string) => (
-                            <span key={t} className="text-[10px] px-2 py-0.5 rounded-md"
-                              style={{ background: 'rgba(99,102,241,0.1)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.2)' }}>
-                              {t}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between sm:justify-end gap-3">
-                        <div className="flex -space-x-2">
-                          {proj.members.map((m: string, j: number) => (
-                            <div key={j} className="w-7 h-7 rounded-lg text-xs font-bold text-white flex items-center justify-center border border-gray-900"
-                              style={{ background: `hsl(${j * 60 + 220}, 70%, 55%)`, zIndex: proj.members.length - j }}>
-                              {m}
-                            </div>
-                          ))}
-                        </div>
-                        <span className={`text-[10px] px-2.5 py-1 rounded-full font-medium ${
-                          proj.status === 'In Progress' ? 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/20' :
-                          proj.status === 'Review' ? 'bg-green-500/15 text-green-400 border border-green-500/20' :
-                          'bg-amber-500/15 text-amber-400 border border-amber-500/20'
-                        }`}>{proj.status}</span>
-                      </div>
-                    </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1 h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}>
-                      <motion.div
-                        initial={{ width: 0 }} animate={{ width: `${proj.progress}%` }}
-                        transition={{ delay: 0.5 + i * 0.1, duration: 0.8, ease: 'easeOut' }}
-                        className="h-full rounded-full"
-                        style={{ background: `linear-gradient(90deg, ${proj.color}, ${proj.color}aa)` }}
-                      />
-                    </div>
-                    <span className="text-xs text-slate-500 w-8 text-right">{proj.progress}%</span>
-                    <div className="flex items-center gap-1 text-xs text-slate-500">
-                      <Clock size={11} /> {proj.due}
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
+            <div>
+                <h2 className="text-2xl font-bold text-white mb-2">Start your first project 🚀</h2>
+                <p className="text-slate-400 max-w-md">You haven't hired anyone or been hired yet. Browse our top developers to get started.</p>
             </div>
+            <Link to="/search">
+                <button className="btn-primary px-8 py-3">Explore Marketplace</button>
+            </Link>
           </motion.div>
-
-          {/* Right column */}
-          <div className="space-y-6">
-            {/* Messages */}
+        ) : (
+            <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
             <motion.div
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
-              className="glass rounded-2xl overflow-hidden"
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+              className="lg:col-span-2 glass rounded-2xl overflow-hidden"
               style={{ border: '1px solid rgba(255,255,255,0.06)' }}
             >
-              <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+              <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                 <h2 className="font-bold text-white flex items-center gap-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                  <MessageSquare size={16} className="text-green-400" /> Messages
+                  <LayoutDashboard size={18} className="text-indigo-400" /> Active Projects
                 </h2>
-                <Link to="/chat/global" className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1">
-                  Open <ArrowRight size={12} />
-                </Link>
               </div>
               <div className="divide-y" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
-                {recentMessages.length === 0 && (
-                  <div className="px-5 py-8 text-center">
-                    <p className="text-slate-500 text-sm">No recent messages</p>
-                  </div>
-                )}
-                {recentMessages.map((msg, i) => (
-                  <Link key={i} to={`/chat/${msg.name.toLowerCase().replace(' ', '-')}`}>
-                    <motion.div whileHover={{ backgroundColor: 'rgba(255,255,255,0.02)' }} className="px-5 py-4 flex items-center gap-3 cursor-pointer">
-                      <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${msg.color} flex items-center justify-center text-white text-xs font-bold shrink-0`}>
-                        {msg.initials}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-semibold text-white">{msg.name}</span>
-                          <span className="text-xs text-slate-600">{msg.time}</span>
+                {projects.map((proj, i) => (
+                  <motion.div
+                    key={i}
+                    whileHover={{ backgroundColor: 'rgba(255,255,255,0.02)' }}
+                    className="px-6 py-5 cursor-pointer"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                          <h3 className="font-semibold text-white text-sm">{proj.title}</h3>
+                          <p className="text-xs text-slate-500 mt-1 line-clamp-1">{proj.description}</p>
                         </div>
-                        <p className="text-xs text-slate-500 truncate mt-0.5">{msg.msg}</p>
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs font-bold text-indigo-400">${proj.budget}</span>
+                          <span className={`text-[10px] px-2.5 py-1 rounded-full font-medium bg-indigo-500/15 text-indigo-400 border border-indigo-500/20`}>
+                            {proj.status}
+                          </span>
+                        </div>
                       </div>
-                      {msg.unread > 0 && (
-                        <span className="w-5 h-5 rounded-full text-xs font-bold text-white flex items-center justify-center shrink-0"
-                          style={{ background: '#6366f1' }}>{msg.unread}</span>
-                      )}
-                    </motion.div>
-                  </Link>
+                  </motion.div>
                 ))}
               </div>
             </motion.div>
-
-            {/* Activity */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-              className="glass rounded-2xl overflow-hidden"
-              style={{ border: '1px solid rgba(255,255,255,0.06)' }}
-            >
-              <div className="flex items-center gap-2 px-5 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                <GitBranch size={16} className="text-purple-400" />
-                <h2 className="font-bold text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Activity</h2>
-              </div>
-              <div className="p-2 space-y-1">
-                {activityFeed.length === 0 && (
-                  <div className="py-8 text-center">
-                    <p className="text-slate-500 text-sm">No recent activity</p>
-                  </div>
-                )}
-                {activityFeed.map((item, i) => {
-                  const Icon = item.icon;
-                  return (
-                    <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 + i * 0.06 }}
-                      className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors">
-                      <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
-                        style={{ background: `${item.color}15`, border: `1px solid ${item.color}25` }}>
-                        <Icon size={13} style={{ color: item.color }} />
-                      </div>
+  
+            <div className="space-y-6">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
+                className="glass rounded-2xl overflow-hidden"
+                style={{ border: '1px solid rgba(255,255,255,0.06)' }}
+              >
+                <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                  <h2 className="font-bold text-white flex items-center gap-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                    <FileText size={16} className="text-fuchsia-400" /> Recent Contracts
+                  </h2>
+                </div>
+                <div className="divide-y" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
+                  {contracts.map((contract, i) => (
+                    <div key={i} className="px-5 py-4 flex items-center justify-between hover:bg-white/5 transition-colors cursor-pointer"
+                        onClick={() => navigate(`/chat/${contract.id}`)}>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs text-slate-300 leading-relaxed">{item.text}</p>
-                        <p className="text-xs text-slate-600 mt-0.5">{item.time}</p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-semibold text-white">Contract #{contract.id.substring(0, 8)}</span>
+                          <span className="text-[10px] text-slate-500">{new Date(contract.created_at).toLocaleDateString()}</span>
+                        </div>
+                        <p className="text-xs text-slate-400 mt-1">Status: {contract.status}</p>
                       </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </motion.div>
+                      <ExternalLink size={14} className="text-slate-600 ml-3" />
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
       <AIAgent />
     </div>

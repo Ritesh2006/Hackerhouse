@@ -1,6 +1,6 @@
-from ..core.database import get_database
-from ..utils.geo_utils import haversine_distance
-from ..services.github_service import search_github_users
+from app.db.database import get_database
+from app.utils.geo_utils import haversine_distance
+from app.services.github_service import search_github_users
 from typing import List, Optional
 import uuid
 import logging

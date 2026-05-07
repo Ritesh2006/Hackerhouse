@@ -1,5 +1,5 @@
 import httpx
-from ..core.config import settings
+from app.core.config import settings
 import logging
 from typing import Optional
 
