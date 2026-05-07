@@ -163,6 +163,100 @@ function HeroVisual() {
   );
 }
 
+// Typewriter effect component
+function Typewriter({ text }: { text: string }) {
+  const [displayText, setDisplayText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [loopNum, setLoopNum] = useState(0);
+  const [typingSpeed, setTypingSpeed] = useState(150);
+
+  const words = ['Developers', 'Engineers', 'Collaborators', 'Innovators'];
+
+  useEffect(() => {
+    let timer = setTimeout(() => {
+      const i = loopNum % words.length;
+      const fullText = words[i];
+
+      setDisplayText(isDeleting 
+        ? fullText.substring(0, displayText.length - 1)
+        : fullText.substring(0, displayText.length + 1)
+      );
+
+      setTypingSpeed(isDeleting ? 80 : 150);
+
+      if (!isDeleting && displayText === fullText) {
+        setTimeout(() => setIsDeleting(true), 2000);
+      } else if (isDeleting && displayText === '') {
+        setIsDeleting(false);
+        setLoopNum(loopNum + 1);
+      }
+    }, typingSpeed);
+
+    return () => clearTimeout(timer);
+  }, [displayText, isDeleting, loopNum, typingSpeed]);
+
+  return <span className="text-gradient">{displayText}<span className="animate-pulse">|</span></span>;
+}
+
+// Documentation Modal Component
+function DocumentationModal({ isOpen, onClose, feature }: { isOpen: boolean, onClose: () => void, feature: any }) {
+  if (!isOpen) return null;
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0, y: 20 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.9, opacity: 0, y: 20 }}
+          className="bg-[#0f111a] border border-white/10 rounded-3xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col"
+          onClick={e => e.stopPropagation()}
+        >
+          <div className="flex items-center justify-between p-6 border-b border-white/5">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${feature.color}20` }}>
+                {React.createElement(feature.icon, { size: 20, style: { color: feature.color } })}
+              </div>
+              <h2 className="text-xl font-bold text-white">{feature.title} Documentation</h2>
+            </div>
+            <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-full transition-colors text-slate-400 hover:text-white">
+              <X size={20} />
+            </button>
+          </div>
+          <div className="p-8 overflow-y-auto space-y-6 text-slate-300">
+            <section>
+              <h3 className="text-white font-semibold mb-2">Overview</h3>
+              <p className="text-sm leading-relaxed">{feature.desc}</p>
+            </section>
+            <section>
+              <h3 className="text-white font-semibold mb-2">How it works</h3>
+              <div className="bg-white/5 rounded-2xl p-4 border border-white/5 font-mono text-xs text-indigo-300">
+                {`// HackerHouse API Integration\nasync function initialize${feature.title.replace(/\s+/g, '')}() {\n  const config = await HH.getFeatureConfig('${feature.title.toLowerCase()}');\n  return HH.connect(config);\n}`}
+              </div>
+            </section>
+            <section className="space-y-3">
+              <h3 className="text-white font-semibold">Key Benefits</h3>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center gap-2"><Zap size={14} className="text-indigo-400" /> Enterprise-grade security and reliability</li>
+                <li className="flex items-center gap-2"><Zap size={14} className="text-indigo-400" /> Seamless integration with existing workflows</li>
+                <li className="flex items-center gap-2"><Zap size={14} className="text-indigo-400" /> Real-time data synchronization and low latency</li>
+              </ul>
+            </section>
+          </div>
+          <div className="p-6 bg-white/5 border-t border-white/5 flex justify-end">
+            <button onClick={onClose} className="btn-primary py-2 px-6">Got it</button>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
 // Stats badge
 function StatBadge({ icon: Icon, value, label, delay }: any) {
   return (
@@ -170,15 +264,15 @@ function StatBadge({ icon: Icon, value, label, delay }: any) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.5 }}
-      className="glass rounded-2xl px-5 py-4 flex items-center gap-3"
+      className="glass rounded-2xl px-5 py-4 flex items-center gap-3 flex-1 min-w-[140px]"
     >
-      <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+      <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
         style={{ background: 'rgba(99,102,241,0.15)' }}>
         <Icon size={18} className="text-indigo-400" />
       </div>
       <div>
         <div className="text-xl font-bold text-white font-display">{value}</div>
-        <div className="text-xs text-slate-500">{label}</div>
+        <div className="text-xs text-slate-500 whitespace-nowrap">{label}</div>
       </div>
     </motion.div>
   );
@@ -196,6 +290,10 @@ export default function Landing() {
   const [locationSuggestions, setLocationSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const suggestionTimeout = useRef<any>(null);
+
+  const [selectedFeature, setSelectedFeature] = useState<any>(null);
+  const [isDocModalOpen, setIsDocModalOpen] = useState(false);
+
 
   const fetchSuggestions = async (query: string) => {
     if (!query || query.length < 3) {
@@ -315,7 +413,7 @@ export default function Landing() {
               >
                 <h1 className="text-4xl md:text-5xl xl:text-7xl font-black leading-[1.05] tracking-tight font-display">
                   <span className="text-white block">Find Elite</span>
-                  <span className="text-gradient block">Developers</span>
+                  <Typewriter text="Developers" />
                   <span className="text-white block">Near You.</span>
                 </h1>
               </motion.div>
@@ -527,8 +625,11 @@ export default function Landing() {
                   </div>
                   <h3 className="text-xl font-bold text-white mb-3 font-display">{feature.title}</h3>
                   <p className="text-slate-400 text-sm leading-relaxed">{feature.desc}</p>
-                  <div className="flex items-center gap-2 mt-6 text-sm font-medium transition-all"
-                    style={{ color: feature.color }}>
+                  <div 
+                    onClick={() => { setSelectedFeature(feature); setIsDocModalOpen(true); }}
+                    className="flex items-center gap-2 mt-6 text-sm font-medium transition-all hover:opacity-80"
+                    style={{ color: feature.color }}
+                  >
                     <span>Learn more</span>
                     <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                   </div>
@@ -636,6 +737,13 @@ export default function Landing() {
         </div>
       </section>
       <AIAgent />
+      {selectedFeature && (
+        <DocumentationModal 
+          isOpen={isDocModalOpen} 
+          onClose={() => setIsDocModalOpen(false)} 
+          feature={selectedFeature} 
+        />
+      )}
     </div>
   );
 }
