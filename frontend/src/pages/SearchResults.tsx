@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, MapPin, GitBranch, SortAsc, Search, Code2, ChevronDown, ExternalLink } from 'lucide-react';
+import { Star, MapPin, GitBranch, SortAsc, Search, Code2, ChevronDown, Sparkles } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { usersApi } from '../lib/api';
