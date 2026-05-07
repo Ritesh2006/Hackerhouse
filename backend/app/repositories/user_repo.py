@@ -2,13 +2,14 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.models.user import User
 from typing import Optional, List
 from bson import ObjectId
+from app.db.utils import get_id_query
 
 class UserRepository:
     def __init__(self, db: AsyncIOMotorDatabase):
         self.collection = db.users
 
     async def get_by_id(self, user_id: str) -> Optional[dict]:
-        return await self.collection.find_one({"_id": user_id})
+        return await self.collection.find_one(get_id_query(user_id))
 
     async def get_by_email(self, email: str) -> Optional[dict]:
         return await self.collection.find_one({"email": email})
@@ -21,7 +22,7 @@ class UserRepository:
 
     async def update(self, user_id: str, user_data: dict) -> bool:
         result = await self.collection.update_one(
-            {"_id": user_id}, {"$set": user_data}
+            get_id_query(user_id), {"$set": user_data}
         )
         return result.modified_count > 0
 

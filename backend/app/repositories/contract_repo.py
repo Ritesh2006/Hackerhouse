@@ -2,6 +2,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from typing import Optional, List
 from bson import ObjectId
 from datetime import datetime
+from app.db.utils import get_id_query
 
 class ContractRepository:
     def __init__(self, db: AsyncIOMotorDatabase):
@@ -14,7 +15,7 @@ class ContractRepository:
         return contract_data["_id"]
 
     async def get_by_id(self, contract_id: str) -> Optional[dict]:
-        return await self.collection.find_one({"_id": contract_id})
+        return await self.collection.find_one(get_id_query(contract_id))
 
     async def get_by_user(self, user_id: str, skip: int = 0, limit: int = 20) -> List[dict]:
         cursor = self.collection.find(
@@ -34,6 +35,6 @@ class ContractRepository:
         update_data.update(kwargs)
         
         result = await self.collection.update_one(
-            {"_id": contract_id}, {"$set": update_data}
+            get_id_query(contract_id), {"$set": update_data}
         )
         return result.modified_count > 0

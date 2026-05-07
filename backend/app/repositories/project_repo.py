@@ -1,6 +1,7 @@
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from typing import Optional, List
 from bson import ObjectId
+from app.db.utils import get_id_query
 
 class ProjectRepository:
     def __init__(self, db: AsyncIOMotorDatabase):
@@ -13,7 +14,7 @@ class ProjectRepository:
         return project_data["_id"]
 
     async def get_by_id(self, project_id: str) -> Optional[dict]:
-        return await self.collection.find_one({"_id": project_id})
+        return await self.collection.find_one(get_id_query(project_id))
 
     async def get_by_user(self, user_id: str, role: str) -> List[dict]:
         query = {"client_id": user_id} if role == "client" else {"developer_id": user_id}
@@ -22,6 +23,6 @@ class ProjectRepository:
 
     async def update_status(self, project_id: str, status: str) -> bool:
         result = await self.collection.update_one(
-            {"_id": project_id}, {"$set": {"status": status}}
+            get_id_query(project_id), {"$set": {"status": status}}
         )
         return result.modified_count > 0
