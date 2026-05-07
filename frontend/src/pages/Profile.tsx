@@ -298,9 +298,9 @@ export default function Profile() {
           transition={{ delay: 0.15 }}
           className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6"
         >
-          <StatCard label="Repositories" value={githubData?.public_repos || 0} icon={Terminal} color="#6366f1" />
-          <StatCard label="Total Stars" value={githubData?.total_stars || 0} icon={Star} color="#f59e0b" />
-          <StatCard label="Followers" value={githubData?.followers || 0} icon={Users} color="#22c55e" />
+          <StatCard label="Repositories" value={githubData?.public_repos || profile.public_repos || 0} icon={Terminal} color="#6366f1" />
+          <StatCard label="Total Stars" value={githubData?.total_stars || profile.total_stars || 0} icon={Star} color="#f59e0b" />
+          <StatCard label="Followers" value={githubData?.followers || profile.followers || 0} icon={Users} color="#22c55e" />
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-6">

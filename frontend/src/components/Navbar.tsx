@@ -62,9 +62,16 @@ export default function Navbar() {
               <span className="text-lg md:text-xl font-bold flex items-center" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
                 <span className="text-gradient">Hacker</span>
                 <span className="text-white">House</span>
-                <div className="ml-2 flex h-1.5 w-1.5 relative" title={isBackendOnline ? "Backend Online" : "Backend Offline"}>
+                <div className="ml-2 flex h-1.5 w-1.5 relative group/status" 
+                     title={isBackendOnline ? `Backend Online (${finalBaseUrl})` : `Backend Offline (Check VITE_API_URL: ${finalBaseUrl})`}>
                   <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isBackendOnline ? 'bg-green-400' : 'bg-red-400'}`}></span>
                   <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${isBackendOnline ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                  
+                  {/* Tooltip for debugging */}
+                  <div className="absolute top-4 left-0 glass p-2 rounded-lg text-[10px] text-white opacity-0 group-hover/status:opacity-100 whitespace-nowrap pointer-events-none transition-opacity z-50">
+                    {isBackendOnline ? "✓ Connected" : "✗ Connection Error"} <br/>
+                    {finalBaseUrl}
+                  </div>
                 </div>
               </span>
             </Link>
