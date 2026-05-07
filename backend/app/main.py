@@ -40,9 +40,8 @@ app.include_router(github_routes.router, prefix=f"{settings.API_V1_STR}/github",
 app.include_router(linkedin_routes.router, prefix=f"{settings.API_V1_STR}/linkedin", tags=["LinkedIn"])
 app.include_router(chat_routes.router, prefix=f"{settings.API_V1_STR}/chat", tags=["Chat"])
 
-@app.get("/")
+@app.get("/", methods=["GET", "HEAD"])
 async def root():
-    db = connect_to_mongo # not needed, just checking if initialized
     from .core.database import db_connection
     db_status = "connected" if db_connection.db is not None else "disconnected"
     return {
@@ -51,3 +50,8 @@ async def root():
         "database": db_status,
         "database_name": settings.DATABASE_NAME
     }
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy"}
+
