@@ -6,7 +6,6 @@ import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import { Search, MapPin, Code2, ArrowRight, Star, Users, Zap, Terminal, Globe, MessageCircle, Navigation, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
-import AIAgent from '../components/AIAgent';
 
 
 const HERO_IMAGES = [
@@ -738,7 +737,6 @@ export default function Landing() {
           </motion.div>
         </div>
       </section>
-      <AIAgent />
       {selectedFeature && (
         <DocumentationModal 
           isOpen={isDocModalOpen} 

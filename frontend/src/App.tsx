@@ -10,6 +10,7 @@ import Chat from './pages/Chat';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import LoadingScreen from './components/LoadingScreen';
+import AIAgent from './components/AIAgent';
 import { AnimatePresence } from 'framer-motion';
 
 function App() {
@@ -42,6 +43,7 @@ function App() {
           </Routes>
         </main>
         <Footer />
+        <AIAgent />
       </div>
     </BrowserRouter>
   );

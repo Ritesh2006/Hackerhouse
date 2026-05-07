@@ -1,6 +1,9 @@
+import os
+from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 from typing import List
-import os
+
+load_dotenv()
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "HackerHouse"

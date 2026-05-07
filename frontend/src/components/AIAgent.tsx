@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, User, Sparkles, Loader2 } from 'lucide-react';
-import { API_URL } from '../lib/api';
+import api from '../lib/api';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -29,7 +29,8 @@ const AIAgent = () => {
     e.preventDefault();
     if (!inputValue.trim() || isLoading) return;
 
-    const newMsg: Message = { role: 'user', content: inputValue };
+    const userMessage = inputValue.trim();
+    const newMsg: Message = { role: 'user', content: userMessage };
     const chatHistory = [...messages];
     
     setMessages(prev => [...prev, newMsg]);
@@ -37,25 +38,21 @@ const AIAgent = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/ai/chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          message: newMsg.content,
-          history: chatHistory.map(m => ({ role: m.role, content: m.content }))
-        })
+      // Using axios 'api' instance which already has base URL and auth headers
+      const response = await api.post('/ai/chat', {
+        message: userMessage,
+        history: chatHistory.map(m => ({ role: m.role, content: m.content }))
       });
 
-      if (!response.ok) throw new Error('Failed to get response');
-
-      const data = await response.json();
-      setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
-    } catch (error) {
+      if (response.data && response.data.reply) {
+        setMessages(prev => [...prev, { role: 'assistant', content: response.data.reply }]);
+      } else {
+        throw new Error('Invalid response format');
+      }
+    } catch (error: any) {
       console.error("AI Error:", error);
-      setMessages(prev => [...prev, { role: 'assistant', content: "Sorry, I'm having trouble connecting right now. Please try again later." }]);
+      const errorMsg = error.response?.data?.detail || "Sorry, I'm having trouble connecting right now. Please try again later.";
+      setMessages(prev => [...prev, { role: 'assistant', content: errorMsg }]);
     } finally {
       setIsLoading(false);
     }
