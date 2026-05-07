@@ -17,7 +17,7 @@ async def find_matching_developers(
     location_name: Optional[str] = None,
     max_distance_km: float = 100.0
 ):
-    db = get_database()
+    db = await get_database()
     query = {"role": "developer"}
 
     if skills:
