@@ -14,6 +14,22 @@ export default function Navbar() {
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/chat/global', label: 'Chat', icon: MessageCircle },
   ];
+  
+  const [isBackendOnline, setIsBackendOnline] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const checkHealth = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'}/health`);
+        setIsBackendOnline(res.ok);
+      } catch {
+        setIsBackendOnline(false);
+      }
+    };
+    checkHealth();
+    const interval = setInterval(checkHealth, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const token = localStorage.getItem('token');
   const userId = localStorage.getItem('user_id');
@@ -43,9 +59,13 @@ export default function Navbar() {
                 style={{ background: 'linear-gradient(135deg, #6366f1, #818cf8)' }}>
                 <Code2 size={16} className="text-white" />
               </div>
-              <span className="text-lg md:text-xl font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+              <span className="text-lg md:text-xl font-bold flex items-center" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
                 <span className="text-gradient">Hacker</span>
                 <span className="text-white">House</span>
+                <div className="ml-2 flex h-1.5 w-1.5 relative" title={isBackendOnline ? "Backend Online" : "Backend Offline"}>
+                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isBackendOnline ? 'bg-green-400' : 'bg-red-400'}`}></span>
+                  <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${isBackendOnline ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                </div>
               </span>
             </Link>
 
