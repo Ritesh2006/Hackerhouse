@@ -63,7 +63,7 @@ export default function Navbar() {
         initial={{ y: -80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="fixed top-0 left-0 right-0 z-50"
+        className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm"
       >
         <div className="mx-3 sm:mx-4 mt-3 sm:mt-4">
           <div className="glass rounded-2xl px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex items-center justify-between max-w-7xl mx-auto"
