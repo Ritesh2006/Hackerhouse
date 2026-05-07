@@ -1,6 +1,8 @@
 import httpx
 from app.core.config import settings
 import logging
+from typing import Optional
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +16,10 @@ async def get_linkedin_profile(access_token: str = None):
         logger.warning("No LinkedIn access token available.")
         return None
 
-    async with httpx.AsyncClient() as client:
+    # Use httpx with timeout
+    timeout = httpx.Timeout(5.0, connect=2.0)
+    
+    async with httpx.AsyncClient(timeout=timeout) as client:
         try:
             # LinkedIn UserInfo endpoint for OIDC
             headers = {"Authorization": f"Bearer {token}"}
@@ -30,14 +35,24 @@ async def get_linkedin_profile(access_token: str = None):
                     "email": data.get("email"),
                     "headline": "LinkedIn Verified Developer",
                     "experience": [],
-                    "skills": []
+                    "skills": [],
+                    "is_fallback": False
                 }
             else:
                 logger.error(f"LinkedIn API error: {response.status_code} - {response.text}")
-                return None
+                # Fallback to basic data instead of None
+                return {
+                    "headline": "LinkedIn Profile Unavailable",
+                    "note": "⚡ LinkedIn data temporarily unavailable",
+                    "is_fallback": True
+                }
         except Exception as e:
             logger.error(f"Error fetching LinkedIn profile: {e}")
-            return None
+            return {
+                "headline": "LinkedIn Connection Error",
+                "note": "⚡ Could not connect to LinkedIn",
+                "is_fallback": True
+            }
 
 async def get_linkedin_access_token(code: str, redirect_uri: str):
     """
@@ -52,7 +67,8 @@ async def get_linkedin_access_token(code: str, redirect_uri: str):
         "client_secret": settings.LINKEDIN_CLIENT_SECRET,
     }
     
-    async with httpx.AsyncClient() as client:
+    timeout = httpx.Timeout(10.0, connect=2.0)
+    async with httpx.AsyncClient(timeout=timeout) as client:
         try:
             response = await client.post(url, data=data)
             response.raise_for_status()

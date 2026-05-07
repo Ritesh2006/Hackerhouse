@@ -223,6 +223,15 @@ export default function Profile() {
           className="glass rounded-3xl p-5 sm:p-6 md:p-8 mb-6 relative overflow-hidden"
           style={{ border: '1px solid rgba(255,255,255,0.06)' }}
         >
+          {githubData?.note && (
+            <div className="mb-6 p-4 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl text-indigo-400 text-sm font-medium flex items-center gap-3">
+              <div className="p-2 bg-indigo-500/20 rounded-lg">
+                <Terminal size={16} />
+              </div>
+              {githubData.note}
+            </div>
+          )}
+          
           <div className="absolute top-0 right-0 w-80 h-80 rounded-full blur-3xl pointer-events-none"
             style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.12), transparent)' }} />
 

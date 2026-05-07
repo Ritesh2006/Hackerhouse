@@ -14,6 +14,9 @@ class UserRepository:
     async def get_by_email(self, email: str) -> Optional[dict]:
         return await self.collection.find_one({"email": email})
 
+    async def get_by_username(self, username: str) -> Optional[dict]:
+        return await self.collection.find_one({"username": username})
+
     async def create(self, user_data: dict) -> str:
         if "_id" not in user_data:
             user_data["_id"] = str(ObjectId())
