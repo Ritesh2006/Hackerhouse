@@ -138,7 +138,7 @@ export default function SearchResults() {
   }, [searchParams]);
 
   return (
-    <div className="min-h-screen pt-28 pb-16 px-4" style={{ background: '#030712' }}>
+    <div className="min-h-screen pt-24 sm:pt-28 pb-16 px-4" style={{ background: '#030712' }}>
       <div className="fixed top-32 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full blur-3xl pointer-events-none opacity-10"
         style={{ background: 'radial-gradient(ellipse, #6366f1, transparent)' }} />
 
@@ -151,7 +151,7 @@ export default function SearchResults() {
           </div>
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-white font-display">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white font-display">
                 {loading ? 'Searching...' : `${developers.length} Developers Found`}
               </h1>
               <p className="text-slate-500 mt-1 text-sm md:text-base">Showing top matches for your criteria</p>

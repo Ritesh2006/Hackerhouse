@@ -59,7 +59,7 @@ const AIAgent = () => {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50">
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -67,7 +67,7 @@ const AIAgent = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="absolute bottom-16 right-0 w-[calc(100vw-2rem)] sm:w-96 h-[500px] max-h-[80vh] bg-[#1a1b26] border border-[#2d2e3d] rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+            className="absolute bottom-16 right-0 w-[calc(100vw-2rem)] sm:w-96 h-[480px] sm:h-[500px] max-h-[75vh] bg-[#1a1b26] border border-[#2d2e3d] rounded-2xl shadow-2xl flex flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-[#2d2e3d] bg-gradient-to-r from-[#1f202e] to-[#1a1b26]">

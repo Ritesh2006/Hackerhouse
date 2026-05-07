@@ -16,14 +16,14 @@ function MetricCard({ icon: Icon, label, value, delta, color, bg }: any) {
   return (
     <motion.div variants={itemVariants}
       whileHover={{ y: -4, scale: 1.01 }}
-      className="glass rounded-2xl p-6 relative overflow-hidden cursor-default"
+      className="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 relative overflow-hidden cursor-default"
       style={{ border: '1px solid rgba(255,255,255,0.06)' }}
     >
       <div className="absolute inset-0 pointer-events-none" style={{ background: `radial-gradient(ellipse at top right, ${bg}, transparent 70%)` }} />
       <div className="flex items-start justify-between relative">
         <div>
-          <p className="text-slate-500 text-sm mb-1">{label}</p>
-          <p className="text-3xl font-black text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{value}</p>
+          <p className="text-slate-500 text-xs sm:text-sm mb-1">{label}</p>
+          <p className="text-2xl sm:text-3xl font-black text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{value}</p>
           {delta && (
             <p className="text-xs mt-2 flex items-center gap-1" style={{ color: delta.startsWith('+') ? '#22c55e' : '#f87171' }}>
               <TrendingUp size={11} />
@@ -31,9 +31,9 @@ function MetricCard({ icon: Icon, label, value, delta, color, bg }: any) {
             </p>
           )}
         </div>
-        <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
+        <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0"
           style={{ background: `${color}20`, border: `1px solid ${color}30` }}>
-          <Icon size={20} style={{ color }} />
+          <Icon size={18} style={{ color }} />
         </div>
       </div>
     </motion.div>
@@ -48,7 +48,7 @@ const recentMessages: any[] = [];
 
 export default function Dashboard() {
   return (
-    <div className="min-h-screen pt-24 pb-16 px-4" style={{ background: '#030712' }}>
+    <div className="min-h-screen pt-20 sm:pt-24 pb-16 px-4" style={{ background: '#030712' }}>
       {/* Ambient light */}
       <div className="fixed top-0 left-0 right-0 h-[400px] pointer-events-none"
         style={{ background: 'radial-gradient(ellipse at 70% -10%, rgba(99,102,241,0.08), transparent 60%)' }} />
@@ -74,7 +74,7 @@ export default function Dashboard() {
         {/* Metric Cards */}
         <motion.div
           variants={containerVariants} initial="hidden" animate="visible"
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8"
         >
           <MetricCard icon={Activity} label="Active Projects" value="0" color="#6366f1" bg="rgba(99,102,241,0.08)" />
           <MetricCard icon={MessageSquare} label="Unread Messages" value="0" color="#22c55e" bg="rgba(34,197,94,0.06)" />
@@ -82,7 +82,7 @@ export default function Dashboard() {
           <MetricCard icon={Users} label="Collaborators" value="0" color="#818cf8" bg="rgba(129,140,248,0.06)" />
         </motion.div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Projects */}
           <motion.div
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}

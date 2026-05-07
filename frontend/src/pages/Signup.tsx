@@ -48,7 +48,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-16 px-4 flex items-center justify-center relative overflow-hidden bg-[#030014]">
+    <div className="min-h-screen pt-20 sm:pt-24 pb-16 px-4 flex items-center justify-center relative overflow-hidden bg-[#030014]">
       {/* Background Gradients */}
       <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-500/10 blur-[120px] pointer-events-none" />
@@ -58,7 +58,7 @@ export default function Signup() {
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-lg relative z-10"
       >
-        <div className="glass rounded-[2.5rem] p-8 md:p-10 border border-white/10 shadow-2xl shadow-indigo-500/5">
+        <div className="glass rounded-[1.5rem] sm:rounded-[2.5rem] p-6 sm:p-8 md:p-10 border border-white/10 shadow-2xl shadow-indigo-500/5">
           <div className="text-center mb-8">
             <motion.div 
               initial={{ scale: 0.5, opacity: 0 }}
@@ -71,18 +71,18 @@ export default function Signup() {
             <p className="text-slate-400 text-sm">Find top developers or land your next professional contract</p>
           </div>
 
-          <form onSubmit={handleSignup} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={handleSignup} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {error && (
               <motion.div 
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
-                className="md:col-span-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs text-center font-medium"
+                className="col-span-1 sm:col-span-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs text-center font-medium"
               >
                 {error}
               </motion.div>
             )}
 
-            <div className="space-y-2 md:col-span-2">
+            <div className="space-y-2 col-span-1 sm:col-span-2">
               <label className="text-xs font-semibold text-slate-400 ml-1">Full Name</label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-blue-400 transition-colors">
@@ -99,7 +99,7 @@ export default function Signup() {
               </div>
             </div>
 
-            <div className="space-y-2 md:col-span-2">
+            <div className="space-y-2 col-span-1 sm:col-span-2">
               <label className="text-xs font-semibold text-slate-400 ml-1">Email Address</label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-blue-400 transition-colors">
@@ -153,7 +153,7 @@ export default function Signup() {
             <button 
               type="submit"
               disabled={loading}
-              className="md:col-span-2 btn-primary py-4 rounded-2xl flex items-center justify-center gap-2 font-bold group shadow-lg shadow-indigo-500/20 mt-4"
+              className="col-span-1 sm:col-span-2 btn-primary py-4 rounded-2xl flex items-center justify-center gap-2 font-bold group shadow-lg shadow-indigo-500/20 mt-4"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

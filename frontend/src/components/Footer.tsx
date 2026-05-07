@@ -12,7 +12,7 @@ export default function Footer() {
         style={{ background: 'radial-gradient(circle, #6366f1, transparent)' }} />
 
       <div className="max-w-7xl mx-auto px-4 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10 md:gap-12 mb-12 sm:mb-16">
           {/* Logo & Bio */}
           <div className="col-span-1 md:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-6 group">
@@ -63,15 +63,15 @@ export default function Footer() {
 
           {/* Newsletter */}
           <div>
-            <h4 className="text-white font-bold mb-6" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Newsletter</h4>
+            <h4 className="text-white font-bold mb-4 sm:mb-6" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Newsletter</h4>
             <p className="text-slate-500 text-sm mb-4">Get curated developer opportunities delivered weekly.</p>
             <div className="flex gap-2">
               <input 
                 type="email" 
                 placeholder="email@work.com" 
-                className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-indigo-500/50 flex-1 transition-all"
+                className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-indigo-500/50 flex-1 transition-all min-w-0"
               />
-              <button className="w-10 h-10 rounded-xl bg-indigo-500 flex items-center justify-center text-white hover:bg-indigo-400 transition-colors">
+              <button className="w-10 h-10 shrink-0 rounded-xl bg-indigo-500 flex items-center justify-center text-white hover:bg-indigo-400 transition-colors">
                 <Mail size={18} />
               </button>
             </div>
@@ -79,7 +79,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-10 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="pt-8 sm:pt-10 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 text-center sm:text-left">
           <p className="text-slate-600 text-xs">
             © {currentYear} HackerHouse Inc. All rights reserved. Built with precision for the modern dev.
           </p>

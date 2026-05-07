@@ -205,18 +205,18 @@ export default function Profile() {
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass rounded-3xl p-8 mb-6 relative overflow-hidden"
+          className="glass rounded-3xl p-5 sm:p-6 md:p-8 mb-6 relative overflow-hidden"
           style={{ border: '1px solid rgba(255,255,255,0.06)' }}
         >
           <div className="absolute top-0 right-0 w-80 h-80 rounded-full blur-3xl pointer-events-none"
             style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.12), transparent)' }} />
 
-          <div className="relative flex flex-col md:flex-row gap-8 items-start">
+          <div className="relative flex flex-col sm:flex-row gap-5 sm:gap-8 items-start">
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
-              className={`w-28 h-28 rounded-3xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-4xl font-black shadow-2xl shrink-0 overflow-hidden font-display`}
+              className={`w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-3xl md:text-4xl font-black shadow-2xl shrink-0 overflow-hidden font-display`}
             >
               {profile.avatar_url ? (
                 <img src={profile.avatar_url} alt={profile.name} className="w-full h-full object-cover" />
@@ -225,10 +225,10 @@ export default function Profile() {
               )}
             </motion.div>
 
-            <div className="flex-1 min-w-0">
-              <div className="flex flex-wrap items-start justify-between gap-4 mb-2">
+            <div className="flex-1 min-w-0 w-full">
+              <div className="flex flex-wrap items-start justify-between gap-3 mb-2">
                 <div>
-                  <h1 className="text-4xl font-black text-white font-display">
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white font-display">
                     {profile.name}
                   </h1>
                   <p className="text-indigo-400 font-medium">@{profile.github_username || 'dev'}</p>
@@ -245,15 +245,15 @@ export default function Profile() {
                 )}
               </div>
 
-              <div className="flex flex-wrap gap-4 text-sm text-slate-400 mb-5">
+              <div className="flex flex-wrap gap-3 text-sm text-slate-400 mb-4 sm:mb-5">
                 <span className="flex items-center gap-1.5"><MapPin size={14} className="text-indigo-400" /> {profile.location_name || 'Global'}</span>
                 <span className="flex items-center gap-1.5"><Briefcase size={14} className="text-green-400" /> $95/hr</span>
                 <span className="flex items-center gap-1.5"><Clock size={14} className="text-yellow-400" /> Active now</span>
               </div>
 
-              <p className="text-slate-400 text-sm leading-relaxed mb-6 max-w-2xl">{githubData?.bio || profile.bio || 'Professional Developer and HackerHouse member.'}</p>
+              <p className="text-slate-400 text-sm leading-relaxed mb-5 sm:mb-6 max-w-2xl">{githubData?.bio || profile.bio || 'Professional Developer and HackerHouse member.'}</p>
 
-              <div className="flex flex-wrap gap-2 mb-6">
+              <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-5 sm:mb-6">
                 {profile.skills.map((skill: string) => (
                   <span key={skill} className="px-3 py-1.5 rounded-xl text-xs font-semibold"
                     style={{ background: 'rgba(99,102,241,0.1)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.2)' }}>
@@ -262,12 +262,12 @@ export default function Profile() {
                 ))}
               </div>
 
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-2 sm:gap-3">
                 <motion.button 
                   whileHover={{ scale: 1.03 }} 
                   whileTap={{ scale: 0.97 }}
                   onClick={() => setIsMessageModalOpen(true)}
-                  className="btn-primary flex items-center gap-2"
+                  className="btn-primary flex items-center gap-2 text-sm py-2.5 px-4 sm:px-5"
                 >
                   <MessageCircle size={16} /> Send Real Message
                 </motion.button>
@@ -296,14 +296,14 @@ export default function Profile() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6"
+          className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6"
         >
           <StatCard label="Repositories" value={githubData?.public_repos || profile.public_repos || 0} icon={Terminal} color="#6366f1" />
           <StatCard label="Total Stars" value={githubData?.total_stars || profile.total_stars || 0} icon={Star} color="#f59e0b" />
           <StatCard label="Followers" value={githubData?.followers || profile.followers || 0} icon={Users} color="#22c55e" />
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
             className="glass rounded-2xl p-6" style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
             <h3 className="font-bold text-white mb-4 flex items-center gap-2 font-display">

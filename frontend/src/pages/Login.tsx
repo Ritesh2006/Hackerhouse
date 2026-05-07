@@ -37,7 +37,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-16 px-4 flex items-center justify-center relative overflow-hidden bg-[#030014]">
+    <div className="min-h-screen pt-20 sm:pt-24 pb-16 px-4 flex items-center justify-center relative overflow-hidden bg-[#030014]">
       {/* Background Gradients */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-blue-500/10 blur-[120px] pointer-events-none" />
@@ -47,7 +47,7 @@ export default function Login() {
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md relative z-10"
       >
-        <div className="glass rounded-[2.5rem] p-8 md:p-10 border border-white/10 shadow-2xl shadow-indigo-500/5">
+        <div className="glass rounded-[1.5rem] sm:rounded-[2.5rem] p-6 sm:p-8 md:p-10 border border-white/10 shadow-2xl shadow-indigo-500/5">
           <div className="text-center mb-8">
             <motion.div 
               initial={{ scale: 0.5, opacity: 0 }}

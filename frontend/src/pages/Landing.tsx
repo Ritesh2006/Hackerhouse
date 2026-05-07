@@ -388,12 +388,12 @@ export default function Landing() {
 
       {/* Hero Section */}
       <motion.section ref={heroRef} style={{ opacity: heroOpacity, y: heroY }}
-        className="relative min-h-[90vh] flex items-center pt-32 pb-16 px-4">
+        className="relative min-h-[100svh] sm:min-h-[90vh] flex items-center pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 px-4">
         <div className="max-w-7xl mx-auto w-full">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+          <div className="grid lg:grid-cols-2 gap-6 lg:gap-16 items-center">
 
             {/* Left Content */}
-            <div className="space-y-6 md:space-y-8 order-2 lg:order-1">
+            <div className="space-y-5 md:space-y-8 order-2 lg:order-1">
               {/* Badge */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
@@ -412,7 +412,7 @@ export default function Landing() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 }}
               >
-                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black leading-[1.1] tracking-tight font-display">
+                <h1 className="text-4xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-7xl font-black leading-[1.1] tracking-tight font-display">
                   <span className="text-white block">Find Elite</span>
                   <Typewriter />
                   <span className="text-white block">Near You.</span>
@@ -423,13 +423,13 @@ export default function Landing() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
-                className="text-base md:text-lg text-slate-400 max-w-lg leading-relaxed"
+                className="text-sm sm:text-base md:text-lg text-slate-400 max-w-lg leading-relaxed"
               >
                 HackerHouse uses GitHub intelligence + GPS proximity to match you with top engineers in your city. From discovery to contract — all in one platform.
               </motion.p>
 
               {/* Search bar */}
-              <div className="flex justify-center mb-4">
+              <div className="flex justify-start mb-3">
                 <div className="glass p-1 rounded-xl border border-white/10 flex gap-1">
                   <button onClick={() => setSearchType('skill')} 
                     className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${searchType === 'skill' ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20' : 'text-slate-500 hover:text-white'}`}>
@@ -446,10 +446,10 @@ export default function Landing() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, duration: 0.5 }}
-                className="glass rounded-2xl p-2 md:p-3 flex flex-col md:flex-row gap-2 md:gap-3 max-w-xl"
+                className="glass rounded-2xl p-2 md:p-3 flex flex-col sm:flex-row gap-2 md:gap-3 w-full max-w-xl"
                 style={{ border: '1px solid rgba(99,102,241,0.2)' }}
               >
-                <div className="flex-1 flex items-center gap-2 px-3 py-2 border-b border-white/5 md:border-b-0 relative group">
+                <div className="flex-1 flex items-center gap-2 px-3 py-2 border-b border-white/5 sm:border-b-0 relative group">
                   <MapPin size={16} className={`shrink-0 transition-colors ${isLocating ? 'text-indigo-400 animate-bounce' : 'text-slate-500'}`} />
                   <input
                     type="text"
@@ -503,7 +503,7 @@ export default function Landing() {
                     )}
                   </AnimatePresence>
                 </div>
-                <div className="w-px bg-white/10 hidden md:block" />
+                <div className="w-px bg-white/10 hidden sm:block" />
                 <div className="flex-1 flex items-center gap-2 px-3 py-2">
                   {searchType === 'skill' ? (
                     <>
@@ -531,7 +531,7 @@ export default function Landing() {
                     </>
                   )}
                 </div>
-                <button onClick={handleSearch} className="btn-primary flex items-center justify-center gap-2 whitespace-nowrap py-3 md:py-2 px-6">
+                <button onClick={handleSearch} className="btn-primary flex items-center justify-center gap-2 whitespace-nowrap py-3 px-5 sm:px-6 w-full sm:w-auto">
                   <Search size={16} />
                   <span>Search</span>
                 </button>
@@ -542,7 +542,7 @@ export default function Landing() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, duration: 0.5 }}
-                className="flex flex-wrap gap-3 md:gap-4"
+                className="flex flex-wrap gap-2 sm:gap-3 md:gap-4"
               >
                 <StatBadge icon={Users} value="12K+" label="Developers" delay={0.5} />
                 <StatBadge icon={Star} value="4.9★" label="Avg Rating" delay={0.6} />
@@ -551,7 +551,7 @@ export default function Landing() {
             </div>
 
             {/* Right: Visual */}
-            <div className="order-1 lg:order-2">
+            <div className="order-1 lg:order-2 w-full max-w-sm sm:max-w-md mx-auto lg:max-w-none">
               <HeroVisual />
             </div>
           </div>
@@ -577,21 +577,21 @@ export default function Landing() {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 px-4">
+      <section className="py-16 sm:py-20 md:py-24 px-4">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-10 sm:mb-14 md:mb-16"
           >
-            <h2 className="text-4xl font-bold text-white mb-4 font-display">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 font-display">
               Everything you need to <span className="text-gradient">collaborate</span>
             </h2>
             <p className="text-slate-400 max-w-xl mx-auto">From finding talent to signing contracts and communicating in real-time.</p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
             {[
               {
                 icon: Code2, title: 'GitHub Intelligence', color: '#6366f1',
@@ -644,18 +644,18 @@ export default function Landing() {
       {/* Detailed Info Section */}
       <section className="py-24 px-4 relative overflow-hidden">
         <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               className="space-y-6"
             >
-              <h2 className="text-4xl font-bold text-white leading-tight font-display">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight font-display">
                 Precision Matching.<br />
                 <span className="text-gradient">Local Connection.</span>
               </h2>
-              <p className="text-slate-400 text-lg leading-relaxed">
+              <p className="text-slate-400 text-base md:text-lg leading-relaxed">
                 HackerHouse isn't just another platform; it's a specialized ecosystem for high-performance engineering teams. We bridge the gap between digital expertise and physical proximity, facilitating high-bandwidth collaboration that remote-only environments can't replicate.
               </p>
               
@@ -716,11 +716,11 @@ export default function Landing() {
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="relative rounded-3xl p-12 overflow-hidden"
+            className="relative rounded-3xl p-8 sm:p-10 md:p-12 overflow-hidden text-center"
             style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.15), rgba(34,197,94,0.08))', border: '1px solid rgba(99,102,241,0.2)' }}
           >
             <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(99,102,241,0.2), transparent 70%)' }} />
-            <h2 className="relative text-4xl font-black text-white mb-4 font-display">
+            <h2 className="relative text-2xl sm:text-3xl md:text-4xl font-black text-white mb-4 font-display">
               Ready to find your next<br /><span className="text-gradient">collaborator?</span>
             </h2>
             <p className="relative text-slate-400 mb-8">Join 12,000+ developers already building together on HackerHouse.</p>

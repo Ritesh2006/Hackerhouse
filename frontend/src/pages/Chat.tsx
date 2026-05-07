@@ -146,11 +146,11 @@ export default function Chat() {
       <div className="flex-1 flex flex-col overflow-hidden relative">
         <motion.div
           initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-          className="px-4 md:px-6 py-3 md:py-4 flex items-center justify-between flex-shrink-0"
+          className="px-3 sm:px-4 md:px-6 py-3 md:py-4 flex items-center justify-between flex-shrink-0"
           style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(3,7,18,0.8)', backdropFilter: 'blur(20px)' }}
         >
-          <div className="flex items-center gap-2 md:gap-3">
-            <Link to="/dashboard" className="mr-1 text-slate-400 hover:text-white transition-colors">
+          <div className="flex items-center gap-2 md:gap-3 min-w-0">
+            <Link to="/dashboard" className="mr-0.5 sm:mr-1 text-slate-400 hover:text-white transition-colors shrink-0">
               <ArrowLeft size={18} />
             </Link>
             <div className="min-w-0">
@@ -175,7 +175,7 @@ export default function Chat() {
           </button>
         </motion.div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4">
+        <div className="flex-1 overflow-y-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 space-y-3 sm:space-y-4">
           {messages.map((msg) => (
             <motion.div
               key={msg.id}
@@ -184,7 +184,7 @@ export default function Chat() {
               transition={{ duration: 0.25 }}
               className={`flex items-end gap-2 ${msg.sender === 'me' ? 'justify-end' : 'justify-start'}`}
             >
-              <div className={`max-w-[68%] group`}>
+              <div className={`max-w-[85%] sm:max-w-[75%] group`}>
                 <div
                   className={`px-4 py-3 rounded-2xl text-sm leading-relaxed ${
                     msg.sender === 'me' ? 'text-white rounded-br-md' : 'text-slate-200 rounded-bl-md'
@@ -213,8 +213,8 @@ export default function Chat() {
 
         <motion.div
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-          className="px-6 pb-6 pt-4 flex-shrink-0"
-          style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
+          className="px-3 sm:px-4 md:px-6 pb-4 sm:pb-6 pt-3 sm:pt-4 flex-shrink-0"
+          style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 1.5rem)' }}
         >
           <div className="flex items-center gap-3 glass rounded-2xl px-4 py-2"
             style={{ border: '1px solid rgba(99,102,241,0.15)' }}>
