@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, LayoutDashboard, MessageCircle, Code2, User, Bell, Home, Menu, X } from 'lucide-react';
+import { Search, LayoutDashboard, MessageCircle, User, Bell, Home, Menu, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { finalBaseUrl } from '../lib/api';
 
