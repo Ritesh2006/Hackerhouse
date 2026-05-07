@@ -55,9 +55,8 @@ export default function Navbar() {
             
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3 group">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-primary-light flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform"
-                style={{ background: 'linear-gradient(135deg, #6366f1, #818cf8)' }}>
-                <Code2 size={16} className="text-white" />
+              <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg group-hover:scale-110 transition-transform">
+                <img src="/logo.png" alt="HackerHouse Logo" className="w-full h-full object-cover" />
               </div>
               <span className="text-lg md:text-xl font-bold flex items-center" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
                 <span className="text-gradient">Hacker</span>
