@@ -11,3 +11,4 @@ redis
 websockets
 bcrypt
 groq
+dnspython
