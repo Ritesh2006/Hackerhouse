@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { LayoutDashboard, MessageSquare, FileText, Activity, TrendingUp, Users, ArrowRight, Zap, GitBranch, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import AIAgent from '../components/AIAgent';
 
 const containerVariants = {
   hidden: {},
@@ -237,6 +238,7 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+      <AIAgent />
     </div>
   );
 }

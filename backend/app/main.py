@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .core.config import settings
 from .core.database import connect_to_mongo, close_mongo_connection
-from .routes import auth_routes, user_routes, project_routes, github_routes, linkedin_routes, chat_routes
+from .routes import auth_routes, user_routes, project_routes, github_routes, linkedin_routes, chat_routes, ai_routes
 import logging
 
 # Configure logging
@@ -39,6 +39,7 @@ app.include_router(project_routes.router, prefix=f"{settings.API_V1_STR}/project
 app.include_router(github_routes.router, prefix=f"{settings.API_V1_STR}/github", tags=["GitHub"])
 app.include_router(linkedin_routes.router, prefix=f"{settings.API_V1_STR}/linkedin", tags=["LinkedIn"])
 app.include_router(chat_routes.router, prefix=f"{settings.API_V1_STR}/chat", tags=["Chat"])
+app.include_router(ai_routes.router, prefix=f"{settings.API_V1_STR}/ai", tags=["AI Agent"])
 
 @app.api_route("/", methods=["GET", "HEAD"])
 async def root():
