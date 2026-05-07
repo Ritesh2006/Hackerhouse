@@ -166,7 +166,7 @@ function HeroVisual() {
 }
 
 // Typewriter effect component
-function Typewriter({ text }: { text: string }) {
+function Typewriter() {
   const [displayText, setDisplayText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const [loopNum, setLoopNum] = useState(0);
@@ -415,7 +415,7 @@ export default function Landing() {
               >
                 <h1 className="text-4xl md:text-5xl xl:text-7xl font-black leading-[1.05] tracking-tight font-display">
                   <span className="text-white block">Find Elite</span>
-                  <Typewriter text="Developers" />
+                  <Typewriter />
                   <span className="text-white block">Near You.</span>
                 </h1>
               </motion.div>
