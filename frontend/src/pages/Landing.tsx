@@ -102,7 +102,7 @@ function HeroVisual() {
 
   return (
     <motion.div
-      className="relative w-full max-w-2xl mx-auto aspect-square flex items-center justify-center"
+      className="relative w-full max-w-lg lg:max-w-2xl mx-auto aspect-square flex items-center justify-center scale-75 sm:scale-90 lg:scale-100"
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 1, delay: 0.4, ease: 'easeOut' }}
@@ -133,14 +133,14 @@ function HeroVisual() {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.5 }}
-              className="absolute bottom-10 left-10 glass p-4 rounded-2xl border border-white/10 min-w-[180px]"
+              className="absolute bottom-6 left-6 sm:bottom-10 sm:left-10 glass p-3 sm:p-4 rounded-2xl border border-white/10 min-w-[140px] sm:min-w-[180px]"
             >
               <div className="flex gap-2 mb-2">
                 <div className="w-2 h-2 rounded-full bg-rose-500" />
                 <div className="w-2 h-2 rounded-full bg-amber-500" />
                 <div className="w-2 h-2 rounded-full bg-green-500" />
               </div>
-              <code className="text-xs text-indigo-300 font-mono whitespace-pre">
+              <code className="text-[10px] sm:text-xs text-indigo-300 font-mono whitespace-pre">
                 {HERO_IMAGES[index].code}
               </code>
             </motion.div>
@@ -391,7 +391,7 @@ export default function Landing() {
       <motion.section ref={heroRef} style={{ opacity: heroOpacity, y: heroY }}
         className="relative min-h-[90vh] flex items-center pt-32 pb-16 px-4">
         <div className="max-w-7xl mx-auto w-full">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
 
             {/* Left Content */}
             <div className="space-y-6 md:space-y-8 order-2 lg:order-1">
@@ -413,7 +413,7 @@ export default function Landing() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 }}
               >
-                <h1 className="text-4xl md:text-5xl xl:text-7xl font-black leading-[1.05] tracking-tight font-display">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black leading-[1.1] tracking-tight font-display">
                   <span className="text-white block">Find Elite</span>
                   <Typewriter />
                   <span className="text-white block">Near You.</span>
