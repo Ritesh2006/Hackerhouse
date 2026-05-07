@@ -77,8 +77,9 @@ async def search_github_users(skill: Optional[str] = None, location: Optional[st
     
     async with httpx.AsyncClient(headers=headers) as client:
         try:
-            url = f"{settings.GITHUB_API_URL}/search/users?q={query}&per_page=30"
-            response = await client.get(url)
+            params = {"q": query, "per_page": 30}
+            url = f"{settings.GITHUB_API_URL}/search/users"
+            response = await client.get(url, params=params)
             response.raise_for_status()
             data = response.json()
             
