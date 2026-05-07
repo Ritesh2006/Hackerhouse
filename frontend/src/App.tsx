@@ -1,0 +1,34 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import Landing from './pages/Landing';
+import SearchResults from './pages/SearchResults';
+import Profile from './pages/Profile';
+import Dashboard from './pages/Dashboard';
+import Chat from './pages/Chat';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <div className="min-h-screen flex flex-col" style={{ background: '#030712', color: '#e2e8f0', fontFamily: 'Inter, sans-serif' }}>
+        <Navbar />
+        <main className="flex-1">
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/search" element={<SearchResults />} />
+            <Route path="/profile/:id" element={<Profile />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/chat/:roomId" element={<Chat />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </BrowserRouter>
+  );
+}
+
+export default App;
