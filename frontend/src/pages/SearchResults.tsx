@@ -88,11 +88,11 @@ function DevCard({ dev, index }: { dev: any; index: number }) {
             <div className="flex items-center gap-4 text-xs text-slate-500">
               <div className="flex items-center gap-1.5">
                 <GitBranch size={13} className="text-indigo-400" />
-                <span className="text-slate-300 font-medium">{dev.public_repos || randomInt(5, 45)}</span> repos
+                <span className="text-slate-300 font-medium">{dev.public_repos || 0}</span> repos
               </div>
               <div className="flex items-center gap-1.5">
                 <Star size={13} className="text-yellow-400" />
-                <span className="text-slate-300 font-medium">{dev.total_stars || randomInt(10, 500)}</span> stars
+                <span className="text-slate-300 font-medium">{dev.total_stars || 0}</span> stars
               </div>
             </div>
             <div className="flex items-center gap-1">
@@ -106,9 +106,8 @@ function DevCard({ dev, index }: { dev: any; index: number }) {
   );
 }
 
-function randomInt(min: number, max: number) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
+
+
 
 export default function SearchResults() {
   const [searchParams] = useSearchParams();

@@ -35,8 +35,6 @@ app.add_middleware(RateLimitMiddleware, limit=100, window=60)
 async def startup_event():
     await connect_to_mongo()
     await create_indexes()
-    from app.db.seed import seed_developers
-    await seed_developers()
 
 @app.on_event("shutdown")
 async def shutdown_event():
