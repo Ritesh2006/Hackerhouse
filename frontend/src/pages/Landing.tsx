@@ -544,9 +544,9 @@ export default function Landing() {
                 transition={{ delay: 0.4, duration: 0.5 }}
                 className="flex flex-wrap gap-2 sm:gap-3 md:gap-4"
               >
-                <StatBadge icon={Users} value="12K+" label="Developers" delay={0.5} />
-                <StatBadge icon={Star} value="4.9★" label="Avg Rating" delay={0.6} />
-                <StatBadge icon={Globe} value="48" label="Cities" delay={0.7} />
+                <StatBadge icon={Users} value="New" label="Developers" delay={0.5} />
+                <StatBadge icon={Star} value="Top" label="Verified" delay={0.6} />
+                <StatBadge icon={Globe} value="Global" label="Network" delay={0.7} />
               </motion.div>
             </div>
 
@@ -723,7 +723,7 @@ export default function Landing() {
             <h2 className="relative text-2xl sm:text-3xl md:text-4xl font-black text-white mb-4 font-display">
               Ready to find your next<br /><span className="text-gradient">collaborator?</span>
             </h2>
-            <p className="relative text-slate-400 mb-8">Join 12,000+ developers already building together on HackerHouse.</p>
+            <p className="relative text-slate-400 mb-8">Join the community of elite developers already building together on HackerHouse.</p>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.98 }}
