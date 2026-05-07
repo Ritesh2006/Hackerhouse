@@ -7,7 +7,7 @@ from typing import List, Optional
 
 router = APIRouter()
 
-@router.get("/", response_model=List[UserResponse])
+@router.get("/")
 async def get_users(
     skill: Optional[str] = None,
     name: Optional[str] = None,
@@ -16,13 +16,20 @@ async def get_users(
     lon: Optional[float] = None,
 ):
     skills = [skill] if skill else None
-    return await find_matching_developers(
+    users, is_fallback = await find_matching_developers(
         skills=skills,
         name=name,
         lat=lat,
         lon=lon,
         location_name=location
     )
+    
+    return {
+        "success": True,
+        "count": len(users),
+        "data": users,
+        "is_fallback": is_fallback
+    }
 
 @router.get("/{id}", response_model=UserResponse)
 async def get_user(id: str, db=Depends(get_database)):

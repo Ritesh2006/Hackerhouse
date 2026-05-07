@@ -11,6 +11,8 @@ class UserBase(BaseModel):
     avatar_url: Optional[str] = None
     github_username: Optional[str] = None
     location_name: Optional[str] = None
+    rating: float = 0.0
+    hourly_rate: int = 0
 
 class UserCreate(UserBase):
     password: str
