@@ -29,7 +29,6 @@ export default function Chat() {
   const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
   const socketRef = useRef<WebSocket | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   
@@ -74,7 +73,6 @@ export default function Chat() {
 
       socket.onopen = () => {
         console.log("Connected to Chat Relay");
-        setIsConnected(true);
         fetchHistory();
       };
 
@@ -103,7 +101,6 @@ export default function Chat() {
 
       socket.onclose = () => {
         console.warn("Disconnected from Chat Relay. Reconnecting...");
-        setIsConnected(false);
         reconnectTimeout = setTimeout(connect, 3000);
       };
 
@@ -125,12 +122,9 @@ export default function Chat() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
-  const [isSending, setIsSending] = useState(false);
-
   const handleSend = () => {
     if (!input.trim() || !socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) return;
     
-    setIsSending(true);
     const msg = {
       message: input,
       type: 'text'
@@ -138,7 +132,6 @@ export default function Chat() {
     
     socketRef.current.send(JSON.stringify(msg));
     setInput('');
-    setTimeout(() => setIsSending(false), 500);
   };
 
   const handleTyping = (e: React.ChangeEvent<HTMLInputElement>) => {

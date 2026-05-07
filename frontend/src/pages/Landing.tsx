@@ -193,7 +193,7 @@ export default function Landing() {
   
   const [locationSuggestions, setLocationSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const suggestionTimeout = useRef<NodeJS.Timeout | null>(null);
+  const suggestionTimeout = useRef<any>(null);
 
   const fetchSuggestions = async (query: string) => {
     if (!query || query.length < 3) {

@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -8,10 +9,25 @@ import Dashboard from './pages/Dashboard';
 import Chat from './pages/Chat';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import LoadingScreen from './components/LoadingScreen';
+import { AnimatePresence } from 'framer-motion';
 
 function App() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <BrowserRouter>
+      <AnimatePresence mode="wait">
+        {loading && <LoadingScreen key="loader" />}
+      </AnimatePresence>
+      
       <div className="min-h-screen flex flex-col" style={{ background: '#030712', color: '#e2e8f0', fontFamily: 'Inter, sans-serif' }}>
         <Navbar />
         <main className="flex-1">
