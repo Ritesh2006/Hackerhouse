@@ -1,8 +1,8 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Briefcase, Terminal, Code2, Star, GitBranch, Users, ExternalLink, MessageCircle, ArrowLeft, Clock, Globe, Send, X } from 'lucide-react';
+import { MapPin, Briefcase, Terminal, Code2, Star, GitBranch, Users, ExternalLink, MessageCircle, ArrowLeft, Clock, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { usersApi, githubApi, linkedinApi, chatApi } from '../lib/api';
+import { usersApi, githubApi } from '../lib/api';
 
 function HireModal({ isOpen, onClose, developerName, developerId }: any) {
   const [formData, setFormData] = useState({

@@ -37,7 +37,7 @@ function App() {
             <Route path="/search" element={<SearchResults />} />
             <Route path="/profile/:id" element={<Profile />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/chat/:roomId" element={<Chat />} />
+            <Route path="/chat/:contractId" element={<Chat />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
           </Routes>

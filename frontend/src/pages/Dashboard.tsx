@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { LayoutDashboard, MessageSquare, FileText, Activity, TrendingUp, Users, ArrowRight, Zap, GitBranch, Clock, ExternalLink } from 'lucide-react';
+import { LayoutDashboard, FileText, Activity, TrendingUp, Users, ArrowRight, Zap, ExternalLink } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { usersApi } from '../lib/api';

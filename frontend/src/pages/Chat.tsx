@@ -1,34 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Send, ArrowLeft, Users } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Send, ArrowLeft } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
-
-function TypingIndicator() {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }}
-      className="flex items-end gap-2 justify-start"
-    >
-      <div className="flex items-center gap-1 px-4 py-3 rounded-2xl rounded-bl-md"
-        style={{ background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.15)' }}>
-        {[0, 1, 2].map(i => (
-          <motion.span key={i} className="w-1.5 h-1.5 rounded-full bg-indigo-400"
-            animate={{ y: [0, -5, 0] }}
-            transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
-          />
-        ))}
-      </div>
-    </motion.div>
-  );
-}
 
 // Force reload
 export default function Chat() {
   const { contractId } = useParams();
   const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
   const socketRef = useRef<WebSocket | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const token = localStorage.getItem('token');
