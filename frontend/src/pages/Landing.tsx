@@ -1,7 +1,9 @@
+import React from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
+
 import { Float, MeshDistortMaterial, Sphere, PerspectiveCamera } from '@react-three/drei';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
-import { Search, MapPin, Code2, ArrowRight, Star, Users, Zap, Terminal, Globe, MessageCircle, Navigation } from 'lucide-react';
+import { Search, MapPin, Code2, ArrowRight, Star, Users, Zap, Terminal, Globe, MessageCircle, Navigation, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
 import AIAgent from '../components/AIAgent';
