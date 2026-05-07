@@ -39,6 +39,16 @@ async def startup_event():
 async def shutdown_event():
     await close_mongo_connection()
 
+# Welcome Route
+@app.get("/")
+async def root():
+    return {
+        "message": "Welcome to HackerHouse API",
+        "version": settings.VERSION,
+        "docs": "/docs",
+        "health": "/health"
+    }
+
 # Health Check
 @app.get("/health")
 async def health_check():
