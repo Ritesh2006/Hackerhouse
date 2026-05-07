@@ -296,7 +296,7 @@ export default function Profile() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="grid grid-cols-3 gap-4 mb-6"
+          className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6"
         >
           <StatCard label="Repositories" value={githubData?.public_repos || 0} icon={Terminal} color="#6366f1" />
           <StatCard label="Total Stars" value={githubData?.total_stars || 0} icon={Star} color="#f59e0b" />

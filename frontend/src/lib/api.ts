@@ -1,6 +1,13 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api/v1';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+// Remove trailing slash if present
+const cleanBaseUrl = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
+
+// Handle case where user accidentally included /api/v1 in VITE_API_URL
+export const finalBaseUrl = cleanBaseUrl.endsWith('/api/v1') ? cleanBaseUrl.replace('/api/v1', '') : cleanBaseUrl;
+
+export const API_URL = `${finalBaseUrl}/api/v1`;
 
 const api = axios.create({
   baseURL: API_URL,

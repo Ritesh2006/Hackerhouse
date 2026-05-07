@@ -1,7 +1,8 @@
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, LayoutDashboard, MessageCircle, Code2, User, Bell, Home, Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { finalBaseUrl } from '../lib/api';
 
 export default function Navbar() {
   const location = useLocation();
@@ -20,7 +21,7 @@ export default function Navbar() {
   useEffect(() => {
     const checkHealth = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'}/health`);
+        const res = await fetch(`${finalBaseUrl}/health`);
         setIsBackendOnline(res.ok);
       } catch {
         setIsBackendOnline(false);
