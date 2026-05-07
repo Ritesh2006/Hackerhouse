@@ -74,14 +74,18 @@ const AIAgent = () => {
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-[#2d2e3d] bg-gradient-to-r from-[#1f202e] to-[#1a1b26]">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                  <Bot size={20} className="text-white" />
+                <div className="w-10 h-10 rounded-full p-0.5 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 shadow-lg shadow-indigo-500/20">
+                  <img 
+                    src="/ai_agent_logo.png" 
+                    alt="HackerHouse AI" 
+                    className="w-full h-full rounded-full object-cover bg-[#0f1015]"
+                  />
                 </div>
                 <div>
                   <h3 className="font-semibold text-white flex items-center gap-2">
-                    Llama 3 Agent <Sparkles size={14} className="text-purple-400" />
+                    SoulLink AI <Sparkles size={14} className="text-purple-400" />
                   </h3>
-                  <p className="text-xs text-gray-400">Powered by Groq</p>
+                  <p className="text-[10px] text-gray-400 uppercase tracking-widest font-medium">HackerHouse Production</p>
                 </div>
               </div>
               <button 
@@ -93,27 +97,27 @@ const AIAgent = () => {
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide">
               {messages.map((msg, idx) => (
                 <div 
                   key={idx} 
                   className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
                 >
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden ${
                     msg.role === 'user' 
                       ? 'bg-[#2d2e3d]' 
-                      : 'bg-gradient-to-br from-indigo-500 to-purple-600'
+                      : 'bg-gradient-to-br from-indigo-500 to-purple-600 p-0.5'
                   }`}>
                     {msg.role === 'user' ? (
                       <User size={16} className="text-gray-300" />
                     ) : (
-                      <Bot size={16} className="text-white" />
+                      <img src="/ai_agent_logo.png" className="w-full h-full rounded-full object-cover" />
                     )}
                   </div>
                   <div className={`max-w-[75%] p-3 rounded-2xl ${
                     msg.role === 'user'
-                      ? 'bg-indigo-600 text-white rounded-tr-none'
-                      : 'bg-[#2d2e3d] text-gray-200 rounded-tl-none'
+                      ? 'bg-indigo-600 text-white rounded-tr-none shadow-lg shadow-indigo-900/20'
+                      : 'bg-[#2d2e3d] text-gray-200 rounded-tl-none border border-white/5'
                   }`}>
                     <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                   </div>
@@ -121,12 +125,12 @@ const AIAgent = () => {
               ))}
               {isLoading && (
                 <div className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                    <Bot size={16} className="text-white" />
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 p-0.5 flex items-center justify-center">
+                    <img src="/ai_agent_logo.png" className="w-full h-full rounded-full object-cover" />
                   </div>
-                  <div className="bg-[#2d2e3d] p-3 rounded-2xl rounded-tl-none flex items-center gap-2">
+                  <div className="bg-[#2d2e3d] p-3 rounded-2xl rounded-tl-none flex items-center gap-2 border border-white/5">
                     <Loader2 size={16} className="text-purple-400 animate-spin" />
-                    <span className="text-sm text-gray-400">Thinking...</span>
+                    <span className="text-sm text-gray-400">Connecting to soul...</span>
                   </div>
                 </div>
               )}
@@ -140,13 +144,13 @@ const AIAgent = () => {
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Ask me anything..."
-                  className="w-full bg-[#0f1015] border border-[#2d2e3d] text-white rounded-full py-3 pl-4 pr-12 focus:outline-none focus:border-indigo-500 transition-colors"
+                  placeholder="Tell me your vision..."
+                  className="w-full bg-[#0f1015] border border-[#2d2e3d] text-white rounded-full py-3 pl-4 pr-12 focus:outline-none focus:border-indigo-500 transition-all placeholder:text-gray-600 text-sm"
                 />
                 <button
                   type="submit"
                   disabled={!inputValue.trim() || isLoading}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full bg-indigo-600 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-indigo-700 transition-colors"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-indigo-500/40 transition-all"
                 >
                   <Send size={14} className="ml-0.5" />
                 </button>
@@ -158,11 +162,12 @@ const AIAgent = () => {
 
       {/* Floating Action Button */}
       <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
+        whileHover={{ scale: 1.1, rotate: 5 }}
+        whileTap={{ scale: 0.9 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="w-14 h-14 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg shadow-indigo-500/30 flex items-center justify-center text-white relative group"
+        className="w-16 h-16 rounded-full p-1 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 shadow-2xl shadow-indigo-500/40 flex items-center justify-center text-white relative group overflow-hidden"
       >
+        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
         <AnimatePresence mode="wait">
           {isOpen ? (
             <motion.div
@@ -172,27 +177,35 @@ const AIAgent = () => {
               exit={{ rotate: 90, opacity: 0 }}
               transition={{ duration: 0.15 }}
             >
-              <X size={24} />
+              <X size={28} />
             </motion.div>
           ) : (
             <motion.div
-              key="bot"
-              initial={{ rotate: 90, opacity: 0 }}
-              animate={{ rotate: 0, opacity: 1 }}
-              exit={{ rotate: -90, opacity: 0 }}
-              transition={{ duration: 0.15 }}
+              key="logo"
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              className="w-full h-full rounded-full overflow-hidden"
             >
-              <Bot size={28} />
+              <img 
+                src="/ai_agent_logo.png" 
+                alt="AI Agent" 
+                className="w-full h-full object-cover scale-110"
+              />
             </motion.div>
           )}
         </AnimatePresence>
         
         {/* Pulsing ring when closed */}
         {!isOpen && (
-          <span className="absolute -inset-1 rounded-full border border-indigo-500/50 animate-ping group-hover:hidden" />
+          <>
+            <span className="absolute -inset-2 rounded-full border border-indigo-500/30 animate-ping" />
+            <span className="absolute -inset-4 rounded-full border border-purple-500/10 animate-pulse" />
+          </>
         )}
       </motion.button>
     </div>
+
   );
 };
 
