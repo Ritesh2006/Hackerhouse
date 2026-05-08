@@ -8,6 +8,13 @@ async def create_indexes():
         # Users indexes
         await db.db.users.create_index([("location", "2dsphere")])
         await db.db.users.create_index("skills")
+        
+        # Drop existing email index to update its specification (sparse: true)
+        try:
+            await db.db.users.drop_index("email_1")
+        except Exception:
+            pass # Index might not exist yet
+            
         await db.db.users.create_index("email", unique=True, sparse=True)
         
         # Projects indexes
