@@ -49,9 +49,11 @@ async def get_user(id: str, db=Depends(get_database)):
         gh_data = await get_github_user_data(username)
         
         # Always return a profile for a gh_ ID
+        name = (gh_data.get("name") if gh_data else None) or username
         return {
             "_id": id,
-            "full_name": (gh_data.get("name") if gh_data else None) or username,
+            "name": name,
+            "full_name": name,
             "email": gh_data.get("email") if gh_data else None,
             "role": "developer",
             "skills": gh_data.get("languages", []) if gh_data else [],
@@ -66,6 +68,7 @@ async def get_user(id: str, db=Depends(get_database)):
     if id.startswith("li_"):
         return {
             "_id": id,
+            "name": "LinkedIn Developer",
             "full_name": "LinkedIn Developer",
             "role": "developer",
             "skills": [],

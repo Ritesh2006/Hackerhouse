@@ -243,9 +243,9 @@ export default function Profile() {
               className={`w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-3xl md:text-4xl font-black shadow-2xl shrink-0 overflow-hidden font-display`}
             >
               {profile.avatar_url ? (
-                <img src={profile.avatar_url} alt={profile.name} className="w-full h-full object-cover" />
+                <img src={profile.avatar_url} alt={profile.name || profile.full_name} className="w-full h-full object-cover" />
               ) : (
-                profile.name.charAt(0)
+                (profile.name || profile.full_name || 'U').charAt(0)
               )}
             </motion.div>
 
@@ -253,7 +253,7 @@ export default function Profile() {
               <div className="flex flex-wrap items-start justify-between gap-3 mb-2">
                 <div>
                   <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white font-display">
-                    {profile.name}
+                    {profile.name || profile.full_name}
                   </h1>
                   <p className="text-indigo-400 font-medium">@{profile.github_username || 'dev'}</p>
                 </div>
@@ -272,7 +272,7 @@ export default function Profile() {
               <p className="text-slate-400 text-sm leading-relaxed mb-5 sm:mb-6 max-w-2xl">{githubData?.bio || profile.bio || 'Professional Developer and HackerHouse member.'}</p>
 
               <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-5 sm:mb-6">
-                {profile.skills.map((skill: string) => (
+                {(profile.skills || []).map((skill: string) => (
                   <span key={skill} className="px-3 py-1.5 rounded-xl text-xs font-semibold"
                     style={{ background: 'rgba(99,102,241,0.1)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.2)' }}>
                     {skill}
