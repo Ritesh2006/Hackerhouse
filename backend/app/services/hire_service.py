@@ -45,6 +45,7 @@ class HireService:
                         "created_at": datetime.utcnow(),
                         "is_active": True
                     }
+                    # We can use create directly
                     await self.user_repo.create(developer_data)
                     developer = developer_data
 
@@ -54,39 +55,36 @@ class HireService:
                 detail="Invalid developer ID"
             )
 
-        # 2. Create Project
-        project_data = {
+        # 2. Sequential Creation (IDs are dependent)
+        now = datetime.utcnow()
+        
+        project_id = await self.project_repo.create({
             "title": hire_data.title,
             "description": hire_data.description,
             "budget": hire_data.budget,
             "deadline": hire_data.deadline,
             "client_id": client_id,
-            "developer_id": hire_data.developer_id,
+            "developer_id": developer_id,
             "status": "created",
-            "created_at": datetime.utcnow()
-        }
-        project_id = await self.project_repo.create(project_data)
+            "created_at": now
+        })
 
-        # 3. Create Contract
-        contract_data = {
+        contract_id = await self.contract_repo.create({
             "project_id": project_id,
             "client_id": client_id,
-            "developer_id": hire_data.developer_id,
+            "developer_id": developer_id,
             "budget": hire_data.budget,
             "deadline": hire_data.deadline,
             "status": "pending",
-            "created_at": datetime.utcnow()
-        }
-        contract_id = await self.contract_repo.create(contract_data)
+            "created_at": now
+        })
 
-        # 4. Create Chat Room
-        chat_data = {
+        await self.chat_repo.create({
             "contract_id": contract_id,
-            "participants": [client_id, hire_data.developer_id],
+            "participants": [client_id, developer_id],
             "messages": [],
-            "created_at": datetime.utcnow(),
-            "updated_at": datetime.utcnow()
-        }
-        await self.chat_repo.create(chat_data)
+            "created_at": now,
+            "updated_at": now
+        })
 
         return {"project_id": project_id, "contract_id": contract_id}
