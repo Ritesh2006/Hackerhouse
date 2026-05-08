@@ -8,7 +8,7 @@ async def create_indexes():
         # Users indexes
         await db.db.users.create_index([("location", "2dsphere")])
         await db.db.users.create_index("skills")
-        await db.db.users.create_index("email", unique=True)
+        await db.db.users.create_index("email", unique=True, sparse=True)
         
         # Projects indexes
         await db.db.projects.create_index("client_id")
