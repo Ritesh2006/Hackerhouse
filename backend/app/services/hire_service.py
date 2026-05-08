@@ -47,9 +47,23 @@ class HireService:
                             "created_at": datetime.utcnow(),
                             "is_active": True
                         }
-                        # We can use create directly
                         await self.user_repo.create(developer_data)
                         developer = developer_data
+
+                elif developer_id.startswith("li_"):
+                    # We create a placeholder for LinkedIn virtual users
+                    # Full data can be synced when they login, but for now we need a DB record to hire
+                    developer_data = {
+                        "_id": developer_id,
+                        "name": "LinkedIn Developer",
+                        "role": "developer",
+                        "skills": [],
+                        "bio": "Verified LinkedIn Professional",
+                        "is_active": True,
+                        "created_at": datetime.utcnow()
+                    }
+                    await self.user_repo.create(developer_data)
+                    developer = developer_data
 
             if not developer or developer.get("role") != "developer":
                 logging.error(f"Invalid developer for hire: {developer_id}")
