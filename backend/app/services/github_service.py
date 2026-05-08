@@ -138,45 +138,43 @@ async def search_github_users(skill: Optional[str] = None, location: Optional[st
     if settings.GITHUB_TOKEN:
         headers["Authorization"] = f"token {settings.GITHUB_TOKEN}"
 
-    # Build query
+    async def execute_search(q: str):
+        timeout = httpx.Timeout(10.0, connect=2.0)
+        async with httpx.AsyncClient(headers=headers, timeout=timeout) as client:
+            params = {"q": q, "per_page": 30}
+            response = await client.get(f"{settings.GITHUB_API_URL}/search/users", params=params)
+            if response.status_code == 200:
+                return response.json().get("items", [])[:15]
+            return []
+
+    # 1. Try specific search (Skill + Location)
     query_parts = []
     if skill:
         query_parts.append(skill)
     if location:
-        query_parts.append(f"location:{location}")
+        # Clean location: take only the first part before a comma for better matching
+        clean_loc = location.split(',')[0].strip()
+        query_parts.append(f"location:\"{clean_loc}\"")
     
-    if not query_parts:
-        query_parts.append("type:user")
-        
-    query = "+".join(query_parts)
-    timeout = httpx.Timeout(10.0, connect=2.0)
-    
-    try:
-        async with httpx.AsyncClient(headers=headers, timeout=timeout) as client:
-            params = {"q": query, "per_page": 30}
-            url = f"{settings.GITHUB_API_URL}/search/users"
-            response = await client.get(url, params=params)
-            
-            if response.status_code == 403:
-                logger.error(f"GitHub Search API rate limit exceeded: {response.text}")
-                return []
-                
-            response.raise_for_status()
-            data = response.json()
-            
-            items = data.get("items", [])[:15]
-            
-            # Fetch all profiles concurrently
-            tasks = [get_github_user_data(item["login"]) for item in items]
-            results = await asyncio.gather(*tasks, return_exceptions=True)
-            
-            users = []
-            for res in results:
-                if res and not isinstance(res, Exception):
-                    users.append(res)
-            
-            logger.info(f"GitHub search completed in {time.time() - start_time:.2f}s")
-            return users
-    except Exception as e:
-        logger.error(f"Error searching GitHub users: {e}")
+    query = " ".join(query_parts) if query_parts else "type:user"
+    items = await execute_search(query)
+
+    # 2. Fallback search (Just Skill) if no results found with location
+    if not items and skill and location:
+        logger.info(f"No GitHub results for {query}, falling back to skill only search")
+        items = await execute_search(skill)
+
+    if not items:
         return []
+
+    # Fetch all profiles concurrently
+    tasks = [get_github_user_data(item["login"]) for item in items]
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+    
+    users = []
+    for res in results:
+        if res and not isinstance(res, Exception):
+            users.append(res)
+    
+    logger.info(f"GitHub search completed in {time.time() - start_time:.2f}s, found {len(users)} users")
+    return users
