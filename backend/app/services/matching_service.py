@@ -58,12 +58,12 @@ async def find_matching_developers(
     # Execute searches
     local_users = await search_local(apply_location=True)
     
-    # 2. INTEGRATE REAL GITHUB DATA (Now always active, not just fallback)
+    # 2. INTEGRATE REAL GITHUB DATA
     github_users = []
-    if skills or location_name:
+    if skills or location_name or name:
         try:
             search_skill = skills[0] if skills else None
-            gh_results = await search_github_users(skill=search_skill, location=location_name)
+            gh_results = await search_github_users(skill=search_skill, location=location_name, name=name)
             for gh_user in gh_results:
                 github_users.append({
                     "id": f"gh_{gh_user['username']}",
@@ -73,7 +73,7 @@ async def find_matching_developers(
                     "skills": gh_user.get("languages", []),
                     "bio": gh_user.get("bio"),
                     "location_name": gh_user.get("location") or "GitHub",
-                    "rating": 4.9, # Real GitHub talent
+                    "rating": 4.9,
                     "hourly_rate": 95,
                     "public_repos": gh_user.get("public_repos", 0),
                     "total_stars": gh_user.get("total_stars", 0),
@@ -84,29 +84,57 @@ async def find_matching_developers(
         except Exception as e:
             logger.error(f"GitHub search failed: {e}")
 
-    # Step 3: Local Fallback (Global) if no local users found in location
-    if not local_users and not github_users:
-        logger.info("No location matches found. Expanding to global search.")
+    # 3. INTEGRATE LINKEDIN DATA (Verified Account)
+    linkedin_users = []
+    from app.services.linkedin_service import get_linkedin_profile
+    li_profile = await get_linkedin_profile()
+    if li_profile and not li_profile.get("is_fallback"):
+        li_name = f"{li_profile.get('first_name', '')} {li_profile.get('last_name', '')}".strip()
+        # Add if name matches or no name filter
+        if not name or name.lower() in li_name.lower():
+            linkedin_users.append({
+                "id": f"li_{li_profile['linkedin_id']}",
+                "name": li_name,
+                "linkedin_id": li_profile['linkedin_id'],
+                "avatar_url": li_profile.get("profile_picture"),
+                "bio": li_profile.get("headline"),
+                "skills": li_profile.get("skills", []),
+                "location_name": "LinkedIn Verified",
+                "rating": 5.0,
+                "hourly_rate": 120,
+                "role": "developer",
+                "is_virtual": True,
+                "source": "linkedin"
+            })
+
+    # Step 4: Local Fallback (Global) if no results found
+    if not local_users and not github_users and not linkedin_users:
+        logger.info("No matches found. Expanding search.")
         is_fallback = True
         local_users = await search_local(apply_location=False)
 
-    # 4. Merge and Deduplicate
+    # 5. Merge and Deduplicate
     all_users = []
-    seen_usernames = set()
+    seen_ids = set()
     
-    # Prioritize local users
+    # 1. LinkedIn (Highest Priority)
+    for lu in linkedin_users:
+        all_users.append(lu)
+        seen_ids.add(lu["id"])
+
+    # 2. Local users
     for u in local_users:
-        u["id"] = str(u.pop("_id")) if "_id" in u else u.get("id")
-        gh_username = u.get("github_username")
-        if gh_username:
-            seen_usernames.add(gh_username.lower())
-        all_users.append(u)
+        u_id = str(u.pop("_id")) if "_id" in u else u.get("id")
+        u["id"] = u_id
+        if u_id not in seen_ids:
+            all_users.append(u)
+            seen_ids.add(u_id)
         
-    # Add unique GitHub users
+    # 3. GitHub users
     for gu in github_users:
-        if gu["github_username"].lower() not in seen_usernames:
+        if gu["id"] not in seen_ids:
             all_users.append(gu)
-            seen_usernames.add(gu["github_username"].lower())
+            seen_ids.add(gu["id"])
 
     # Final Processing
     processed_users = []

@@ -129,7 +129,7 @@ async def get_github_user_data(username: str):
             logger.error(f"Unexpected error fetching GitHub data for {username}: {e}")
             return await get_github_fallback(username, "Internal error")
 
-async def search_github_users(skill: Optional[str] = None, location: Optional[str] = None):
+async def search_github_users(skill: Optional[str] = None, location: Optional[str] = None, name: Optional[str] = None):
     start_time = time.time()
     headers = {
         "Accept": "application/vnd.github.v3+json",
@@ -147,22 +147,24 @@ async def search_github_users(skill: Optional[str] = None, location: Optional[st
                 return response.json().get("items", [])[:15]
             return []
 
-    # 1. Try specific search (Skill + Location)
+    # Build query
     query_parts = []
+    if name:
+        # Search in name and username
+        query_parts.append(f"{name} in:name,login")
     if skill:
         query_parts.append(skill)
     if location:
-        # Clean location: take only the first part before a comma for better matching
         clean_loc = location.split(',')[0].strip()
         query_parts.append(f"location:\"{clean_loc}\"")
     
     query = " ".join(query_parts) if query_parts else "type:user"
     items = await execute_search(query)
 
-    # 2. Fallback search (Just Skill) if no results found with location
-    if not items and skill and location:
-        logger.info(f"No GitHub results for {query}, falling back to skill only search")
-        items = await execute_search(skill)
+    # Fallback: if name search with location failed, try name search only
+    if not items and name and location:
+        logger.info(f"Retrying name search without location for {name}")
+        items = await execute_search(f"{name} in:name,login")
 
     if not items:
         return []
