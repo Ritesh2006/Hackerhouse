@@ -20,9 +20,35 @@ class HireService:
         self.user_repo = user_repo
 
     async def hire_developer(self, client_id: str, hire_data: ProjectCreate):
-        # 1. Validate developer
-        developer = await self.user_repo.get_by_id(hire_data.developer_id)
-        if not developer or developer["role"] != "developer":
+        developer_id = hire_data.developer_id
+        
+        # 1. Validate developer (Handle virtual IDs)
+        developer = await self.user_repo.get_by_id(developer_id)
+        
+        if not developer and (developer_id.startswith("gh_") or developer_id.startswith("li_")):
+            # It's a virtual user not yet in our DB, create them
+            if developer_id.startswith("gh_"):
+                from app.services.github_service import get_github_user_data
+                username = developer_id.replace("gh_", "")
+                gh_data = await get_github_user_data(username)
+                if gh_data:
+                    developer_data = {
+                        "_id": developer_id,
+                        "name": gh_data.get("name") or username,
+                        "email": gh_data.get("email"),
+                        "role": "developer",
+                        "skills": gh_data.get("languages", []),
+                        "bio": gh_data.get("bio"),
+                        "avatar_url": gh_data.get("avatar_url"),
+                        "github_username": username,
+                        "location_name": gh_data.get("location"),
+                        "created_at": datetime.utcnow(),
+                        "is_active": True
+                    }
+                    await self.user_repo.create(developer_data)
+                    developer = developer_data
+
+        if not developer or developer.get("role") != "developer":
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid developer ID"
