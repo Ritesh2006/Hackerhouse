@@ -34,49 +34,59 @@ async def get_users(
 
 @router.get("/{id}", response_model=UserResponse)
 async def get_user(id: str, db=Depends(get_database)):
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.info(f"🔍 Fetching profile for ID: {id}")
+    
     user_repo = UserRepository(db)
     user = await user_repo.get_by_id(id)
     
     if user:
+        # Standardize for frontend consistency
+        if "name" not in user and "full_name" in user:
+            user["name"] = user["full_name"]
         return user
 
     # Handle Virtual Users (GitHub/LinkedIn) if not in database
     from datetime import datetime
     
-    if id.startswith("gh_"):
-        from app.services.github_service import get_github_user_data
-        username = id.replace("gh_", "")
-        gh_data = await get_github_user_data(username)
+    if id.startswith("gh_") or id.startswith("li_"):
+        logger.info(f"🏗️ Generating virtual profile for {id}")
         
-        # Always return a profile for a gh_ ID
-        name = (gh_data.get("name") if gh_data else None) or username
-        return {
-            "_id": id,
-            "name": name,
-            "full_name": name,
-            "email": gh_data.get("email") if gh_data else None,
-            "role": "developer",
-            "skills": gh_data.get("languages", []) if gh_data else [],
-            "bio": (gh_data.get("bio") if gh_data else None) or f"GitHub developer ({username})",
-            "avatar_url": gh_data.get("avatar_url") if gh_data else None,
-            "github_username": username,
-            "location_name": gh_data.get("location") if gh_data else "Global",
-            "is_active": True,
-            "created_at": datetime.utcnow()
-        }
+        if id.startswith("gh_"):
+            from app.services.github_service import get_github_user_data
+            username = id.replace("gh_", "")
+            gh_data = await get_github_user_data(username)
+            
+            name = (gh_data.get("name") if gh_data else None) or username
+            return {
+                "_id": id,
+                "name": name,
+                "full_name": name,
+                "email": gh_data.get("email") if gh_data else None,
+                "role": "developer",
+                "skills": gh_data.get("languages", []) if gh_data else [],
+                "bio": (gh_data.get("bio") if gh_data else None) or f"External GitHub Developer ({username})",
+                "avatar_url": gh_data.get("avatar_url") if gh_data else None,
+                "github_username": username,
+                "location_name": gh_data.get("location") if gh_data else "Global",
+                "is_active": True,
+                "created_at": datetime.utcnow()
+            }
+        
+        if id.startswith("li_"):
+            return {
+                "_id": id,
+                "name": "LinkedIn Developer",
+                "full_name": "LinkedIn Developer",
+                "role": "developer",
+                "skills": [],
+                "bio": "Verified LinkedIn Professional Profile",
+                "is_active": True,
+                "created_at": datetime.utcnow()
+            }
 
-    if id.startswith("li_"):
-        return {
-            "_id": id,
-            "name": "LinkedIn Developer",
-            "full_name": "LinkedIn Developer",
-            "role": "developer",
-            "skills": [],
-            "bio": "Verified LinkedIn Professional",
-            "is_active": True,
-            "created_at": datetime.utcnow()
-        }
-
+    logger.warning(f"❌ User not found in DB or Virtual Registry: {id}")
     raise HTTPException(status_code=404, detail="User not found")
 
 @router.post("/link-github")
