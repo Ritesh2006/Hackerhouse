@@ -9,6 +9,11 @@ export const finalBaseUrl = cleanBaseUrl.endsWith('/api/v1') ? cleanBaseUrl.repl
 
 export const API_URL = `${finalBaseUrl}/api/v1`;
 
+console.log("🚀 HackerHouse API Initialized at:", API_URL);
+if (finalBaseUrl.includes('127.0.0.1') || finalBaseUrl.includes('localhost')) {
+  console.warn("⚠️ Warning: Frontend is connecting to LOCAL backend. If this is production, please set VITE_API_URL in your environment.");
+}
+
 const api = axios.create({
   baseURL: API_URL,
 });
