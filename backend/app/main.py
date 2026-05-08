@@ -21,14 +21,8 @@ app = FastAPI(
 # CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://hackerhouse-eta.vercel.app",
-        "https://hackerhouse-pro.vercel.app",
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-    ],
-    allow_origin_regex="https://hackerhouse-.*\.vercel\.app", # Support all Vercel previews
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False, # Essential for allow_origins=["*"]
     allow_methods=["*"],
     allow_headers=["*"],
 )

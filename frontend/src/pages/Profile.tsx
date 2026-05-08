@@ -29,21 +29,35 @@ function HireModal({ isOpen, onClose, developerName, developerId }: any) {
     
     setSending(true);
     try {
-      const response = await usersApi.hireDeveloper({
-        developer_id: developerId,
-        title: formData.title,
-        description: formData.description,
-        budget: parseFloat(formData.budget),
-        deadline: new Date(formData.deadline).toISOString()
-      });
+        // Safely handle date parsing
+        let isoDeadline;
+        try {
+          const dateObj = new Date(formData.deadline);
+          if (isNaN(dateObj.getTime())) throw new Error("Invalid date");
+          isoDeadline = dateObj.toISOString();
+        } catch (e) {
+          alert("Invalid deadline date format. Please use YYYY-MM-DD.");
+          setSending(false);
+          return;
+        }
+
+        const response = await usersApi.hireDeveloper({
+          developer_id: developerId,
+          title: formData.title,
+          description: formData.description,
+          budget: parseFloat(formData.budget),
+          deadline: isoDeadline
+        });
       
       const { contract_id } = response.data;
       alert("Hiring request sent successfully!");
       onClose();
       navigate(`/chat/${contract_id}`);
     } catch (err: any) {
-      console.error("Failed to hire developer:", err);
-      alert(`Failed: ${err?.response?.data?.detail || err.message}`);
+      console.error("Hire Error Details:", err);
+      const serverDetail = err.response?.data?.detail;
+      const errorMessage = serverDetail || err.message || "Network Error";
+      alert(`Failed: ${errorMessage}`);
     } finally {
       setSending(false);
     }
