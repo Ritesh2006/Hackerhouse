@@ -57,10 +57,7 @@ async def find_matching_developers(
 
     # Execute searches
     local_users = await search_local(apply_location=True)
-    if not local_users:
-        is_fallback = True
-        local_users = await search_local(apply_location=False)
-
+    
     # 2. INTEGRATE REAL GITHUB DATA (Now always active, not just fallback)
     github_users = []
     if skills or location_name:
@@ -87,11 +84,17 @@ async def find_matching_developers(
         except Exception as e:
             logger.error(f"GitHub search failed: {e}")
 
-    # 3. Merge and Deduplicate
+    # Step 3: Local Fallback (Global) if no local users found in location
+    if not local_users and not github_users:
+        logger.info("No location matches found. Expanding to global search.")
+        is_fallback = True
+        local_users = await search_local(apply_location=False)
+
+    # 4. Merge and Deduplicate
     all_users = []
     seen_usernames = set()
     
-    # Prioritize local users (who might have already linked GitHub)
+    # Prioritize local users
     for u in local_users:
         u["id"] = str(u.pop("_id")) if "_id" in u else u.get("id")
         gh_username = u.get("github_username")
@@ -105,18 +108,25 @@ async def find_matching_developers(
             all_users.append(gu)
             seen_usernames.add(gu["github_username"].lower())
 
-    # 4. Final Processing
+    # Final Processing
     processed_users = []
     for user in all_users:
-        # Distance calculation
         if lat is not None and lon is not None and user.get("location"):
             u_lon, u_lat = user["location"]["coordinates"]
             user["distance_km"] = haversine_distance(lat, lon, u_lat, u_lon)
         else:
             user["distance_km"] = None
-            
         processed_users.append(user)
 
-    logger.info(f"Merged search results: {len(processed_users)}, GitHub source: {len(github_users)}")
+    # Only show fallback warning if we really didn't find anyone in the location
+    is_fallback = (len(processed_users) > 0 and len(local_users) > 0 and not any("distance_km" in u and u["distance_km"] is not None for u in local_users)) if location_name or lat else False
+    
+    # Simplified is_fallback: True only if we had to find users outside the specified location
+    if (location_name or lat) and not any(u.get("location_name") and (location_name.lower() in u["location_name"].lower()) for u in processed_users):
+        is_fallback = True
+    else:
+        is_fallback = False
+
+    logger.info(f"Merged search results: {len(processed_users)}, is_fallback: {is_fallback}")
     return processed_users[:40], is_fallback
 
