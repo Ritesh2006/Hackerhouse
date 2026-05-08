@@ -17,9 +17,10 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Shorter initial delay for better perceived performance
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 1200);
     return () => clearTimeout(timer);
   }, []);
 
