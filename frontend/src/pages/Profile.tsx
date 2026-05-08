@@ -15,6 +15,13 @@ function HireModal({ isOpen, onClose, developerName, developerId }: any) {
   const navigate = useNavigate();
 
   const handleHire = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        alert("Session missing. Please login to hire developers.");
+        navigate('/login');
+        return;
+    }
+
     if (!formData.title || !formData.description || !formData.budget || !formData.deadline) {
       alert("Please fill all fields");
       return;
