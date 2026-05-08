@@ -37,32 +37,44 @@ async def get_user(id: str, db=Depends(get_database)):
     user_repo = UserRepository(db)
     user = await user_repo.get_by_id(id)
     
-    # Handle GitHub virtual users
-    if not user and id.startswith("gh_"):
+    if user:
+        return user
+
+    # Handle Virtual Users (GitHub/LinkedIn) if not in database
+    from datetime import datetime
+    
+    if id.startswith("gh_"):
         from app.services.github_service import get_github_user_data
-        from datetime import datetime
-        
         username = id.replace("gh_", "")
         gh_data = await get_github_user_data(username)
         
-        if gh_data:
-            return {
-                "_id": id,
-                "full_name": gh_data.get("name") or gh_data.get("username"),
-                "email": gh_data.get("email"),
-                "role": "developer",
-                "skills": gh_data.get("languages", []),
-                "bio": gh_data.get("bio"),
-                "avatar_url": gh_data.get("avatar_url"),
-                "github_username": gh_data.get("username"),
-                "location_name": gh_data.get("location"),
-                "is_active": True,
-                "created_at": datetime.utcnow()
-            }
+        # Always return a profile for a gh_ ID
+        return {
+            "_id": id,
+            "full_name": (gh_data.get("name") if gh_data else None) or username,
+            "email": gh_data.get("email") if gh_data else None,
+            "role": "developer",
+            "skills": gh_data.get("languages", []) if gh_data else [],
+            "bio": (gh_data.get("bio") if gh_data else None) or f"GitHub developer ({username})",
+            "avatar_url": gh_data.get("avatar_url") if gh_data else None,
+            "github_username": username,
+            "location_name": gh_data.get("location") if gh_data else "Global",
+            "is_active": True,
+            "created_at": datetime.utcnow()
+        }
 
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user
+    if id.startswith("li_"):
+        return {
+            "_id": id,
+            "full_name": "LinkedIn Developer",
+            "role": "developer",
+            "skills": [],
+            "bio": "Verified LinkedIn Professional",
+            "is_active": True,
+            "created_at": datetime.utcnow()
+        }
+
+    raise HTTPException(status_code=404, detail="User not found")
 
 @router.post("/link-github")
 async def link_github(username: str, current_user = Depends(get_current_user), db = Depends(get_database)):
