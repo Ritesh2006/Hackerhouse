@@ -4,6 +4,7 @@ from app.repositories.user_repo import UserRepository
 from app.schemas.user import UserResponse
 from app.services.matching_service import find_matching_developers
 from typing import List, Optional
+from app.deps.auth_dep import get_current_user
 
 router = APIRouter()
 
