@@ -301,6 +301,26 @@ export default function Profile() {
                     </motion.button>
                 )}
                 
+                {!profile.github_username && (
+                  <motion.button 
+                    whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                    onClick={() => alert("Redirecting to GitHub OAuth...")}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-slate-800 text-white border border-white/10 hover:border-indigo-500/30 transition-all"
+                  >
+                    <GitBranch size={16} /> Connect GitHub
+                  </motion.button>
+                )}
+
+                {!profile.linkedin_id && (
+                  <motion.button 
+                    whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                    onClick={() => alert("Redirecting to LinkedIn OAuth...")}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-[#0077b5] text-white border border-white/10 hover:opacity-90 transition-all"
+                  >
+                    <ExternalLink size={16} /> Connect LinkedIn
+                  </motion.button>
+                )}
+
                 {profile.github_username && (
                   <a href={`https://github.com/${profile.github_username}`} target="_blank" rel="noreferrer">
                     <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}

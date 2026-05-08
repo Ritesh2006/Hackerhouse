@@ -21,11 +21,10 @@ async def find_matching_developers(
     
     logger.info(f"Incoming search params: skills={skills}, location={location_name}, lat={lat}, lon={lon}")
 
-    # Helper function for primary search
-    async def search(apply_location=True):
+    # 1. Search Local Database
+    async def search_local(apply_location=True):
         query = {"role": "developer"}
         
-        # 1. Skill Match Improvement: lowercase and partial matching
         if skills:
             skill_queries = []
             for s in skills:
@@ -36,7 +35,6 @@ async def find_matching_developers(
         if name:
             query["name"] = {"$regex": name, "$options": "i"}
 
-        # 2. Location Filtering
         if apply_location:
             if lat is not None and lon is not None:
                 query["location"] = {
@@ -45,7 +43,7 @@ async def find_matching_developers(
                             "type": "Point",
                             "coordinates": [lon, lat]
                         },
-                        "$maxDistance": max_distance_km * 1000 # convert to meters
+                        "$maxDistance": max_distance_km * 1000
                     }
                 }
             elif location_name:
@@ -55,69 +53,62 @@ async def find_matching_developers(
         if not apply_location:
             cursor = cursor.sort("rating", -1)
             
-        return await cursor.to_list(length=50)
+        return await cursor.to_list(length=30)
 
-    # Step 1: Primary Search (Skills + Location)
-    users = await search(apply_location=True)
-    
-    # Step 2: Fallback System
-    if not users:
-        logger.info("Fallback Level 1: Global Skill Search")
+    # Execute searches
+    local_users = await search_local(apply_location=True)
+    if not local_users:
         is_fallback = True
-        users = await search(apply_location=False)
-        
-    if not users:
-        logger.info("Fallback Level 2: Top Rated Developers")
-        is_fallback = True
-        cursor = db.users.find({"role": "developer"}).sort("rating", -1).limit(20)
-        users = await cursor.to_list(length=20)
+        local_users = await search_local(apply_location=False)
 
-    # Step 3: Fallback Level 3 - GitHub Search Integration (CRITICAL)
-    # If we still have very few results, supplement with GitHub users
-    if len(users) < 3 and skills:
-        logger.info(f"Fallback Level 3: Fetching from GitHub for skill '{skills[0]}'")
-        is_fallback = True
+    # 2. INTEGRATE REAL GITHUB DATA (Now always active, not just fallback)
+    github_users = []
+    if skills or location_name:
         try:
-            gh_users = await search_github_users(skill=skills[0], location=location_name)
-            for gh_user in gh_users:
-                # Map GitHub user to our internal format with a virtual ID
-                virtual_id = f"gh_{gh_user['username']}"
-                
-                # Check if this user already exists in our results (by github_username)
-                if any(u.get("github_username") == gh_user["username"] for u in users):
-                    continue
-                
-                users.append({
-                    "id": virtual_id,
+            search_skill = skills[0] if skills else None
+            gh_results = await search_github_users(skill=search_skill, location=location_name)
+            for gh_user in gh_results:
+                github_users.append({
+                    "id": f"gh_{gh_user['username']}",
                     "name": gh_user.get("name") or gh_user["username"],
-                    "full_name": gh_user.get("name") or gh_user["username"],
                     "github_username": gh_user["username"],
                     "avatar_url": gh_user.get("avatar_url"),
                     "skills": gh_user.get("languages", []),
                     "bio": gh_user.get("bio"),
                     "location_name": gh_user.get("location") or "GitHub",
-                    "rating": 4.8, # Default high rating for GitHub talent
-                    "hourly_rate": 85,
+                    "rating": 4.9, # Real GitHub talent
+                    "hourly_rate": 95,
                     "public_repos": gh_user.get("public_repos", 0),
                     "total_stars": gh_user.get("total_stars", 0),
                     "role": "developer",
-                    "is_virtual": True
+                    "is_virtual": True,
+                    "source": "github"
                 })
         except Exception as e:
-            logger.error(f"GitHub fallback search failed: {e}")
+            logger.error(f"GitHub search failed: {e}")
 
-    # Final processing: Ensure ID field is consistent
-    processed_users = []
-    for user in users:
-        # Convert _id to id for MongoDB results
-        if "_id" in user:
-            user["id"] = str(user.pop("_id"))
+    # 3. Merge and Deduplicate
+    all_users = []
+    seen_usernames = set()
+    
+    # Prioritize local users (who might have already linked GitHub)
+    for u in local_users:
+        u["id"] = str(u.pop("_id")) if "_id" in u else u.get("id")
+        gh_username = u.get("github_username")
+        if gh_username:
+            seen_usernames.add(gh_username.lower())
+        all_users.append(u)
         
-        # Ensure id exists (should already be there for virtual users)
-        if "id" not in user:
-            user["id"] = f"user_{uuid.uuid4().hex[:8]}"
+    # Add unique GitHub users
+    for gu in github_users:
+        if gu["github_username"].lower() not in seen_usernames:
+            all_users.append(gu)
+            seen_usernames.add(gu["github_username"].lower())
 
-        # Calculate distance if coordinates are available
+    # 4. Final Processing
+    processed_users = []
+    for user in all_users:
+        # Distance calculation
         if lat is not None and lon is not None and user.get("location"):
             u_lon, u_lat = user["location"]["coordinates"]
             user["distance_km"] = haversine_distance(lat, lon, u_lat, u_lon)
@@ -126,5 +117,6 @@ async def find_matching_developers(
             
         processed_users.append(user)
 
-    logger.info(f"Final response count: {len(processed_users)}, is_fallback: {is_fallback}")
-    return processed_users, is_fallback
+    logger.info(f"Merged search results: {len(processed_users)}, GitHub source: {len(github_users)}")
+    return processed_users[:40], is_fallback
+

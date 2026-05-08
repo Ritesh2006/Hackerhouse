@@ -62,3 +62,15 @@ async def get_user(id: str, db=Depends(get_database)):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
+@router.post("/link-github")
+async def link_github(username: str, current_user = Depends(get_current_user), db = Depends(get_database)):
+    user_repo = UserRepository(db)
+    await user_repo.update(current_user["_id"], {"github_username": username})
+    return {"status": "success", "github_username": username}
+
+@router.post("/link-linkedin")
+async def link_linkedin(linkedin_id: str, current_user = Depends(get_current_user), db = Depends(get_database)):
+    user_repo = UserRepository(db)
+    await user_repo.update(current_user["_id"], {"linkedin_id": linkedin_id})
+    return {"status": "success", "linkedin_id": linkedin_id}

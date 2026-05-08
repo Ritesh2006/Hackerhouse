@@ -50,10 +50,16 @@ function DevCard({ dev, index }: { dev: any; index: number }) {
                 <h3 className="font-bold text-white text-lg flex items-center gap-2 font-display">
                   {dev.name}
                 </h3>
-                <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2">
                   <p className="text-indigo-400 text-sm">@{dev.github_username || 'dev'}</p>
                   <span className="text-slate-600">·</span>
-                  <div className="flex items-center gap-1 text-yellow-400 text-xs">
+                  {dev.source === 'github' && (
+                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-800 border border-white/10 text-[10px] text-slate-300">
+                      <GitBranch size={10} />
+                      <span>GitHub</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-1 text-yellow-400 text-xs ml-auto">
                     <Star size={10} fill="currentColor" />
                     <span className="font-bold">{dev.rating || '4.5'}</span>
                   </div>
