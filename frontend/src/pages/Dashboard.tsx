@@ -3,7 +3,6 @@ import { LayoutDashboard, FileText, Activity, TrendingUp, Users, ArrowRight, Zap
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { usersApi } from '../lib/api';
-import AIAgent from '../components/AIAgent';
 
 const containerVariants = {
   hidden: {},
@@ -89,7 +88,7 @@ export default function Dashboard() {
             <div>
               <p className="text-slate-500 text-sm mb-1">Welcome back,</p>
               <h1 className="text-2xl md:text-3xl font-black text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                Good evening, <span className="text-gradient">{user?.full_name?.split(' ')[0] || 'Member'}</span> 👋
+              Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}, <span className="text-gradient">{user?.name?.split(' ')[0] || user?.full_name?.split(' ')[0] || 'Member'}</span> 👋
               </h1>
             </div>
             <Link to="/search" className="w-full sm:w-auto">
@@ -195,7 +194,7 @@ export default function Dashboard() {
           </div>
         )}
       </div>
-      <AIAgent />
+
     </div>
   );
 }

@@ -47,4 +47,9 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db=Depends(get
 
 @router.get("/me", response_model=UserResponse)
 async def get_me(current_user=Depends(get_current_user)):
+    # Ensure name fields are synced
+    if "name" not in current_user and "full_name" in current_user:
+        current_user["name"] = current_user["full_name"]
+    elif "full_name" not in current_user and "name" in current_user:
+        current_user["full_name"] = current_user["name"]
     return current_user

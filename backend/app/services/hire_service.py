@@ -4,7 +4,7 @@ from app.repositories.chat_repo import ChatRepository
 from app.repositories.user_repo import UserRepository
 from app.schemas.project import ProjectCreate
 from fastapi import HTTPException, status
-from datetime import datetime
+from datetime import datetime, UTC
 import logging
 
 class HireService:
@@ -45,7 +45,7 @@ class HireService:
                             "avatar_url": gh_data.get("avatar_url"),
                             "github_username": username,
                             "location_name": gh_data.get("location"),
-                            "created_at": datetime.utcnow(),
+                            "created_at": datetime.now(UTC),
                             "is_active": True
                         }
                         await self.user_repo.create(developer_data)
@@ -66,7 +66,7 @@ class HireService:
                         "bio": li_profile.get("headline", "Verified LinkedIn Professional Profile") if li_profile else "Verified LinkedIn Professional Profile",
                         "avatar_url": li_profile.get("profile_picture") if li_profile else None,
                         "is_active": True,
-                        "created_at": datetime.utcnow()
+                        "created_at": datetime.now(UTC)
                     }
                     await self.user_repo.create(developer_data)
                     developer = developer_data
@@ -79,7 +79,7 @@ class HireService:
                 )
 
             # 2. Sequential Creation (IDs are dependent)
-            now = datetime.utcnow()
+            now = datetime.now(UTC)
             
             project_id = await self.project_repo.create({
                 "title": hire_data.title,

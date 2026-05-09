@@ -1,5 +1,5 @@
 from app.repositories.chat_repo import ChatRepository
-from datetime import datetime
+from datetime import datetime, UTC
 
 class ChatService:
     def __init__(self, chat_repo: ChatRepository):
@@ -12,7 +12,7 @@ class ChatService:
         message = {
             "sender_id": sender_id,
             "text": text,
-            "timestamp": datetime.utcnow()
+            "timestamp": datetime.now(UTC)
         }
         await self.chat_repo.add_message(chat_id, message)
         return message

@@ -9,14 +9,17 @@ export default function Chat() {
   const { contractId } = useParams();
   const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState('');
+  const [wsStatus, setWsStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
   const socketRef = useRef<WebSocket | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const reconnectCountRef = useRef(0);
   const token = localStorage.getItem('token');
   const userId = localStorage.getItem('user_id');
   
   useEffect(() => {
     const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1').replace('/api/v1', '');
-    const WS_URL = API_URL.replace('http', 'ws');
+    // Properly convert http(s) to ws(s)
+    const WS_URL = API_URL.replace(/^https/, 'wss').replace(/^http/, 'ws');
 
     const fetchHistory = async () => {
       try {
@@ -42,12 +45,24 @@ export default function Chat() {
     let reconnectTimeout: any;
 
     const connect = () => {
-      if (!token) return;
+      if (!token || !contractId) return;
+      
+      // Don't reconnect endlessly
+      if (reconnectCountRef.current > 5) {
+        console.warn("Max reconnect attempts reached");
+        setWsStatus('disconnected');
+        return;
+      }
+      
+      setWsStatus('connecting');
+      console.log(`Connecting WebSocket to: ${WS_URL}/ws/chat/${contractId}`);
       socket = new WebSocket(`${WS_URL}/ws/chat/${contractId}?token=${token}`);
       socketRef.current = socket;
 
       socket.onopen = () => {
         console.log("Connected to Chat WebSocket");
+        setWsStatus('connected');
+        reconnectCountRef.current = 0;
         fetchHistory();
       };
 
@@ -66,19 +81,23 @@ export default function Chat() {
       };
 
       socket.onclose = () => {
-        console.warn("WebSocket disconnected. Reconnecting...");
-        reconnectTimeout = setTimeout(connect, 3000);
+        setWsStatus('disconnected');
+        reconnectCountRef.current += 1;
+        reconnectTimeout = setTimeout(connect, 3000 * Math.min(reconnectCountRef.current, 5));
       };
 
-      socket.onerror = (err) => {
-        console.error("WebSocket Error:", err);
+      socket.onerror = () => {
+        setWsStatus('disconnected');
         socket.close();
       };
     };
 
+    // Fetch history even if websocket fails (REST fallback)
+    fetchHistory();
     connect();
 
     return () => {
+      reconnectCountRef.current = 99; // prevent reconnect in cleanup
       if (socket) socket.close();
       if (reconnectTimeout) clearTimeout(reconnectTimeout);
     };
@@ -113,8 +132,9 @@ export default function Chat() {
             </Link>
             <div className="min-w-0">
               <h3 className="font-bold text-white text-xs md:text-sm truncate" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>HackerHouse Project Workspace</h3>
-              <p className="text-[10px] md:text-xs text-indigo-400 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" /> Active Contract Room
+              <p className={`text-[10px] md:text-xs flex items-center gap-1 ${wsStatus === 'connected' ? 'text-green-400' : wsStatus === 'connecting' ? 'text-yellow-400' : 'text-red-400'}`}>
+                <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${wsStatus === 'connected' ? 'bg-green-400' : wsStatus === 'connecting' ? 'bg-yellow-400' : 'bg-red-400'}`} />
+                {wsStatus === 'connected' ? 'Connected' : wsStatus === 'connecting' ? 'Connecting...' : 'Offline — Messages via REST'}
               </p>
             </div>
           </div>
@@ -127,9 +147,17 @@ export default function Chat() {
         </motion.div>
 
         <div className="flex-1 overflow-y-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 space-y-3 sm:space-y-4">
+          {messages.length === 0 && (
+            <div className="flex flex-col items-center justify-center h-full text-center gap-3 py-20">
+              <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 flex items-center justify-center">
+                <Send size={24} className="text-indigo-400" />
+              </div>
+              <p className="text-slate-500 text-sm">No messages yet. Start the conversation!</p>
+            </div>
+          )}
           {messages.map((msg, i) => (
             <motion.div
-              key={i}
+              key={msg.id || i}
               initial={{ opacity: 0, y: 16, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.25 }}

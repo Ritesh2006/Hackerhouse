@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr, Field
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
 class UserBase(BaseModel):
     email: Optional[EmailStr] = None
@@ -28,8 +28,9 @@ class UserUpdate(BaseModel):
 class UserResponse(UserBase):
     id: str = Field(alias="_id")
     is_active: bool = True
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     distance_km: Optional[float] = None
+    linkedin_id: Optional[str] = None
 
     class Config:
         populate_by_name = True

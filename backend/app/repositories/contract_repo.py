@@ -1,7 +1,7 @@
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from typing import Optional, List
 from bson import ObjectId
-from datetime import datetime
+from datetime import datetime, UTC
 from app.db.utils import get_id_query
 
 class ContractRepository:
@@ -26,11 +26,11 @@ class ContractRepository:
     async def update_status(self, contract_id: str, status: str, **kwargs) -> bool:
         update_data = {"status": status}
         if status == "accepted":
-            update_data["accepted_at"] = datetime.utcnow()
+            update_data["accepted_at"] = datetime.now(UTC)
         elif status == "active":
-            update_data["started_at"] = datetime.utcnow()
+            update_data["started_at"] = datetime.now(UTC)
         elif status == "completed":
-            update_data["completed_at"] = datetime.utcnow()
+            update_data["completed_at"] = datetime.now(UTC)
         
         update_data.update(kwargs)
         

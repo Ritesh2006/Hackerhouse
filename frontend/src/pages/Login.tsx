@@ -30,7 +30,6 @@ export default function Login() {
       
       alert('Login successful!');
       navigate('/dashboard');
-      window.location.reload(); // Refresh to update navbar state
     } catch (err: any) {
       const msg = err.response?.data?.detail || err.message || 'Invalid email or password';
       setError(msg);
