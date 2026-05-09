@@ -16,10 +16,18 @@ export default function Chat() {
   const token = localStorage.getItem('token');
   const userId = localStorage.getItem('user_id');
   
-  useEffect(() => {
-    const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1').replace('/api/v1', '');
-    // Properly convert http(s) to ws(s)
-    const WS_URL = API_URL.replace(/^https/, 'wss').replace(/^http/, 'ws');
+    const getWsUrl = () => {
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+      // Handle relative URLs for production
+      const absoluteBaseUrl = baseUrl.startsWith('http') 
+        ? baseUrl 
+        : `${window.location.origin}${baseUrl.startsWith('/') ? '' : '/'}${baseUrl}`;
+      
+      const cleanBaseUrl = absoluteBaseUrl.replace('/api/v1', '');
+      return cleanBaseUrl.replace(/^https/, 'wss').replace(/^http/, 'ws');
+    };
+    
+    const WS_URL = getWsUrl();
 
     const fetchHistory = async () => {
       try {

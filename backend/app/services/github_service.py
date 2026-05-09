@@ -182,3 +182,34 @@ async def search_github_users(skill: Optional[str] = None, location: Optional[st
     
     logger.info(f"GitHub search completed in {time.time() - start_time:.2f}s, found {len(users)} users")
     return users
+
+async def get_github_access_token(code: str):
+    """Exchange OAuth code for access token."""
+    url = "https://github.com/login/oauth/access_token"
+    headers = {"Accept": "application/json"}
+    data = {
+        "client_id": settings.GITHUB_CLIENT_ID,
+        "client_secret": settings.GITHUB_CLIENT_SECRET,
+        "code": code
+    }
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.post(url, headers=headers, data=data)
+            response.raise_for_status()
+            return response.json().get("access_token")
+        except Exception as e:
+            logger.error(f"Error exchanging GitHub code: {e}")
+            return None
+
+async def get_github_username_from_token(token: str):
+    """Get GitHub username from access token."""
+    url = f"{settings.GITHUB_API_URL}/user"
+    headers = {"Authorization": f"token {token}"}
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(url, headers=headers)
+            response.raise_for_status()
+            return response.json().get("login")
+        except Exception as e:
+            logger.error(f"Error getting GitHub user: {e}")
+            return None

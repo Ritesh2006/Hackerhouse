@@ -12,6 +12,8 @@ import Signup from './pages/Signup';
 import LoadingScreen from './components/LoadingScreen';
 import AIAgent from './components/AIAgent';
 import { AnimatePresence, motion } from 'framer-motion';
+import GitHubCallback from './pages/GitHubCallback';
+import LinkedInCallback from './pages/LinkedInCallback';
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -47,6 +49,8 @@ function App() {
               <Route path="/chat/:contractId" element={<Chat />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/github-callback" element={<GitHubCallback />} />
+              <Route path="/linkedin-callback" element={<LinkedInCallback />} />
             </Routes>
           </main>
           <Footer />

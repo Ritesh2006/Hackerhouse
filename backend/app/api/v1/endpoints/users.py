@@ -69,6 +69,7 @@ async def get_user(id: str, db=Depends(get_database)):
                 "bio": (gh_data.get("bio") if gh_data else None) or f"External GitHub Developer ({username})",
                 "avatar_url": gh_data.get("avatar_url") if gh_data else None,
                 "github_username": username,
+                "github_url": f"https://github.com/{username}",
                 "location_name": gh_data.get("location") if gh_data else "Global",
                 "is_active": True,
                 "created_at": datetime.now(UTC)
@@ -89,6 +90,7 @@ async def get_user(id: str, db=Depends(get_database)):
                 "skills": li_profile.get("skills", []) if li_profile else [],
                 "bio": li_profile.get("headline", "Verified LinkedIn Professional Profile") if li_profile else "Verified LinkedIn Professional Profile",
                 "avatar_url": li_profile.get("profile_picture") if li_profile else None,
+                "linkedin_url": li_profile.get("linkedin_url") if li_profile and not li_profile.get("is_fallback") else f"https://www.linkedin.com/search/results/all/?keywords={name.replace(' ', '+')}",
                 "is_active": True,
                 "created_at": datetime.now(UTC)
             }

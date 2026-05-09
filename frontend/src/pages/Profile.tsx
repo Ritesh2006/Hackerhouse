@@ -349,6 +349,20 @@ export default function Profile() {
                   </a>
                 )}
 
+                {id === localStorage.getItem('user_id') && !profile.linkedin_id && (
+                  <motion.button 
+                    whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                    onClick={() => {
+                      const clientId = '8630h8u8a8g170';
+                      const redirectUri = `${window.location.origin}/linkedin-callback`;
+                      window.location.href = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=openid%20profile%20email`;
+                    }}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-[#0077b5] text-white hover:opacity-90 transition-all shadow-lg shadow-[#0077b5]/20"
+                  >
+                    <ExternalLink size={16} /> Connect LinkedIn
+                  </motion.button>
+                )}
+
                 {id === localStorage.getItem('user_id') && !profile.github_username && (
                   <motion.button 
                     whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
