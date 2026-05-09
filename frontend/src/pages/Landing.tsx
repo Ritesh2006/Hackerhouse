@@ -89,7 +89,7 @@ function ThreeScene() {
         setWebglAvailable(false);
         localStorage.setItem('webgl_failed', 'true');
       }
-    } catch (e) {
+    } catch {
       setWebglAvailable(false);
       localStorage.setItem('webgl_failed', 'true');
     }

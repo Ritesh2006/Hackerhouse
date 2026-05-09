@@ -58,7 +58,7 @@ export default function Chat() {
             sender: data.sender_id === userId ? 'me' : 'other',
             time: new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
           }]);
-        } catch (e) {
+        } catch {
           console.warn("Received non-JSON message:", event.data);
         }
       };
