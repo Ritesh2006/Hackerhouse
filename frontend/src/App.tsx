@@ -11,7 +11,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import LoadingScreen from './components/LoadingScreen';
 import AIAgent from './components/AIAgent';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 
 function App() {
   const [loading, setLoading] = useState(true);
