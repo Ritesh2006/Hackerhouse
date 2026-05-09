@@ -327,7 +327,17 @@ export default function Profile() {
                     </motion.button>
                 )}
                 
-                {!profile.github_username && (
+                {profile.linkedin_id && (
+                  <a href={`https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(profile.name || profile.full_name)}`} target="_blank" rel="noreferrer">
+                    <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-[#0077b5] text-white transition-all hover:opacity-90"
+                    >
+                      <ExternalLink size={16} /> LinkedIn <span className="text-white/70">↗</span>
+                    </motion.button>
+                  </a>
+                )}
+
+                {id === localStorage.getItem('user_id') && !profile.github_username && (
                   <motion.button 
                     whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                     onClick={() => alert("Redirecting to GitHub OAuth...")}
@@ -337,7 +347,7 @@ export default function Profile() {
                   </motion.button>
                 )}
 
-                {!profile.linkedin_id && (
+                {id === localStorage.getItem('user_id') && !profile.linkedin_id && (
                   <motion.button 
                     whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                     onClick={() => alert("Redirecting to LinkedIn OAuth...")}
