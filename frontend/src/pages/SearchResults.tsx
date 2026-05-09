@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, MapPin, GitBranch, SortAsc, Search, Code2, ChevronDown, Sparkles, ExternalLink } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { usersApi } from '../lib/api';
 
 const skillColors: Record<string, string> = {
@@ -13,9 +13,14 @@ const skillColors: Record<string, string> = {
   Solidity: '#363636', Web3: '#f6851b', 'ethers.js': '#6c47ff',
 };
 
+// --- Components ---
+
 function DevCard({ dev, index }: { dev: any; index: number }) {
   const [hovered, setHovered] = useState(false);
   const navigate = useNavigate();
+
+  // Safety check for skills
+  const skills = Array.isArray(dev.skills) ? dev.skills : [];
 
   return (
     <motion.div
@@ -59,7 +64,7 @@ function DevCard({ dev, index }: { dev: any; index: number }) {
                       <span>GitHub</span>
                     </div>
                   )}
-                  {dev.linkedin_id && (
+                  {(dev.linkedin_id || dev.source === 'linkedin') && (
                     <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#0077b5]/20 border border-[#0077b5]/30 text-[10px] text-[#0077b5] font-bold">
                       <ExternalLink size={10} />
                       <span>LinkedIn</span>
@@ -84,7 +89,7 @@ function DevCard({ dev, index }: { dev: any; index: number }) {
           <p className="text-slate-400 text-sm mb-4 leading-relaxed line-clamp-2">{dev.bio || 'Professional Developer and HackerHouse member.'}</p>
 
           <div className="flex flex-wrap gap-1.5 mb-5">
-            {dev.skills.map((skill: string) => (
+            {skills.map((skill: string) => (
               <span key={skill} className="px-2.5 py-1 rounded-lg text-xs font-medium"
                 style={{
                   background: `${skillColors[skill] || '#6366f1'}15`,
@@ -118,8 +123,42 @@ function DevCard({ dev, index }: { dev: any; index: number }) {
   );
 }
 
+const LoadingSkeleton = () => (
+  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+    {[1, 2, 3, 4, 5, 6].map((i) => (
+      <div key={i} className="card-devcard p-6 border border-white/5 animate-pulse">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-14 h-14 rounded-2xl bg-white/10" />
+            <div className="space-y-2">
+              <div className="w-32 h-5 bg-white/10 rounded-md" />
+              <div className="w-24 h-4 bg-white/10 rounded-md" />
+            </div>
+          </div>
+          <div className="w-20 h-6 bg-white/10 rounded-full" />
+        </div>
+        <div className="space-y-2 mb-4">
+          <div className="w-full h-4 bg-white/10 rounded-md" />
+          <div className="w-5/6 h-4 bg-white/10 rounded-md" />
+        </div>
+        <div className="flex flex-wrap gap-2 mb-5">
+          <div className="w-16 h-6 bg-white/10 rounded-lg" />
+          <div className="w-20 h-6 bg-white/10 rounded-lg" />
+          <div className="w-14 h-6 bg-white/10 rounded-lg" />
+        </div>
+        <div className="flex items-center justify-between pt-4 border-t border-white/5">
+          <div className="flex gap-4">
+            <div className="w-16 h-4 bg-white/10 rounded-md" />
+            <div className="w-16 h-4 bg-white/10 rounded-md" />
+          </div>
+          <div className="w-12 h-4 bg-white/10 rounded-md" />
+        </div>
+      </div>
+    ))}
+  </div>
+);
 
-
+// --- Main Component ---
 
 export default function SearchResults() {
   const [searchParams] = useSearchParams();
@@ -129,41 +168,44 @@ export default function SearchResults() {
   const [sortBy, setSortBy] = useState('distance');
   const [filterOpen, setFilterOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchDevelopers = async () => {
-      setLoading(true);
-      try {
-        const skill = searchParams.get('skill');
-        const name = searchParams.get('name');
-        const location = searchParams.get('location');
-        const lat = searchParams.get('lat');
-        const lon = searchParams.get('lon');
-        
-        const res = await usersApi.getUsers({ 
-          skill: skill || undefined, 
-          name: name || undefined,
-          location: location || undefined,
-          lat: lat ? parseFloat(lat) : undefined,
-          lon: lon ? parseFloat(lon) : undefined
-        });
-        
-        // Handle the new API format: { success, count, data, is_fallback }
-        if (res.data.success) {
-          setDevelopers(res.data.data);
-          setIsFallback(res.data.is_fallback);
-        } else {
-          // Fallback for old API format just in case
-          setDevelopers(Array.isArray(res.data) ? res.data : []);
-          setIsFallback(false);
-        }
-      } catch (err) {
-        console.error("Failed to fetch developers:", err);
-      } finally {
-        setLoading(false);
+  const fetchDevelopers = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = {
+        skill: searchParams.get('skill') || undefined,
+        name: searchParams.get('name') || undefined,
+        location: searchParams.get('location') || undefined,
+        lat: searchParams.get('lat') ? parseFloat(searchParams.get('lat')!) : undefined,
+        lon: searchParams.get('lon') ? parseFloat(searchParams.get('lon')!) : undefined
+      };
+      
+      const res = await usersApi.getUsers(params);
+      
+      if (res.data && res.data.success) {
+        setDevelopers(Array.isArray(res.data.data) ? res.data.data : []);
+        setIsFallback(!!res.data.is_fallback);
+      } else {
+        setDevelopers(Array.isArray(res.data) ? res.data : []);
+        setIsFallback(false);
       }
-    };
-    fetchDevelopers();
+    } catch (err) {
+      console.error("Failed to fetch developers:", err);
+      setDevelopers([]);
+    } finally {
+      setLoading(false);
+    }
   }, [searchParams]);
+
+  useEffect(() => {
+    fetchDevelopers();
+  }, [fetchDevelopers]);
+
+  const sortedDevelopers = [...developers].sort((a, b) => {
+    if (sortBy === 'distance') return (a.distance_km || 9999) - (b.distance_km || 9999);
+    if (sortBy === 'stars') return (b.total_stars || 0) - (a.total_stars || 0);
+    if (sortBy === 'rating') return (b.rating || 0) - (a.rating || 0);
+    return 0;
+  });
 
   return (
     <div className="min-h-screen pt-24 sm:pt-28 pb-16 px-4" style={{ background: '#030712' }}>
@@ -175,7 +217,13 @@ export default function SearchResults() {
           <div className="flex items-center gap-3 text-sm text-slate-500 mb-3 overflow-x-auto whitespace-nowrap pb-1 no-scrollbar">
             <Search size={14} className="shrink-0" />
             <span>{searchParams.get('location') || 'Anywhere'}</span>
-            {searchParams.get('skill') && <><span>·</span><Code2 size={14} className="shrink-0" /><span>{searchParams.get('skill')}</span></>}
+            {searchParams.get('skill') && (
+              <>
+                <span>·</span>
+                <Code2 size={14} className="shrink-0" />
+                <span>{searchParams.get('skill')}</span>
+              </>
+            )}
           </div>
 
           {isFallback && !loading && (
@@ -235,41 +283,10 @@ export default function SearchResults() {
         </motion.div>
 
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="card-devcard p-6 border border-white/5 animate-pulse">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-14 h-14 rounded-2xl bg-white/10" />
-                    <div className="space-y-2">
-                      <div className="w-32 h-5 bg-white/10 rounded-md" />
-                      <div className="w-24 h-4 bg-white/10 rounded-md" />
-                    </div>
-                  </div>
-                  <div className="w-20 h-6 bg-white/10 rounded-full" />
-                </div>
-                <div className="space-y-2 mb-4">
-                  <div className="w-full h-4 bg-white/10 rounded-md" />
-                  <div className="w-5/6 h-4 bg-white/10 rounded-md" />
-                </div>
-                <div className="flex flex-wrap gap-2 mb-5">
-                  <div className="w-16 h-6 bg-white/10 rounded-lg" />
-                  <div className="w-20 h-6 bg-white/10 rounded-lg" />
-                  <div className="w-14 h-6 bg-white/10 rounded-lg" />
-                </div>
-                <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                  <div className="flex gap-4">
-                    <div className="w-16 h-4 bg-white/10 rounded-md" />
-                    <div className="w-16 h-4 bg-white/10 rounded-md" />
-                  </div>
-                  <div className="w-12 h-4 bg-white/10 rounded-md" />
-                </div>
-              </div>
-            ))}
-          </div>
+          <LoadingSkeleton />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-            {developers.map((dev, i) => <DevCard key={dev.id} dev={dev} index={i} />)}
+            {sortedDevelopers.map((dev, i) => <DevCard key={dev.id || i} dev={dev} index={i} />)}
             {developers.length === 0 && (
               <div className="col-span-full text-center py-20 glass rounded-3xl border-dashed border-white/10">
                 <p className="text-slate-500 font-medium">No developers found. Try broadening your search.</p>

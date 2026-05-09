@@ -151,6 +151,8 @@ function HireModal({ isOpen, onClose, developerName, developerId }: any) {
   );
 }
 
+// --- Components ---
+
 function StatCard({ label, value, icon: Icon, color }: any) {
   return (
     <motion.div
@@ -162,7 +164,7 @@ function StatCard({ label, value, icon: Icon, color }: any) {
         <Icon size={18} style={{ color }} />
       </div>
       <div className="text-2xl font-bold text-white font-display">
-        {typeof value === 'number' ? value.toLocaleString() : value}
+        {typeof value === 'number' ? value.toLocaleString() : (value || '0')}
       </div>
       <div className="text-xs text-slate-500 mt-1">{label}</div>
     </motion.div>
@@ -180,20 +182,26 @@ export default function Profile() {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!id) return;
       setLoading(true);
       try {
-        if (!id) return;
         const userRes = await usersApi.getUser(id);
         const user = userRes.data;
+        
+        // Data normalization
+        if (user && !user.name && user.full_name) user.name = user.full_name;
+        if (user && !user.full_name && user.name) user.full_name = user.name;
+        
         setProfile(user);
 
         // Check for active contracts
         try {
             const contractsRes = await usersApi.getMyContracts();
-            const existingContract = contractsRes.data.find((c: any) => 
+            const existingContract = Array.isArray(contractsRes.data) ? contractsRes.data.find((c: any) => 
                 (c.client_id === localStorage.getItem('user_id') && c.developer_id === id) ||
                 (c.developer_id === localStorage.getItem('user_id') && c.client_id === id)
-            );
+            ) : null;
+            
             if (existingContract) {
                 setActiveContractId(existingContract.id);
             }
@@ -201,7 +209,7 @@ export default function Profile() {
             console.warn("Failed to fetch contracts:", e);
         }
 
-        if (user.github_username) {
+        if (user?.github_username) {
           const ghRes = await githubApi.getProfile(user.github_username);
           setGithubData(ghRes.data);
         }
@@ -230,6 +238,10 @@ export default function Profile() {
       </div>
     );
   }
+
+  const skills = Array.isArray(profile.skills) ? profile.skills : [];
+  const displayName = profile.name || profile.full_name || 'Anonymous Developer';
+  const linkedinUrl = profile.linkedin_url || (profile.linkedin_id ? `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(displayName)}` : null);
 
   return (
     <div className="min-h-screen pt-24 pb-16 px-4" style={{ background: '#030712' }}>
@@ -269,9 +281,9 @@ export default function Profile() {
               className={`w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-3xl md:text-4xl font-black shadow-2xl shrink-0 overflow-hidden font-display`}
             >
               {profile.avatar_url ? (
-                <img src={profile.avatar_url} alt={profile.name || profile.full_name} className="w-full h-full object-cover" />
+                <img src={profile.avatar_url} alt={displayName} className="w-full h-full object-cover" />
               ) : (
-                (profile.name || profile.full_name || 'U').charAt(0)
+                displayName.charAt(0)
               )}
             </motion.div>
 
@@ -279,7 +291,7 @@ export default function Profile() {
               <div className="flex flex-wrap items-start justify-between gap-3 mb-2">
                 <div>
                   <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white font-display">
-                    {profile.name || profile.full_name}
+                    {displayName}
                   </h1>
                   <p className="text-indigo-400 font-medium">@{profile.github_username || 'dev'}</p>
                 </div>
@@ -291,14 +303,14 @@ export default function Profile() {
 
               <div className="flex flex-wrap gap-3 text-sm text-slate-400 mb-4 sm:mb-5">
                 <span className="flex items-center gap-1.5"><MapPin size={14} className="text-indigo-400" /> {profile.location_name || 'Global'}</span>
-                <span className="flex items-center gap-1.5"><Briefcase size={14} className="text-green-400" /> $95/hr</span>
+                <span className="flex items-center gap-1.5"><Briefcase size={14} className="text-green-400" /> ${profile.hourly_rate || 95}/hr</span>
                 <span className="flex items-center gap-1.5"><Clock size={14} className="text-yellow-400" /> Active now</span>
               </div>
 
               <p className="text-slate-400 text-sm leading-relaxed mb-5 sm:mb-6 max-w-2xl">{githubData?.bio || profile.bio || 'Professional Developer and HackerHouse member.'}</p>
 
               <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-5 sm:mb-6">
-                {(profile.skills || []).map((skill: string) => (
+                {skills.map((skill: string) => (
                   <span key={skill} className="px-3 py-1.5 rounded-xl text-xs font-semibold"
                     style={{ background: 'rgba(99,102,241,0.1)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.2)' }}>
                     {skill}
@@ -327,8 +339,8 @@ export default function Profile() {
                     </motion.button>
                 )}
                 
-                {profile.linkedin_id && (
-                  <a href={`https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(profile.name || profile.full_name)}`} target="_blank" rel="noreferrer">
+                {linkedinUrl && (
+                  <a href={linkedinUrl} target="_blank" rel="noreferrer">
                     <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                       className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-[#0077b5] text-white transition-all hover:opacity-90"
                     >
@@ -341,26 +353,12 @@ export default function Profile() {
                   <motion.button 
                     whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                     onClick={() => {
-                      const clientId = 'Iv1.6a9f43c49e29a8a7'; // Example Client ID
+                      const clientId = 'Iv1.6a9f43c49e29a8a7';
                       window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=user`;
                     }}
                     className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-slate-800 text-white border border-white/10 hover:border-indigo-500/30 transition-all"
                   >
                     <GitBranch size={16} /> Connect GitHub
-                  </motion.button>
-                )}
-
-                {id === localStorage.getItem('user_id') && !profile.linkedin_id && (
-                  <motion.button 
-                    whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-                    onClick={() => {
-                      const clientId = '868vgmsene5mzi';
-                      const redirectUri = encodeURIComponent(`${window.location.origin}/linkedin-callback`);
-                      window.location.href = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=openid%20profile%20email`;
-                    }}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-[#0077b5] text-white border border-white/10 hover:opacity-90 transition-all"
-                  >
-                    <ExternalLink size={16} /> Connect LinkedIn
                   </motion.button>
                 )}
 
@@ -396,12 +394,12 @@ export default function Profile() {
               <Code2 size={16} className="text-indigo-400" /> Top Languages (GitHub)
             </h3>
             <div className="flex flex-wrap gap-2">
-              {githubData?.languages?.map((lang: string) => (
+              {(githubData?.languages || profile.skills || []).map((lang: string) => (
                 <span key={lang} className="px-3 py-1.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-lg text-sm font-medium">
                   {lang}
                 </span>
               ))}
-              {!githubData?.languages?.length && <p className="text-slate-500 text-sm">No language data available</p>}
+              {!(githubData?.languages?.length || profile.skills?.length) && <p className="text-slate-500 text-sm">No language data available</p>}
             </div>
           </motion.div>
 
@@ -411,7 +409,7 @@ export default function Profile() {
               <GitBranch size={16} className="text-purple-400" /> Featured Repos
             </h3>
             <div className="space-y-3">
-              {githubData?.top_repos?.map((repo: any, i: number) => (
+              {(githubData?.top_repos || []).map((repo: any, i: number) => (
                 <a key={i} href={repo.url} target="_blank" rel="noreferrer" className="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-colors cursor-pointer group">
                   <div>
                     <div className="text-sm font-medium text-slate-200 group-hover:text-indigo-400 transition-colors">{repo.name}</div>
@@ -425,7 +423,7 @@ export default function Profile() {
                   </div>
                 </a>
               ))}
-              {!githubData?.top_repos?.length && <p className="text-slate-500 text-sm">No repositories found</p>}
+              {!(githubData?.top_repos?.length) && <p className="text-slate-500 text-sm">No repositories found</p>}
             </div>
           </motion.div>
         </div>
@@ -434,7 +432,7 @@ export default function Profile() {
       <HireModal 
         isOpen={isHireModalOpen} 
         onClose={() => setIsHireModalOpen(false)} 
-        developerName={profile?.name}
+        developerName={displayName}
         developerId={id}
       />
     </div>

@@ -136,9 +136,26 @@ async def find_matching_developers(
     # Final Processing
     processed_users = []
     for user in all_users:
+        # Ensure 'skills' is ALWAYS a list to prevent frontend .map() crashes
+        if "skills" not in user or user["skills"] is None:
+            user["skills"] = []
+        
+        # Ensure 'bio' is not None
+        if "bio" not in user or user["bio"] is None:
+            user["bio"] = "Professional Developer and HackerHouse member."
+            
+        # Add LinkedIn URL if ID exists but URL doesn't
+        if user.get("linkedin_id") and not user.get("linkedin_url"):
+            # We can't generate a perfect direct URL from just an ID without the vanity name,
+            # but we can provide a better search link or placeholder.
+            user["linkedin_url"] = f"https://www.linkedin.com/search/results/all/?keywords={user.get('name', 'Developer')}"
+
         if lat is not None and lon is not None and user.get("location"):
-            u_lon, u_lat = user["location"]["coordinates"]
-            user["distance_km"] = haversine_distance(lat, lon, u_lat, u_lon)
+            try:
+                u_lon, u_lat = user["location"]["coordinates"]
+                user["distance_km"] = haversine_distance(lat, lon, u_lat, u_lon)
+            except (KeyError, TypeError, ValueError):
+                user["distance_km"] = None
         else:
             user["distance_km"] = None
         processed_users.append(user)
