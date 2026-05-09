@@ -75,9 +75,35 @@ function Floating3D() {
 }
 
 function ThreeScene() {
+  const [webglAvailable, setWebglAvailable] = useState(true);
+
+  useEffect(() => {
+    try {
+      const canvas = document.createElement('canvas');
+      const support = !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+      setWebglAvailable(support);
+    } catch (e) {
+      setWebglAvailable(false);
+    }
+  }, []);
+
+  if (!webglAvailable) {
+    return (
+      <div className="absolute inset-0 z-0 opacity-20 bg-gradient-to-br from-indigo-500/20 to-purple-600/20 blur-3xl animate-pulse" />
+    );
+  }
+
   return (
     <div className="absolute inset-0 z-0 opacity-40">
-      <Canvas>
+      <Canvas 
+        gl={{ antialias: false, powerPreference: 'high-performance' }}
+        onCreated={({ gl }) => {
+          gl.domElement.addEventListener('webglcontextlost', (event) => {
+            event.preventDefault();
+            console.warn('WebGL Context Lost. Attempting to recover...');
+          }, false);
+        }}
+      >
         <PerspectiveCamera makeDefault position={[0, 0, 5]} />
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} intensity={1} color="#6366f1" />

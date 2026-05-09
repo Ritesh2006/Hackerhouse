@@ -41,14 +41,14 @@ function DevCard({ dev, index }: { dev: any; index: number }) {
             <div className="flex items-center gap-3">
               <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg overflow-hidden shrink-0 transition-transform group-hover:scale-105`}>
                 {dev.avatar_url ? (
-                  <img src={dev.avatar_url} alt={dev.name} className="w-full h-full object-cover" />
+                  <img src={dev.avatar_url} alt={dev.full_name || dev.name || 'Developer'} className="w-full h-full object-cover" />
                 ) : (
-                  dev.name.charAt(0)
+                  (dev.full_name || dev.name || 'D').charAt(0)
                 )}
               </div>
               <div>
                 <h3 className="font-bold text-white text-lg flex items-center gap-2 font-display">
-                  {dev.name}
+                  {dev.full_name || dev.name || 'Anonymous Developer'}
                 </h3>
               <div className="flex items-center gap-2">
                   <p className="text-indigo-400 text-sm">@{dev.github_username || 'dev'}</p>

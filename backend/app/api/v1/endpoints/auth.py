@@ -19,6 +19,16 @@ async def register(user_in: UserCreate, db=Depends(get_database)):
         raise HTTPException(status_code=400, detail="Email already registered")
     
     user_data = user_in.model_dump()
+    
+    # Ensure full_name is set even if only name was provided
+    if not user_data.get("full_name") and user_data.get("name"):
+        user_data["full_name"] = user_data["name"]
+    elif not user_data.get("name") and user_data.get("full_name"):
+        user_data["name"] = user_data["full_name"]
+        
+    if not user_data.get("full_name"):
+        raise HTTPException(status_code=400, detail="Name is required")
+        
     user_data["hashed_password"] = get_password_hash(user_data.pop("password"))
     user_id = await user_repo.create(user_data)
     

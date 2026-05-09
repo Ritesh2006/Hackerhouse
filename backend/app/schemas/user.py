@@ -4,7 +4,7 @@ from datetime import datetime
 
 class UserBase(BaseModel):
     email: Optional[EmailStr] = None
-    full_name: str
+    full_name: Optional[str] = None
     name: Optional[str] = None # Support for both naming conventions
     role: str = "client"
     skills: List[str] = []

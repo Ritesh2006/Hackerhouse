@@ -5,6 +5,7 @@ from app.repositories.user_repo import UserRepository
 from app.schemas.project import ProjectCreate
 from fastapi import HTTPException, status
 from datetime import datetime
+import logging
 
 class HireService:
     def __init__(
