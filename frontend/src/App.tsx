@@ -26,26 +26,33 @@ function App() {
 
   return (
     <BrowserRouter>
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         {loading && <LoadingScreen key="loader" />}
       </AnimatePresence>
       
-      <div className="min-h-screen flex flex-col" style={{ background: '#030712', color: '#e2e8f0', fontFamily: 'Inter, sans-serif' }}>
-        <Navbar />
-        <main className="flex-1">
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/search" element={<SearchResults />} />
-            <Route path="/profile/:id" element={<Profile />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/chat/:contractId" element={<Chat />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-          </Routes>
-        </main>
-        <Footer />
-        <AIAgent />
-      </div>
+      {!loading && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="min-h-screen flex flex-col" 
+          style={{ background: '#030712', color: '#e2e8f0', fontFamily: 'Inter, sans-serif' }}
+        >
+          <Navbar />
+          <main className="flex-1">
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/search" element={<SearchResults />} />
+              <Route path="/profile/:id" element={<Profile />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/chat/:contractId" element={<Chat />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+            </Routes>
+          </main>
+          <Footer />
+          <AIAgent />
+        </motion.div>
+      )}
     </BrowserRouter>
   );
 }

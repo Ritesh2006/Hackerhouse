@@ -17,7 +17,7 @@ class ProjectRepository:
         return await self.collection.find_one(get_id_query(project_id))
 
     async def get_by_user(self, user_id: str, role: str) -> List[dict]:
-        query = {"client_id": user_id} if role == "client" else {"developer_id": user_id}
+        query = {"client_id": user_id} if role in ["client", "employer"] else {"developer_id": user_id}
         cursor = self.collection.find(query)
         return await cursor.to_list(length=100)
 

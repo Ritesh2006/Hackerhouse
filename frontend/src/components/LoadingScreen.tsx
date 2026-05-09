@@ -5,7 +5,12 @@ export default function LoadingScreen() {
   const dashes = Array.from({ length: 8 });
 
   return (
-    <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#030712]">
+    <motion.div 
+      initial={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#030712]"
+    >
       <div className="relative flex items-center justify-center">
         {/* Central Logo */}
         <motion.div
@@ -78,6 +83,6 @@ export default function LoadingScreen() {
           Initializing Environment
         </motion.p>
       </motion.div>
-    </div>
+    </motion.div>
   );
 }

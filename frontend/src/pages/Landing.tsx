@@ -96,12 +96,21 @@ function ThreeScene() {
   return (
     <div className="absolute inset-0 z-0 opacity-40">
       <Canvas 
-        gl={{ antialias: false, powerPreference: 'high-performance' }}
+        gl={{ 
+          antialias: false, 
+          powerPreference: 'high-performance',
+          preserveDrawingBuffer: false,
+          alpha: true
+        }}
+        dpr={[1, 2]} // Limit pixel ratio for performance
         onCreated={({ gl }) => {
-          gl.domElement.addEventListener('webglcontextlost', (event) => {
+          const handleContextLost = (event: any) => {
             event.preventDefault();
             console.warn('WebGL Context Lost. Attempting to recover...');
-          }, false);
+            setWebglAvailable(false); // Switch to fallback immediately
+          };
+          gl.domElement.addEventListener('webglcontextlost', handleContextLost, false);
+          return () => gl.domElement.removeEventListener('webglcontextlost', handleContextLost);
         }}
       >
         <PerspectiveCamera makeDefault position={[0, 0, 5]} />

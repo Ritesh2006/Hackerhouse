@@ -33,8 +33,11 @@ export default function Signup() {
       
       // Fetch user info to sync ID
       const userRes = await authApi.getMe();
-      localStorage.setItem('user_id', userRes.data.id);
-      localStorage.setItem('chat_user_id', userRes.data.id);
+      const userId = userRes.data.id || userRes.data._id;
+      if (userId) {
+        localStorage.setItem('user_id', userId);
+        localStorage.setItem('chat_user_id', userId);
+      }
       
       alert('Account created successfully!');
       navigate('/dashboard');
