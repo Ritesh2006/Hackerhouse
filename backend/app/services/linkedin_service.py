@@ -34,6 +34,7 @@ async def get_linkedin_profile(access_token: str = None):
                     "profile_picture": data.get("picture"),
                     "email": data.get("email"),
                     "headline": "LinkedIn Verified Developer",
+                    "linkedin_url": f"https://www.linkedin.com/search/results/all/?keywords={data.get('given_name', '')}+{data.get('family_name', '')}",
                     "experience": [],
                     "skills": [],
                     "is_fallback": False

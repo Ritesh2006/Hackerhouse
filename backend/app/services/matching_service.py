@@ -89,11 +89,18 @@ async def find_matching_developers(
         li_profile = await get_linkedin_profile()
         if li_profile and not li_profile.get("is_fallback"):
             li_name = f"{li_profile.get('first_name', '')} {li_profile.get('last_name', '')}".strip()
-            if not name or name.lower() in li_name.lower():
+            
+            # Only add the verified LinkedIn user if they actually match the search criteria
+            # to avoid showing the same user at the top of every search.
+            match_name = not name or name.lower() in li_name.lower()
+            match_skill = not skills or any(s.lower() in [sk.lower() for sk in li_profile.get("skills", [])] for s in skills)
+            
+            if match_name and (match_skill or not skills):
                 linkedin_users.append({
                     "id": f"li_{li_profile['linkedin_id']}",
                     "name": li_name,
                     "linkedin_id": li_profile['linkedin_id'],
+                    "linkedin_url": li_profile.get("linkedin_url"),
                     "avatar_url": li_profile.get("profile_picture"),
                     "bio": li_profile.get("headline"),
                     "skills": li_profile.get("skills", []),
@@ -146,9 +153,11 @@ async def find_matching_developers(
             
         # Add LinkedIn URL if ID exists but URL doesn't
         if user.get("linkedin_id") and not user.get("linkedin_url"):
-            # We can't generate a perfect direct URL from just an ID without the vanity name,
-            # but we can provide a better search link or placeholder.
             user["linkedin_url"] = f"https://www.linkedin.com/search/results/all/?keywords={user.get('name', 'Developer')}"
+            
+        # Add GitHub URL if username exists but URL doesn't
+        if user.get("github_username") and not user.get("github_url"):
+            user["github_url"] = f"https://github.com/{user['github_username']}"
 
         if lat is not None and lon is not None and user.get("location"):
             try:

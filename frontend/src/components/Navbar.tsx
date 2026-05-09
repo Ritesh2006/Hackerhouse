@@ -53,16 +53,42 @@ export default function Navbar() {
     return (id === 'undefined' || id === 'null') ? null : id;
   });
 
-  // Periodically check for state changes (backup for redirect sync)
+  // Periodically check for state changes and recover missing userId
   useEffect(() => {
-    const interval = setInterval(() => {
+    const syncState = async () => {
       const currentToken = localStorage.getItem('token');
       let currentId = localStorage.getItem('user_id');
-      if (currentId === 'undefined' || currentId === 'null') currentId = null;
+      
+      // Sanitize ID
+      if (currentId === 'undefined' || currentId === 'null' || !currentId) {
+        currentId = null;
+        
+        // If we have a token but no ID, fetch it from /me
+        if (currentToken && !userId) {
+          try {
+            const res = await fetch(`${finalBaseUrl}/auth/me`, {
+              headers: { 'Authorization': `Bearer ${currentToken}` }
+            });
+            if (res.ok) {
+              const data = await res.json();
+              const fetchedId = data._id || data.id;
+              if (fetchedId) {
+                localStorage.setItem('user_id', fetchedId);
+                setUserId(fetchedId);
+              }
+            }
+          } catch (e) {
+            console.warn("Failed to recover user ID:", e);
+          }
+        }
+      }
       
       if (currentToken !== token) setToken(currentToken);
       if (currentId !== userId) setUserId(currentId);
-    }, 1000);
+    };
+
+    const interval = setInterval(syncState, 2000);
+    syncState(); // Run immediately
     return () => clearInterval(interval);
   }, [token, userId]);
 

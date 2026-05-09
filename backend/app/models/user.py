@@ -16,6 +16,8 @@ class User(BaseModel):
     location: Optional[GeoLocation] = None
     bio: Optional[str] = None
     github_username: Optional[str] = None
+    github_url: Optional[str] = None
     linkedin_id: Optional[str] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    linkedin_url: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.now)
     is_active: bool = True

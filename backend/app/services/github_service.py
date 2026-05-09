@@ -27,6 +27,7 @@ async def get_github_fallback(username: str, note: str = "GitHub data temporaril
                     "total_stars": 0,
                     "languages": user.get("skills") or [],
                     "email": user.get("email"),
+                    "github_url": f"https://github.com/{username}",
                     "top_repos": [],
                     "note": f"⚡ Limited profile data available: {note}",
                     "is_fallback": True
@@ -110,8 +111,9 @@ async def get_github_user_data(username: str):
                     "name": profile_data.get("name"),
                     "bio": profile_data.get("bio"),
                     "avatar_url": profile_data.get("avatar_url"),
+                    "github_url": profile_data.get("html_url"),
                     "location": profile_data.get("location"),
-                    "public_repos": profile_data.get("public_repos"),
+                    "public_repos": profile_data.get("public_repos") or len(repo_list),
                     "followers": profile_data.get("followers"),
                     "total_stars": total_stars,
                     "languages": list(languages),

@@ -11,6 +11,8 @@ class UserBase(BaseModel):
     bio: Optional[str] = None
     avatar_url: Optional[str] = None
     github_username: Optional[str] = None
+    github_url: Optional[str] = None
+    linkedin_url: Optional[str] = None
     location_name: Optional[str] = None
     rating: float = 0.0
     hourly_rate: int = 0
@@ -31,6 +33,7 @@ class UserResponse(UserBase):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     distance_km: Optional[float] = None
     linkedin_id: Optional[str] = None
+    linkedin_url: Optional[str] = None
 
     class Config:
         populate_by_name = True
