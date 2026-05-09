@@ -45,6 +45,13 @@ async def get_user(id: str, db=Depends(get_database)):
         # Standardize for frontend consistency
         if "name" not in user and "full_name" in user:
             user["name"] = user["full_name"]
+            
+        # Add social URL fallbacks
+        if user.get("linkedin_id") and not user.get("linkedin_url"):
+            user["linkedin_url"] = f"https://www.linkedin.com/search/results/all/?keywords={user.get('name', 'Developer').replace(' ', '+')}"
+        if user.get("github_username") and not user.get("github_url"):
+            user["github_url"] = f"https://github.com/{user['github_username']}"
+            
         return user
 
     # Handle Virtual Users (GitHub/LinkedIn) if not in database
