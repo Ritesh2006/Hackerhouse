@@ -34,9 +34,14 @@ function HireModal({ isOpen, onClose, developerName, developerId }: any) {
         try {
           const dateObj = new Date(formData.deadline);
           if (isNaN(dateObj.getTime())) throw new Error("Invalid date");
+          
+          // Year validation to prevent crazy dates (422 errors)
+          const year = dateObj.getFullYear();
+          if (year < 2024 || year > 2100) throw new Error("Year must be between 2024 and 2100");
+          
           isoDeadline = dateObj.toISOString();
-        } catch (e) {
-          alert("Invalid deadline date format. Please use YYYY-MM-DD.");
+        } catch (e: any) {
+          alert(`Invalid deadline: ${e.message}`);
           setSending(false);
           return;
         }

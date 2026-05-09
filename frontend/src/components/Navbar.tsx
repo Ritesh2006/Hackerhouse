@@ -47,9 +47,24 @@ export default function Navbar() {
     return () => { document.body.style.overflow = ''; };
   }, [isMobileMenuOpen]);
 
-  const token = localStorage.getItem('token');
-  let userId = localStorage.getItem('user_id');
-  if (userId === 'undefined' || userId === 'null') userId = null;
+  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [userId, setUserId] = useState(() => {
+    let id = localStorage.getItem('user_id');
+    return (id === 'undefined' || id === 'null') ? null : id;
+  });
+
+  // Periodically check for state changes (backup for redirect sync)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const currentToken = localStorage.getItem('token');
+      let currentId = localStorage.getItem('user_id');
+      if (currentId === 'undefined' || currentId === 'null') currentId = null;
+      
+      if (currentToken !== token) setToken(currentToken);
+      if (currentId !== userId) setUserId(currentId);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [token, userId]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');

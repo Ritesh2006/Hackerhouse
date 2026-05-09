@@ -52,14 +52,19 @@ class HireService:
                         developer = developer_data
 
                 elif developer_id.startswith("li_"):
-                    # We create a placeholder for LinkedIn virtual users
-                    # Full data can be synced when they login, but for now we need a DB record to hire
+                    from app.services.linkedin_service import get_linkedin_profile
+                    li_profile = await get_linkedin_profile()
+                    name = "LinkedIn Developer"
+                    if li_profile and not li_profile.get("is_fallback"):
+                        name = f"{li_profile.get('first_name', '')} {li_profile.get('last_name', '')}".strip()
+                        
                     developer_data = {
                         "_id": developer_id,
-                        "name": "LinkedIn Developer",
+                        "name": name,
                         "role": "developer",
-                        "skills": [],
-                        "bio": "Verified LinkedIn Professional",
+                        "skills": li_profile.get("skills", []) if li_profile else [],
+                        "bio": li_profile.get("headline", "Verified LinkedIn Professional Profile") if li_profile else "Verified LinkedIn Professional Profile",
+                        "avatar_url": li_profile.get("profile_picture") if li_profile else None,
                         "is_active": True,
                         "created_at": datetime.utcnow()
                     }

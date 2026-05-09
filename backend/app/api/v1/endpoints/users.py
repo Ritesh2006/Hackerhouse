@@ -75,13 +75,20 @@ async def get_user(id: str, db=Depends(get_database)):
             }
         
         if id.startswith("li_"):
+            from app.services.linkedin_service import get_linkedin_profile
+            li_profile = await get_linkedin_profile()
+            name = "LinkedIn Developer"
+            if li_profile and not li_profile.get("is_fallback"):
+                name = f"{li_profile.get('first_name', '')} {li_profile.get('last_name', '')}".strip()
+            
             return {
                 "_id": id,
-                "name": "LinkedIn Developer",
-                "full_name": "LinkedIn Developer",
+                "name": name,
+                "full_name": name,
                 "role": "developer",
-                "skills": [],
-                "bio": "Verified LinkedIn Professional Profile",
+                "skills": li_profile.get("skills", []) if li_profile else [],
+                "bio": li_profile.get("headline", "Verified LinkedIn Professional Profile") if li_profile else "Verified LinkedIn Professional Profile",
+                "avatar_url": li_profile.get("profile_picture") if li_profile else None,
                 "is_active": True,
                 "created_at": datetime.utcnow()
             }
