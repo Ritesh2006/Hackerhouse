@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Send, ArrowLeft } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
-import axios from 'axios';
+import { chatApi } from '../lib/api';
 
 // Force reload
 export default function Chat() {
@@ -20,16 +20,18 @@ export default function Chat() {
 
     const fetchHistory = async () => {
       try {
-        const res = await axios.get(`${API_URL}/api/v1/chat/contract/${contractId}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
-        if (res.data && res.data.messages) {
+        console.log("Fetching chat history for:", contractId);
+        const res = await chatApi.getHistory(contractId!);
+        if (res.data && Array.isArray(res.data.messages)) {
           setMessages(res.data.messages.map((m: any, i: number) => ({
             id: i,
             text: m.text,
-            sender: m.sender_id === userId ? 'me' : 'other',
-            time: new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            sender: String(m.sender_id) === String(userId) ? 'me' : 'other',
+            time: m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'
           })));
+        } else {
+          console.log("No messages found in chat history.");
+          setMessages([]);
         }
       } catch (err) {
         console.error("Failed to fetch history:", err);
@@ -55,8 +57,8 @@ export default function Chat() {
           setMessages(prev => [...prev, {
             id: Date.now(),
             text: data.text,
-            sender: data.sender_id === userId ? 'me' : 'other',
-            time: new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            sender: String(data.sender_id) === String(userId) ? 'me' : 'other',
+            time: data.timestamp ? new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
           }]);
         } catch {
           console.warn("Received non-JSON message:", event.data);
