@@ -100,8 +100,8 @@ export default function Chat() {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col" style={{ background: '#030712' }}>
-      <div className="flex-1 flex flex-col overflow-hidden relative">
+    <div className="fixed inset-0 z-[100] flex flex-col bg-[#030712] h-[100dvh]">
+      <div className="flex-1 flex flex-col min-h-0 relative">
         <motion.div
           initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
           className="px-3 sm:px-4 md:px-6 py-3 md:py-4 flex items-center justify-between flex-shrink-0"

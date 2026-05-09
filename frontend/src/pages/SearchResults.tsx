@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, MapPin, GitBranch, SortAsc, Search, Code2, ChevronDown, Sparkles } from 'lucide-react';
+import { Star, MapPin, GitBranch, SortAsc, Search, Code2, ChevronDown, Sparkles, ExternalLink } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { usersApi } from '../lib/api';
@@ -57,6 +57,12 @@ function DevCard({ dev, index }: { dev: any; index: number }) {
                     <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-800 border border-white/10 text-[10px] text-slate-300">
                       <GitBranch size={10} />
                       <span>GitHub</span>
+                    </div>
+                  )}
+                  {dev.linkedin_id && (
+                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#0077b5]/20 border border-[#0077b5]/30 text-[10px] text-[#0077b5] font-bold">
+                      <ExternalLink size={10} />
+                      <span>LinkedIn</span>
                     </div>
                   )}
                   <div className="flex items-center gap-1 text-yellow-400 text-xs ml-auto">

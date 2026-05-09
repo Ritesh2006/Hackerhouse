@@ -340,7 +340,10 @@ export default function Profile() {
                 {id === localStorage.getItem('user_id') && !profile.github_username && (
                   <motion.button 
                     whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-                    onClick={() => alert("Redirecting to GitHub OAuth...")}
+                    onClick={() => {
+                      const clientId = 'Iv1.6a9f43c49e29a8a7'; // Example Client ID
+                      window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=user`;
+                    }}
                     className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-slate-800 text-white border border-white/10 hover:border-indigo-500/30 transition-all"
                   >
                     <GitBranch size={16} /> Connect GitHub
@@ -350,7 +353,11 @@ export default function Profile() {
                 {id === localStorage.getItem('user_id') && !profile.linkedin_id && (
                   <motion.button 
                     whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-                    onClick={() => alert("Redirecting to LinkedIn OAuth...")}
+                    onClick={() => {
+                      const clientId = '868vgmsene5mzi';
+                      const redirectUri = encodeURIComponent(`${window.location.origin}/linkedin-callback`);
+                      window.location.href = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=openid%20profile%20email`;
+                    }}
                     className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-[#0077b5] text-white border border-white/10 hover:opacity-90 transition-all"
                   >
                     <ExternalLink size={16} /> Connect LinkedIn
