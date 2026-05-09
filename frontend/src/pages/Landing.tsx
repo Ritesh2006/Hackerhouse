@@ -75,17 +75,25 @@ function Floating3D() {
 }
 
 function ThreeScene() {
-  const [webglAvailable, setWebglAvailable] = useState(true);
+  const [webglAvailable, setWebglAvailable] = useState(() => {
+    if (typeof window !== 'undefined' && localStorage.getItem('webgl_failed') === 'true') return false;
+    return true;
+  });
 
   useEffect(() => {
+    if (!webglAvailable) return;
     try {
       const canvas = document.createElement('canvas');
       const support = !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
-      setWebglAvailable(support);
+      if (!support) {
+        setWebglAvailable(false);
+        localStorage.setItem('webgl_failed', 'true');
+      }
     } catch (e) {
       setWebglAvailable(false);
+      localStorage.setItem('webgl_failed', 'true');
     }
-  }, []);
+  }, [webglAvailable]);
 
   if (!webglAvailable) {
     return (
@@ -108,6 +116,7 @@ function ThreeScene() {
             event.preventDefault();
             console.warn('WebGL Context Lost. Attempting to recover...');
             setWebglAvailable(false); // Switch to fallback immediately
+            localStorage.setItem('webgl_failed', 'true');
           };
           gl.domElement.addEventListener('webglcontextlost', handleContextLost, false);
           return () => gl.domElement.removeEventListener('webglcontextlost', handleContextLost);

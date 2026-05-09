@@ -41,7 +41,7 @@ export default function Signup() {
       
       alert('Account created successfully!');
       navigate('/dashboard');
-      window.location.reload();
+      window.location.reload(); // Refresh to update navbar state
     } catch (err: any) {
       const msg = err.response?.data?.detail || err.message || 'Failed to create account';
       setError(msg);

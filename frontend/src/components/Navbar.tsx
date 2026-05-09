@@ -48,7 +48,8 @@ export default function Navbar() {
   }, [isMobileMenuOpen]);
 
   const token = localStorage.getItem('token');
-  const userId = localStorage.getItem('user_id');
+  let userId = localStorage.getItem('user_id');
+  if (userId === 'undefined' || userId === 'null') userId = null;
 
   const handleLogout = () => {
     localStorage.removeItem('token');
