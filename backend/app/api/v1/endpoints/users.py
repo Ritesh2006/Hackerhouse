@@ -112,7 +112,19 @@ async def link_github(username: str, current_user = Depends(get_current_user), d
     return {"status": "success", "github_username": username}
 
 @router.post("/link-linkedin")
-async def link_linkedin(linkedin_id: str, current_user = Depends(get_current_user), db = Depends(get_database)):
+async def link_linkedin(
+    linkedin_id: str,
+    linkedin_access_token: Optional[str] = Query(None),
+    linkedin_url: Optional[str] = Query(None),
+    current_user = Depends(get_current_user),
+    db = Depends(get_database)
+):
     user_repo = UserRepository(db)
-    await user_repo.update(current_user["_id"], {"linkedin_id": linkedin_id})
+    update_data = {"linkedin_id": linkedin_id}
+    if linkedin_access_token:
+        update_data["linkedin_access_token"] = linkedin_access_token
+    if linkedin_url:
+        update_data["linkedin_url"] = linkedin_url
+        
+    await user_repo.update(current_user["_id"], update_data)
     return {"status": "success", "linkedin_id": linkedin_id}

@@ -12,7 +12,10 @@ async def linkedin_callback(code: str, redirect_uri: str):
     profile = await get_linkedin_profile(token)
     if not profile:
         raise HTTPException(status_code=400, detail="Failed to fetch LinkedIn profile")
-    return {"profile": profile}
+    return {
+        "profile": profile,
+        "access_token": token
+    }
 
 @router.get("/profile")
 async def get_profile(token: str = Query(...)):

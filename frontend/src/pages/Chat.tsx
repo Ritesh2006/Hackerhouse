@@ -38,7 +38,8 @@ export default function Chat() {
             id: i,
             text: m.text,
             sender: String(m.sender_id) === String(userId) ? 'me' : 'other',
-            time: m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'
+            time: m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--',
+            linkedinStatus: m.linkedin_status
           })));
         } else {
           console.log("No messages found in chat history.");
@@ -81,7 +82,8 @@ export default function Chat() {
             id: Date.now(),
             text: data.text,
             sender: String(data.sender_id) === String(userId) ? 'me' : 'other',
-            time: data.timestamp ? new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            time: data.timestamp ? new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            linkedinStatus: data.linkedin_status
           }]);
         } catch {
           console.warn("Received non-JSON message:", event.data);
@@ -183,9 +185,28 @@ export default function Chat() {
                 >
                   {msg.text}
                 </div>
-                <p className={`text-[10px] text-slate-500 mt-1 px-1 flex items-center gap-1 ${msg.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
-                  {msg.time}
-                  {msg.sender === 'me' && <span className="text-indigo-400 font-bold">✓ Sent</span>}
+                <p className={`text-[10px] mt-1 px-1 flex flex-wrap items-center gap-1.5 ${msg.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
+                  <span className="text-slate-500">{msg.time}</span>
+                  {msg.sender === 'me' && (
+                    <>
+                      <span className="text-indigo-400 font-bold">✓ Sent</span>
+                      {msg.linkedinStatus?.synced && (
+                        <span 
+                          className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold text-white shadow-sm transition-all"
+                          style={{
+                            background: 'linear-gradient(135deg, #0077b5, #005987)',
+                            border: '1px solid rgba(255,255,255,0.1)'
+                          }}
+                          title={msg.linkedinStatus.details || 'Message synced to LinkedIn'}
+                        >
+                          <svg className="w-2.5 h-2.5 fill-current animate-pulse mr-0.5" viewBox="0 0 24 24">
+                            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                          </svg>
+                          Linked Sync
+                        </span>
+                      )}
+                    </>
+                  )}
                 </p>
               </div>
             </motion.div>

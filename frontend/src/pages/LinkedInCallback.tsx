@@ -20,7 +20,8 @@ export default function LinkedInCallback() {
         
         if (res.data && res.data.profile) {
           const profile = res.data.profile;
-          await api.post(`/users/link-linkedin?linkedin_id=${profile.linkedin_id}`);
+          const token = res.data.access_token;
+          await api.post(`/users/link-linkedin?linkedin_id=${profile.linkedin_id}&linkedin_access_token=${token || ''}&linkedin_url=${encodeURIComponent(profile.linkedin_url || '')}`);
           alert("LinkedIn connected successfully!");
         }
       } catch (err) {

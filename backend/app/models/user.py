@@ -19,5 +19,6 @@ class User(BaseModel):
     github_url: Optional[str] = None
     linkedin_id: Optional[str] = None
     linkedin_url: Optional[str] = None
+    linkedin_access_token: Optional[str] = None
     created_at: datetime = Field(default_factory=datetime.now)
     is_active: bool = True

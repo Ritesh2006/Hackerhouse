@@ -69,7 +69,8 @@ async def chat_socket_endpoint(websocket: WebSocket, contract_id: str, token: st
             await manager.broadcast(json.dumps({
                 "sender_id": user_id,
                 "text": message_data["text"],
-                "timestamp": str(saved_message["timestamp"])
+                "timestamp": str(saved_message["timestamp"]),
+                "linkedin_status": saved_message.get("linkedin_status")
             }), room_id)
             
     except WebSocketDisconnect:
