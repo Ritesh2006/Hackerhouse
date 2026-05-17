@@ -48,6 +48,7 @@ class HireService:
                             "created_at": datetime.now(UTC),
                             "is_active": True
                         }
+                        developer_data = {k: v for k, v in developer_data.items() if v is not None}
                         await self.user_repo.create(developer_data)
                         developer = developer_data
 
@@ -68,6 +69,7 @@ class HireService:
                         "is_active": True,
                         "created_at": datetime.now(UTC)
                     }
+                    developer_data = {k: v for k, v in developer_data.items() if v is not None}
                     await self.user_repo.create(developer_data)
                     developer = developer_data
 
