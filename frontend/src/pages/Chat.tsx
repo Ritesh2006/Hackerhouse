@@ -16,6 +16,7 @@ export default function Chat() {
   const token = localStorage.getItem('token');
   const userId = localStorage.getItem('user_id');
   
+  useEffect(() => {
     const getWsUrl = () => {
       const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
       // Handle relative URLs for production
