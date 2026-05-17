@@ -4,6 +4,18 @@ import { MapPin, Briefcase, Terminal, Code2, Star, GitBranch, Users, ExternalLin
 import { useState, useEffect } from 'react';
 import { usersApi, githubApi } from '../lib/api';
 
+const LinkedinIcon = ({ size = 16, className = "" }: { size?: number; className?: string }) => (
+  <svg 
+    viewBox="0 0 24 24" 
+    width={size} 
+    height={size} 
+    fill="currentColor" 
+    className={className}
+  >
+    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+  </svg>
+);
+
 function HireModal({ isOpen, onClose, developerName, developerId }: any) {
   const [formData, setFormData] = useState({
     title: '',
@@ -241,7 +253,11 @@ export default function Profile() {
 
   const skills = Array.isArray(profile.skills) ? profile.skills : [];
   const displayName = profile.name || profile.full_name || 'Anonymous Developer';
-  const linkedinUrl = profile.linkedin_url || (profile.linkedin_id ? `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(displayName)}` : null);
+  const linkedinUrl = profile.linkedin_url || 
+    (profile.linkedin_id 
+      ? `https://www.linkedin.com/search/results/all/?keywords=${profile.linkedin_id}` 
+      : `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(displayName)}`
+    );
 
   return (
     <div className="min-h-screen pt-24 pb-16 px-4" style={{ background: '#030712' }}>
@@ -344,7 +360,7 @@ export default function Profile() {
                     <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                       className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-[#0077b5] text-white transition-all hover:opacity-90"
                     >
-                      <ExternalLink size={16} /> LinkedIn <span className="text-white/70">↗</span>
+                      <LinkedinIcon size={16} /> LinkedIn <span className="text-white/70">↗</span>
                     </motion.button>
                   </a>
                 )}
@@ -359,7 +375,7 @@ export default function Profile() {
                     }}
                     className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-[#0077b5] text-white hover:opacity-90 transition-all shadow-lg shadow-[#0077b5]/20"
                   >
-                    <ExternalLink size={16} /> Connect LinkedIn
+                    <LinkedinIcon size={16} /> Connect LinkedIn
                   </motion.button>
                 )}
 
