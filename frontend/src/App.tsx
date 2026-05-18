@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -11,9 +11,11 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import LoadingScreen from './components/LoadingScreen';
 import AIAgent from './components/AIAgent';
+import ErrorBoundary from './components/ErrorBoundary';
 import { AnimatePresence, motion } from 'framer-motion';
 import GitHubCallback from './pages/GitHubCallback';
 import LinkedInCallback from './pages/LinkedInCallback';
+import { useAuthStore } from './stores/authStore';
 
 // Animated page wrapper
 function PageWrapper({ children }: { children: React.ReactNode }) {
@@ -63,17 +65,21 @@ function AppInner() {
 }
 
 function App() {
-  const [loading, setLoading] = useState(true);
+  const { initialized, checkAuth } = useAuthStore();
 
   useEffect(() => {
-    const t = setTimeout(() => setLoading(false), 1200);
-    return () => clearTimeout(t);
-  }, []);
+    checkAuth();
+  }, [checkAuth]);
+
+  if (!initialized) {
+    return <LoadingScreen />;
+  }
 
   return (
     <BrowserRouter>
-      <AnimatePresence>{loading && <LoadingScreen key="loader" />}</AnimatePresence>
-      {!loading && <AppInner />}
+      <ErrorBoundary>
+        <AppInner />
+      </ErrorBoundary>
     </BrowserRouter>
   );
 }

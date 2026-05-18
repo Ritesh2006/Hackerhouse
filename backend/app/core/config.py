@@ -23,7 +23,11 @@ class Settings(BaseSettings):
     # External APIs
     GITHUB_TOKEN: str = ""
     GITHUB_API_URL: str = "https://api.github.com"
+    GITHUB_CLIENT_ID: str = ""
+    GITHUB_CLIENT_SECRET: str = ""
     LINKEDIN_ACCESS_TOKEN: str = ""
+    LINKEDIN_CLIENT_ID: str = ""
+    LINKEDIN_CLIENT_SECRET: str = ""
     GROQ_API_KEY: str = ""
     
     # CORS

@@ -1,5 +1,8 @@
 node_modules/
 .env
+.env.*
+backend/.env
+frontend/.env
 __pycache__/
 *.pyc
 .DS_Store
@@ -9,4 +12,5 @@ build/
 .vercel/
 brain/
 scratch/
+*.log
 
