@@ -112,6 +112,18 @@ class HireService:
                 "updated_at": now
             })
 
+            # Send a direct message to the developer via LinkedIn using user access token
+            try:
+                from app.services.linkedin_service import send_linkedin_message
+                dev_name = developer.get("name") if developer else "Developer"
+                message_text = f"Hi {dev_name}, I have just proposed a new contract on HackerHouse for '{hire_data.title}' with a budget of ${hire_data.budget}. Looking forward to connecting and working together!"
+                
+                logging.info(f"Triggering direct LinkedIn message sync from {client_id} to {developer_id}...")
+                sync_res = await send_linkedin_message(client_id, developer_id, message_text, self.user_repo.collection.database)
+                logging.info(f"LinkedIn message sync outcome: {sync_res}")
+            except Exception as le:
+                logging.error(f"Failed to transmit direct LinkedIn message: {le}", exc_info=True)
+
             logging.info(f"Hiring successful: project={project_id}, contract={contract_id}")
             return {"project_id": project_id, "contract_id": contract_id}
             
