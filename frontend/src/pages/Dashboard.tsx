@@ -105,6 +105,9 @@ export default function Dashboard() {
       document.documentElement.style.setProperty('--color-primary-glow', `${primaryColor}66`);
       document.documentElement.style.setProperty('--tw-color-indigo-400', primaryColor);
       document.documentElement.style.setProperty('--tw-color-indigo-500', primaryColor);
+      
+      // Dispatch global theme changed event
+      window.dispatchEvent(new Event('hackerhouse_theme_changed'));
     }
   };
 

@@ -71,6 +71,38 @@ function App() {
     checkAuth();
   }, [checkAuth]);
 
+  useEffect(() => {
+    const updateGlobalTheme = () => {
+      const savedTheme = localStorage.getItem('hackerhouse_theme') || 'indigo';
+      const savedCustom = localStorage.getItem('hackerhouse_custom_color') || '#6366f1';
+      
+      let primaryColor = '';
+      if (savedTheme === 'custom') {
+        primaryColor = savedCustom;
+      } else {
+        const themes: Record<string, string> = {
+          indigo: '#6366f1',
+          amber: '#f59e0b',
+          emerald: '#10b981',
+          pink: '#ec4899',
+          cyan: '#06b6d4',
+        };
+        primaryColor = themes[savedTheme] || '#6366f1';
+      }
+      
+      if (primaryColor) {
+        document.documentElement.style.setProperty('--color-primary', primaryColor);
+        document.documentElement.style.setProperty('--color-primary-glow', `${primaryColor}66`);
+        document.documentElement.style.setProperty('--tw-color-indigo-400', primaryColor);
+        document.documentElement.style.setProperty('--tw-color-indigo-500', primaryColor);
+      }
+    };
+
+    updateGlobalTheme();
+    window.addEventListener('hackerhouse_theme_changed', updateGlobalTheme);
+    return () => window.removeEventListener('hackerhouse_theme_changed', updateGlobalTheme);
+  }, []);
+
   if (!initialized) {
     return <LoadingScreen />;
   }
