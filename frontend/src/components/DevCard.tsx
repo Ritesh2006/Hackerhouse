@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Star, MapPin, GitBranch, ExternalLink } from 'lucide-react';
-import { useNavigate, useRef } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import React, { useRef } from 'react';
 
 const SKILL_COLORS: Record<string, string> = {
   React: '#61dafb', TypeScript: '#3178c6', Python: '#4ade80', 'Node.js': '#68a063',

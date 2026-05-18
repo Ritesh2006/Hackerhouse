@@ -123,12 +123,12 @@ export default function Profile() {
           <div className="absolute top-0 right-0 w-[450px] h-[450px] rounded-full blur-[80px] pointer-events-none"
             style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.09), transparent 70%)' }} />
 
-          <div className="relative flex flex-col md:flex-row gap-6 sm:gap-8 items-start">
+          <div className="relative flex flex-col md:flex-row gap-5 sm:gap-8 items-start">
             <motion.div
               initial={{ scale: 0.85, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
-              className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-[2rem] bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-3xl sm:text-4xl font-black shadow-2xl shrink-0 overflow-hidden font-display image-glow-hover shine-sheen"
+              className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-[1.5rem] sm:rounded-[2rem] bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-2xl sm:text-4xl font-black shadow-2xl shrink-0 overflow-hidden font-display image-glow-hover shine-sheen"
               style={{ boxShadow: '0 16px 40px rgba(99,102,241,0.3)' }}
             >
               {profile.avatar_url ? (
@@ -139,16 +139,16 @@ export default function Profile() {
             </motion.div>
 
             <div className="flex-1 min-w-0 w-full">
-              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-3">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-3">
                 <div>
-                  <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight font-display tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white leading-tight font-display tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>
                     {displayName}
                   </h1>
-                  <p className="text-indigo-400 font-bold text-sm mt-0.5">@{profile.github_username || 'dev'}</p>
+                  <p className="text-indigo-400 font-bold text-xs sm:text-sm mt-0.5">@{profile.github_username || 'dev'}</p>
                 </div>
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 w-fit shrink-0">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 w-fit shrink-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  Available for contracts
+                  Available
                 </div>
               </div>
 

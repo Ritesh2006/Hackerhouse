@@ -146,13 +146,13 @@ export default function Dashboard() {
     <div className="min-h-screen pb-20 overflow-x-hidden" style={{ background: '#050914' }}>
       
       {/* ── BANNER AREA ── */}
-      <div className="relative w-full h-[320px] sm:h-[400px] overflow-hidden">
+      <div className="relative w-full h-[200px] sm:h-[320px] md:h-[400px] overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/40 via-purple-900/20 to-transparent" />
         <img src="/dashboard_banner.png" alt="Workspace Banner" className="w-full h-full object-cover animate-float" style={{ animationDuration: '20s' }} />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#050914] via-[#050914]/80 to-transparent" />
-        <div className="absolute inset-0 bg-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#050914] via-[#050914]/60 to-transparent" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 relative -mt-32 sm:-mt-40 z-10">
+      <div className="max-w-7xl mx-auto px-4 relative -mt-24 sm:-mt-32 md:-mt-40 z-10">
         
         {/* Workspace Welcome & Theme Panel Header */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
