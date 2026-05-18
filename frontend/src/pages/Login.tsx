@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Lock, ArrowRight, Eye, EyeOff, Sparkles, Terminal, Globe } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { authApi } from '../lib/api';
 
 function ParticleField() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -46,33 +45,25 @@ function ParticleField() {
   return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none" />;
 }
 
+import { useAuthStore } from '../stores/authStore';
+
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [focused, setFocused] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { login, loading } = useAuthStore();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
     try {
-      const res = await authApi.login({ email, password });
-      localStorage.setItem('token', res.data.access_token);
-      const userRes = await authApi.getMe();
-      const userId = userRes.data.id || userRes.data._id;
-      if (userId) {
-        localStorage.setItem('user_id', userId);
-        localStorage.setItem('chat_user_id', userId);
-      }
+      await login(email, password);
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.detail || err.message || 'Invalid email or password');
-    } finally {
-      setLoading(false);
     }
   };
 

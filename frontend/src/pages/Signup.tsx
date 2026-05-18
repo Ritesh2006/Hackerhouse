@@ -9,6 +9,8 @@ const roles = [
   { value: 'employer', label: 'Employer', desc: 'I hire talent', emoji: '🚀' },
 ];
 
+import { useAuthStore } from '../stores/authStore';
+
 export default function Signup() {
   const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'developer' });
   const [showPass, setShowPass] = useState(false);
@@ -16,6 +18,7 @@ export default function Signup() {
   const [error, setError] = useState('');
   const [focused, setFocused] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { login } = useAuthStore();
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,11 +26,7 @@ export default function Signup() {
     setError('');
     try {
       await authApi.register(formData);
-      const loginRes = await authApi.login({ email: formData.email, password: formData.password });
-      localStorage.setItem('token', loginRes.data.access_token);
-      const userRes = await authApi.getMe();
-      const userId = userRes.data.id || userRes.data._id;
-      if (userId) { localStorage.setItem('user_id', userId); localStorage.setItem('chat_user_id', userId); }
+      await login(formData.email, formData.password);
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.detail || err.message || 'Failed to create account');
