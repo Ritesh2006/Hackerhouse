@@ -1,87 +1,83 @@
 import { motion } from 'framer-motion';
-import { Code2 } from 'lucide-react';
 
 export default function LoadingScreen() {
-  const dashes = Array.from({ length: 8 });
-
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 1 }}
-      exit={{ opacity: 0, pointerEvents: 'none' }}
-      transition={{ duration: 0.5 }}
-      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#030712]"
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center"
+      style={{ background: '#050914' }}
     >
-      <div className="relative flex items-center justify-center">
-        {/* Central Logo */}
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="relative z-10 w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-2xl"
-          style={{ boxShadow: '0 0 40px rgba(99, 102, 241, 0.4)' }}
-        >
-          <Code2 size={32} className="text-white" />
-        </motion.div>
-
-        {/* Rotating Dashes */}
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-          className="absolute inset-0 flex items-center justify-center"
-          style={{ width: '120px', height: '120px' }}
-        >
-          {dashes.map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute bg-indigo-500/40 rounded-full"
-              style={{
-                width: '12px',
-                height: '4px',
-                left: '50%',
-                top: '50%',
-                transformOrigin: '0 0',
-                transform: `rotate(${i * 45}deg) translate(40px, -2px)`,
-              }}
-              animate={{
-                opacity: [0.2, 1, 0.2],
-                backgroundColor: ['rgba(99, 102, 241, 0.4)', 'rgba(34, 197, 94, 0.8)', 'rgba(99, 102, 241, 0.4)'],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                delay: i * 0.25,
-                ease: "easeInOut",
-              }}
-            />
-          ))}
-        </motion.div>
-
-        {/* Outer Glow Ring */}
-        <motion.div
-          animate={{ scale: [1, 1.1, 1], opacity: [0.1, 0.2, 0.1] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute w-32 h-32 rounded-full border border-indigo-500/10"
-        />
+      {/* Ambient glow */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.08), transparent 60%)', filter: 'blur(60px)' }} />
       </div>
 
-      {/* Brand Text */}
+      <div className="relative flex items-center justify-center">
+        {/* Spinning ring */}
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+          className="absolute w-24 h-24 rounded-full"
+          style={{ border: '2px solid transparent', borderTopColor: 'rgba(99,102,241,0.6)', borderRightColor: 'rgba(99,102,241,0.2)' }}
+        />
+
+        {/* Breathing glow ring */}
+        <motion.div
+          animate={{ scale: [1, 1.15, 1], opacity: [0.15, 0.3, 0.15] }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute w-28 h-28 rounded-full"
+          style={{ border: '1px solid rgba(99,102,241,0.15)' }}
+        />
+
+        {/* Logo */}
+        <motion.div
+          initial={{ scale: 0.7, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="relative z-10 w-14 h-14 rounded-2xl overflow-hidden"
+          style={{ boxShadow: '0 0 40px rgba(99,102,241,0.35)' }}
+        >
+          <img src="/logo.png" alt="HackerHouse" className="w-full h-full object-cover"
+            onError={e => {
+              (e.target as HTMLImageElement).style.display = 'none';
+              (e.target as HTMLImageElement).parentElement!.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#6366f1,#4f46e5);color:white;font-weight:900;font-size:24px;font-family:Outfit">H</div>';
+            }}
+          />
+        </motion.div>
+      </div>
+
+      {/* Brand text */}
       <motion.div
-        initial={{ y: 20, opacity: 0 }}
+        initial={{ y: 16, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.3, duration: 0.5 }}
-        className="mt-12 text-center"
+        className="mt-10 text-center"
       >
-        <h1 className="text-2xl font-bold tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-indigo-600">Hacker</span>
+        <h1 className="text-xl font-black tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+          <span className="text-gradient">Hacker</span>
           <span className="text-white">House</span>
         </h1>
         <motion.p
-          animate={{ opacity: [0.4, 1, 0.4] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          className="text-indigo-400/60 text-xs font-medium tracking-[0.2em] uppercase mt-2"
+          animate={{ opacity: [0.3, 0.8, 0.3] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          className="text-indigo-400/50 text-[11px] font-semibold tracking-[0.25em] uppercase mt-3"
         >
-          Initializing Environment
+          Loading workspace
         </motion.p>
+      </motion.div>
+
+      {/* Progress bar */}
+      <motion.div className="mt-8 w-32 h-0.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
+        <motion.div
+          initial={{ width: '0%' }}
+          animate={{ width: '100%' }}
+          transition={{ duration: 1.1, ease: [0.23, 1, 0.32, 1] }}
+          className="h-full rounded-full"
+          style={{ background: 'linear-gradient(90deg, #6366f1, #10b981)' }}
+        />
       </motion.div>
     </motion.div>
   );

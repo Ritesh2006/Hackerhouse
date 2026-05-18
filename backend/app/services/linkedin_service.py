@@ -75,7 +75,7 @@ async def get_linkedin_access_token(code: str, redirect_uri: str):
             response.raise_for_status()
             return response.json().get("access_token")
         except Exception as e:
-            logger.error(f"Error exchanging LinkedIn code: {e}")
+            logger.error(f"Error exchanging LinkedIn code: {e}") 
             return None
 
 async def send_linkedin_message(sender_id: str, recipient_id: str, message_text: str, db):

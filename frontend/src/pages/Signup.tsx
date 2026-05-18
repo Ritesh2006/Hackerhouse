@@ -1,177 +1,163 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Mail, Lock, User, Briefcase, ArrowRight, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Mail, Lock, User, Briefcase, ArrowRight, Eye, EyeOff, Sparkles, Check } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authApi } from '../lib/api';
 
+const roles = [
+  { value: 'developer', label: 'Developer', desc: 'I build & ship code', emoji: '⚡' },
+  { value: 'employer', label: 'Employer', desc: 'I hire talent', emoji: '🚀' },
+];
+
 export default function Signup() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    role: 'developer'
-  });
+  const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'developer' });
+  const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [focused, setFocused] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    
     try {
       await authApi.register(formData);
-      
-      // Auto login after signup
-      const loginRes = await authApi.login({ 
-        email: formData.email, 
-        password: formData.password 
-      });
-      
+      const loginRes = await authApi.login({ email: formData.email, password: formData.password });
       localStorage.setItem('token', loginRes.data.access_token);
-      
-      // Fetch user info to sync ID
       const userRes = await authApi.getMe();
       const userId = userRes.data.id || userRes.data._id;
-      if (userId) {
-        localStorage.setItem('user_id', userId);
-        localStorage.setItem('chat_user_id', userId);
-      }
-      
-      alert('Account created successfully!');
+      if (userId) { localStorage.setItem('user_id', userId); localStorage.setItem('chat_user_id', userId); }
       navigate('/dashboard');
     } catch (err: any) {
-      const msg = err.response?.data?.detail || err.message || 'Failed to create account';
-      setError(msg);
-    } finally {
-      setLoading(false);
-    }
+      setError(err.response?.data?.detail || err.message || 'Failed to create account');
+    } finally { setLoading(false); }
   };
 
+  const inputClass = "input-field";
+
   return (
-    <div className="min-h-screen pt-20 sm:pt-24 pb-16 px-4 flex items-center justify-center relative overflow-hidden bg-[#030014]">
-      {/* Background Gradients */}
-      <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-500/10 blur-[120px] pointer-events-none" />
+    <div className="min-h-screen flex items-center justify-center px-4 pt-24 pb-16 relative overflow-hidden" style={{ background: '#050914' }}>
+      {/* Orbs */}
+      <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.1), transparent 70%)', filter: 'blur(60px)', animation: 'breathe 9s ease-in-out infinite' }} />
+      <div className="absolute bottom-0 left-1/4 w-96 h-96 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.08), transparent 70%)', filter: 'blur(50px)' }} />
 
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
+      <motion.div
+        initial={{ opacity: 0, y: 28 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-lg relative z-10"
+        transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+        className="w-full max-w-[520px] relative z-10"
       >
-        <div className="glass rounded-[1.5rem] sm:rounded-[2.5rem] p-6 sm:p-8 md:p-10 border border-white/10 shadow-2xl shadow-indigo-500/5">
-          <div className="text-center mb-8">
-            <motion.div 
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/20"
-            >
-              <Sparkles className="text-white" size={32} />
-            </motion.div>
-            <h2 className="text-3xl font-bold text-white mb-2 font-display">Join HackerHouse</h2>
-            <p className="text-slate-400 text-sm">Find top developers or land your next professional contract</p>
-          </div>
+        <div className="relative rounded-[2rem] overflow-hidden"
+          style={{ background: 'linear-gradient(145deg, rgba(15,22,45,0.9), rgba(10,15,35,0.95))', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 32px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.07)' }}>
 
-          <form onSubmit={handleSignup} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {error && (
-              <motion.div 
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                className="col-span-1 sm:col-span-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs text-center font-medium"
-              >
-                {error}
+          <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(99,102,241,0.8), rgba(16,185,129,0.5), transparent)' }} />
+
+          <div className="p-8 sm:p-10">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.15, type: 'spring', stiffness: 200 }}
+                className="w-16 h-16 rounded-2xl mx-auto mb-5 flex items-center justify-center relative"
+                style={{ background: 'linear-gradient(135deg, #6366f1, #10b981)', boxShadow: '0 8px 32px rgba(99,102,241,0.35)' }}>
+                <Sparkles size={28} className="text-white" />
               </motion.div>
-            )}
-
-            <div className="space-y-2 col-span-1 sm:col-span-2">
-              <label className="text-xs font-semibold text-slate-400 ml-1">Full Name</label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-blue-400 transition-colors">
-                  <User size={18} />
-                </div>
-                <input 
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white placeholder-slate-600 outline-none focus:border-blue-500/50 focus:bg-white/[0.08] transition-all"
-                  placeholder="John Doe"
-                />
-              </div>
+              <h1 className="text-2xl sm:text-3xl font-black text-white mb-1.5" style={{ fontFamily: 'Outfit, sans-serif', letterSpacing: '-0.02em' }}>Join HackerHouse</h1>
+              <p className="text-slate-400 text-sm">Connect with elite developers around the world</p>
             </div>
 
-            <div className="space-y-2 col-span-1 sm:col-span-2">
-              <label className="text-xs font-semibold text-slate-400 ml-1">Email Address</label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-blue-400 transition-colors">
-                  <Mail size={18} />
-                </div>
-                <input 
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white placeholder-slate-600 outline-none focus:border-blue-500/50 focus:bg-white/[0.08] transition-all"
-                  placeholder="john@hackerhouse.com"
-                />
-              </div>
+            {/* Role picker */}
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              {roles.map(r => (
+                <motion.button key={r.value} type="button" whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}
+                  onClick={() => setFormData({ ...formData, role: r.value })}
+                  className="relative p-4 rounded-2xl text-left transition-all"
+                  style={{
+                    background: formData.role === r.value ? 'rgba(99,102,241,0.12)' : 'rgba(255,255,255,0.03)',
+                    border: `1px solid ${formData.role === r.value ? 'rgba(99,102,241,0.4)' : 'rgba(255,255,255,0.07)'}`,
+                  }}>
+                  {formData.role === r.value && (
+                    <motion.div layoutId="roleCheck" className="absolute top-3 right-3 w-5 h-5 rounded-full flex items-center justify-center"
+                      style={{ background: 'rgba(99,102,241,0.3)', border: '1px solid rgba(99,102,241,0.5)' }}>
+                      <Check size={11} className="text-indigo-300" />
+                    </motion.div>
+                  )}
+                  <div className="text-xl mb-1">{r.emoji}</div>
+                  <div className="font-bold text-white text-sm">{r.label}</div>
+                  <div className="text-[11px] text-slate-500">{r.desc}</div>
+                </motion.button>
+              ))}
             </div>
 
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-400 ml-1">Password</label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-blue-400 transition-colors">
-                  <Lock size={18} />
+            <form onSubmit={handleSignup}>
+              <AnimatePresence>
+                {error && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+                    className="p-3.5 rounded-2xl text-red-300 text-sm text-center font-medium mb-4"
+                    style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
+                    ⚠️ {error}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <div className="grid grid-cols-2 gap-4">
+                {/* Name */}
+                <div className="space-y-1.5 col-span-2">
+                  <label className="text-xs font-bold text-slate-400 tracking-wide uppercase ml-1">Full Name</label>
+                  <div className="relative">
+                    <div className={`absolute inset-y-0 left-4 flex items-center pointer-events-none transition-colors ${focused === 'name' ? 'text-indigo-400' : 'text-slate-500'}`}><User size={15} /></div>
+                    <input type="text" required value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} onFocus={() => setFocused('name')} onBlur={() => setFocused(null)} placeholder="Jane Smith" className={`${inputClass} pl-11`} style={{ borderRadius: '14px' }} />
+                  </div>
                 </div>
-                <input 
-                  type="password"
-                  required
-                  value={formData.password}
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white placeholder-slate-600 outline-none focus:border-blue-500/50 focus:bg-white/[0.08] transition-all"
-                  placeholder="••••••••"
-                />
-              </div>
-            </div>
 
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-400 ml-1">Account Role</label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-blue-400 transition-colors">
-                  <Briefcase size={18} />
+                {/* Email */}
+                <div className="space-y-1.5 col-span-2">
+                  <label className="text-xs font-bold text-slate-400 tracking-wide uppercase ml-1">Email</label>
+                  <div className="relative">
+                    <div className={`absolute inset-y-0 left-4 flex items-center pointer-events-none transition-colors ${focused === 'email' ? 'text-indigo-400' : 'text-slate-500'}`}><Mail size={15} /></div>
+                    <input type="email" required value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} onFocus={() => setFocused('email')} onBlur={() => setFocused(null)} placeholder="jane@example.com" className={`${inputClass} pl-11`} style={{ borderRadius: '14px' }} />
+                  </div>
                 </div>
-                <select 
-                  value={formData.role}
-                  onChange={(e) => setFormData({...formData, role: e.target.value})}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white outline-none focus:border-blue-500/50 focus:bg-white/[0.08] transition-all appearance-none cursor-pointer"
-                >
-                  <option value="developer" className="bg-[#030014]">Developer</option>
-                  <option value="employer" className="bg-[#030014]">Employer</option>
-                </select>
+
+                {/* Password */}
+                <div className="space-y-1.5 col-span-2 sm:col-span-1">
+                  <label className="text-xs font-bold text-slate-400 tracking-wide uppercase ml-1">Password</label>
+                  <div className="relative">
+                    <div className={`absolute inset-y-0 left-4 flex items-center pointer-events-none transition-colors ${focused === 'password' ? 'text-indigo-400' : 'text-slate-500'}`}><Lock size={15} /></div>
+                    <input type={showPass ? 'text' : 'password'} required value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} onFocus={() => setFocused('password')} onBlur={() => setFocused(null)} placeholder="••••••••••" className={`${inputClass} pl-11 pr-11`} style={{ borderRadius: '14px' }} />
+                    <button type="button" onClick={() => setShowPass(!showPass)} className="absolute inset-y-0 right-4 flex items-center text-slate-500 hover:text-slate-300 transition-colors">
+                      {showPass ? <EyeOff size={14} /> : <Eye size={14} />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Role display */}
+                <div className="space-y-1.5 col-span-2 sm:col-span-1">
+                  <label className="text-xs font-bold text-slate-400 tracking-wide uppercase ml-1">Role</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-500"><Briefcase size={15} /></div>
+                    <select value={formData.role} onChange={e => setFormData({ ...formData, role: e.target.value })}
+                      className={`${inputClass} pl-11 appearance-none`} style={{ borderRadius: '14px', background: 'rgba(255,255,255,0.04)' }}>
+                      {roles.map(r => <option key={r.value} value={r.value} style={{ background: '#0a0f1e' }}>{r.label}</option>)}
+                    </select>
+                  </div>
+                </div>
+
+                <motion.button type="submit" disabled={loading} whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
+                  className="col-span-2 btn-primary py-4 rounded-2xl flex items-center justify-center gap-2.5 font-bold text-base mt-3">
+                  {loading ? (
+                    <div className="spinner" style={{ width: 22, height: 22, borderWidth: 2.5 }} />
+                  ) : (
+                    <><span>Create Account</span><ArrowRight size={17} /></>
+                  )}
+                </motion.button>
               </div>
-            </div>
+            </form>
 
-            <button 
-              type="submit"
-              disabled={loading}
-              className="col-span-1 sm:col-span-2 btn-primary py-4 rounded-2xl flex items-center justify-center gap-2 font-bold group shadow-lg shadow-indigo-500/20 mt-4"
-            >
-              {loading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <>
-                  <span>Create Professional Account</span>
-                  <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                </>
-              )}
-            </button>
-          </form>
-
-          <p className="mt-8 text-center text-sm text-slate-500">
-            Already have an account? {' '}
-            <Link to="/login" className="text-blue-400 font-bold hover:text-blue-300 transition-colors">Sign in here</Link>
-          </p>
+            <p className="mt-6 text-center text-sm text-slate-500">
+              Already on HackerHouse?{' '}
+              <Link to="/login" className="text-indigo-400 font-bold hover:text-indigo-300 transition-colors">Sign in →</Link>
+            </p>
+          </div>
         </div>
       </motion.div>
     </div>

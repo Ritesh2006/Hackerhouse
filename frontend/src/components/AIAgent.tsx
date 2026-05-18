@@ -15,6 +15,7 @@ const AIAgent = () => {
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [inputFocused, setInputFocused] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -38,7 +39,6 @@ const AIAgent = () => {
     setIsLoading(true);
 
     try {
-      // Using axios 'api' instance which already has base URL and auth headers
       const response = await api.post('/ai/chat', {
         message: userMessage,
         history: chatHistory.map(m => ({ role: m.role, content: m.content }))
@@ -63,72 +63,84 @@ const AIAgent = () => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            initial={{ opacity: 0, y: 24, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-            className="absolute bottom-16 right-0 w-[calc(100vw-2rem)] sm:w-96 h-[480px] sm:h-[500px] max-h-[75vh] bg-[#1a1b26] border border-[#2d2e3d] rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+            exit={{ opacity: 0, y: 24, scale: 0.95 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+            className="absolute bottom-20 right-0 w-[calc(100vw-2rem)] sm:w-[380px] h-[520px] max-h-[75vh] border rounded-3xl shadow-2xl flex flex-col overflow-hidden"
+            style={{ 
+              background: 'linear-gradient(145deg, rgba(15,22,45,0.98), rgba(10,15,35,0.99))', 
+              borderColor: 'rgba(255,255,255,0.08)',
+              boxShadow: '0 32px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)'
+            }}
           >
+            {/* Ambient background glow inside agent */}
+            <div className="absolute top-0 right-0 w-48 h-48 rounded-full blur-3xl pointer-events-none" 
+              style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.08), transparent 70%)' }} />
+
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-[#2d2e3d] bg-gradient-to-r from-[#1f202e] to-[#1a1b26]">
+            <div className="flex items-center justify-between p-4.5 border-b border-white/5 relative z-10 bg-indigo-500/[0.02]">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full p-0.5 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 shadow-lg shadow-indigo-500/20">
-                  <img 
-                    src="/ai_agent_logo.png" 
-                    alt="HackerHouse AI" 
-                    className="w-full h-full rounded-full object-cover bg-[#0f1015]"
-                  />
+                <div className="w-10 h-10 rounded-2xl p-0.5 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 shadow-lg shadow-indigo-500/25 shrink-0">
+                  <div className="w-full h-full rounded-2xl overflow-hidden bg-[#0c1020] flex items-center justify-center">
+                    <Sparkles size={16} className="text-indigo-400" />
+                  </div>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white flex items-center gap-2">
-                    SoulLink AI <Sparkles size={14} className="text-purple-400" />
+                  <h3 className="font-bold text-white text-sm flex items-center gap-1.5 font-display" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                    SoulLink AI <Sparkles size={13} className="text-indigo-400 animate-pulse" />
                   </h3>
-                  <p className="text-[10px] text-gray-400 uppercase tracking-widest font-medium">HackerHouse Production</p>
+                  <p className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Verified Assistant</p>
                 </div>
               </div>
               <button 
                 onClick={() => setIsOpen(false)}
-                className="p-2 text-gray-400 hover:text-white rounded-full hover:bg-[#2d2e3d] transition-colors"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 hover:text-white hover:bg-white/5 transition-all"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 relative z-10 scrollbar-hide">
               {messages.map((msg, idx) => (
                 <div 
                   key={idx} 
                   className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
                 >
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden ${
+                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 overflow-hidden ${
                     msg.role === 'user' 
-                      ? 'bg-[#2d2e3d]' 
-                      : 'bg-gradient-to-br from-indigo-500 to-purple-600 p-0.5'
+                      ? 'bg-white/5 border border-white/10' 
+                      : 'bg-indigo-500/10 border border-indigo-500/25 p-0.5'
                   }`}>
                     {msg.role === 'user' ? (
-                      <User size={16} className="text-gray-300" />
+                      <User size={14} className="text-slate-300" />
                     ) : (
-                      <img src="/ai_agent_logo.png" className="w-full h-full rounded-full object-cover" />
+                      <Sparkles size={14} className="text-indigo-400" />
                     )}
                   </div>
-                  <div className={`max-w-[75%] p-3 rounded-2xl ${
-                    msg.role === 'user'
-                      ? 'bg-indigo-600 text-white rounded-tr-none shadow-lg shadow-indigo-900/20'
-                      : 'bg-[#2d2e3d] text-gray-200 rounded-tl-none border border-white/5'
-                  }`}>
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                  <div 
+                    className={`max-w-[78%] p-3.5 text-sm leading-relaxed ${
+                      msg.role === 'user'
+                        ? 'text-white'
+                        : 'text-slate-200'
+                    }`}
+                    style={msg.role === 'user'
+                      ? { background: 'linear-gradient(135deg, #6366f1, #4f46e5)', borderRadius: '18px 18px 4px 18px', boxShadow: '0 4px 12px rgba(99,102,241,0.15)' }
+                      : { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '18px 18px 18px 4px' }
+                    }
+                  >
+                    <p className="whitespace-pre-wrap text-[13px]">{msg.content}</p>
                   </div>
                 </div>
               ))}
               {isLoading && (
-                <div className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 p-0.5 flex items-center justify-center">
-                    <img src="/ai_agent_logo.png" className="w-full h-full rounded-full object-cover" />
+                <div className="flex gap-3 animate-pulse">
+                  <div className="w-8 h-8 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
+                    <Loader2 size={14} className="text-indigo-400 animate-spin" />
                   </div>
-                  <div className="bg-[#2d2e3d] p-3 rounded-2xl rounded-tl-none flex items-center gap-2 border border-white/5">
-                    <Loader2 size={16} className="text-purple-400 animate-spin" />
-                    <span className="text-sm text-gray-400">Connecting to soul...</span>
+                  <div className="bg-white/3 border border-white/5 p-3.5 rounded-2xl rounded-tl-none flex items-center gap-2">
+                    <span className="text-xs text-slate-500 font-semibold tracking-wide">AI is brainstorming...</span>
                   </div>
                 </div>
               )}
@@ -136,21 +148,28 @@ const AIAgent = () => {
             </div>
 
             {/* Input Area */}
-            <div className="p-4 border-t border-[#2d2e3d] bg-[#1a1b26]">
+            <div className="p-4 border-t border-white/5 relative z-10 bg-indigo-500/[0.01]">
               <form onSubmit={handleSendMessage} className="relative">
                 <input
                   type="text"
                   value={inputValue}
+                  onFocus={() => setInputFocused(true)}
+                  onBlur={() => setInputFocused(false)}
                   onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Tell me your vision..."
-                  className="w-full bg-[#0f1015] border border-[#2d2e3d] text-white rounded-full py-3 pl-4 pr-12 focus:outline-none focus:border-indigo-500 transition-all placeholder:text-gray-600 text-sm"
+                  placeholder="Ask anything or search developers..."
+                  className="w-full bg-[#050914] border text-white rounded-2xl py-3 pl-4 pr-12 focus:outline-none transition-all placeholder:text-slate-600 text-xs font-semibold"
+                  style={{ borderColor: inputFocused ? 'rgba(99,102,241,0.4)' : 'rgba(255,255,255,0.08)' }}
                 />
+                {inputFocused && (
+                  <motion.div layoutId="agentInputFocus" className="absolute inset-0 rounded-2xl pointer-events-none" style={{ boxShadow: '0 0 0 3px rgba(99,102,241,0.12)' }} />
+                )}
                 <button
                   type="submit"
                   disabled={!inputValue.trim() || isLoading}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-indigo-500/40 transition-all"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-xl text-white disabled:opacity-30 disabled:scale-100 hover:shadow-lg hover:shadow-indigo-500/30 transition-all"
+                  style={{ background: inputValue.trim() ? 'linear-gradient(135deg, #6366f1, #4f46e5)' : 'rgba(255,255,255,0.05)' }}
                 >
-                  <Send size={14} className="ml-0.5" />
+                  <Send size={13} className="translate-x-px" />
                 </button>
               </form>
             </div>
@@ -160,10 +179,10 @@ const AIAgent = () => {
 
       {/* Floating Action Button */}
       <motion.button
-        whileHover={{ scale: 1.1, rotate: 5 }}
-        whileTap={{ scale: 0.9 }}
+        whileHover={{ scale: 1.06, rotate: 3 }}
+        whileTap={{ scale: 0.94 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="w-16 h-16 rounded-full p-1 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 shadow-2xl shadow-indigo-500/40 flex items-center justify-center text-white relative group overflow-hidden"
+        className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 shadow-2xl shadow-indigo-500/30 flex items-center justify-center text-white relative group overflow-hidden"
       >
         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
         <AnimatePresence mode="wait">
@@ -175,21 +194,16 @@ const AIAgent = () => {
               exit={{ rotate: 90, opacity: 0 }}
               transition={{ duration: 0.15 }}
             >
-              <X size={28} />
+              <X size={24} />
             </motion.div>
           ) : (
             <motion.div
               key="logo"
-              initial={{ scale: 0, opacity: 0 }}
+              initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0, opacity: 0 }}
-              className="w-full h-full rounded-full overflow-hidden"
+              exit={{ scale: 0.8, opacity: 0 }}
             >
-              <img 
-                src="/ai_agent_logo.png" 
-                alt="AI Agent" 
-                className="w-full h-full object-cover scale-110"
-              />
+              <Sparkles size={22} className="text-white" />
             </motion.div>
           )}
         </AnimatePresence>
@@ -197,13 +211,12 @@ const AIAgent = () => {
         {/* Pulsing ring when closed */}
         {!isOpen && (
           <>
-            <span className="absolute -inset-2 rounded-full border border-indigo-500/30 animate-ping" />
-            <span className="absolute -inset-4 rounded-full border border-purple-500/10 animate-pulse" />
+            <span className="absolute -inset-1.5 rounded-2xl border border-indigo-500/35 animate-ping" />
+            <span className="absolute -inset-3 rounded-2xl border border-purple-500/10 animate-pulse" />
           </>
         )}
       </motion.button>
     </div>
-
   );
 };
 
