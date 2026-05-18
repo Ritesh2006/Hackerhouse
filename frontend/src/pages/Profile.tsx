@@ -425,7 +425,7 @@ export default function Profile() {
                   <motion.button 
                     whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
                     onClick={() => {
-                      const clientId = '8630h8u8a8g170';
+                      const clientId = import.meta.env.VITE_LINKEDIN_CLIENT_ID || '8630h8u8a8g170';
                       const redirectUri = `${window.location.origin}/linkedin-callback`;
                       window.location.href = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=openid%20profile%20email`;
                     }}
@@ -439,7 +439,7 @@ export default function Profile() {
                   <motion.button 
                     whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
                     onClick={() => {
-                      const clientId = 'Iv1.6a9f43c49e29a8a7';
+                      const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID || 'Iv1.6a9f43c49e29a8a7';
                       window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=user`;
                     }}
                     className="flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm bg-slate-800 text-white border border-white/10 hover:border-indigo-500/30 transition-all"

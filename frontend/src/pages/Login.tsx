@@ -206,17 +206,24 @@ export default function Login() {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              {[
-                { icon: Terminal, label: 'GitHub', color: '#fff' },
-                { icon: Globe, label: 'Google', color: '#fff' },
-              ].map(({ icon: Icon, label }) => (
-                <motion.button key={label} whileHover={{ y: -1, scale: 1.01 }} whileTap={{ scale: 0.98 }}
-                  className="flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-bold text-slate-300 hover:text-white transition-all"
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                  <Icon size={15} />
-                  {label}
-                </motion.button>
-              ))}
+              <motion.button whileHover={{ y: -1, scale: 1.01 }} whileTap={{ scale: 0.98 }}
+                onClick={() => {
+                  const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID || 'Iv1.6a9f43c49e29a8a7';
+                  window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=user`;
+                }}
+                className="flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-bold text-slate-300 hover:text-white transition-all"
+                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                <Terminal size={15} />
+                GitHub
+              </motion.button>
+              <motion.button whileHover={{ y: -1, scale: 1.01 }} whileTap={{ scale: 0.98 }}
+                disabled
+                className="flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-bold text-slate-500 cursor-not-allowed"
+                style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}
+                title="Google login coming soon">
+                <Globe size={15} />
+                Google
+              </motion.button>
             </div>
 
             <p className="mt-7 text-center text-sm text-slate-500">
