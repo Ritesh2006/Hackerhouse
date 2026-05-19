@@ -31,7 +31,7 @@ export default class ErrorBoundary extends Component<Props, State> {
         return this.props.fallback;
       }
       return (
-        <div className="min-h-screen flex flex-col items-center justify-center px-4" style={{ background: '#050914', color: '#e2e8f0' }}>
+        <div className="min-h-screen flex flex-col items-center justify-center px-4" style={{ background: 'var(--color-background)', color: '#e2e8f0' }}>
           <div className="max-w-md text-center">
             <div className="w-20 h-20 rounded-2xl bg-red-500/10 flex items-center justify-center mx-auto mb-6 border border-red-500/20">
               <svg className="w-10 h-10 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">

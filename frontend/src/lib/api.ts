@@ -38,6 +38,7 @@ export const usersApi = {
 
 export const githubApi = {
   getProfile: (username: string) => api.get(`/github/${username}`),
+  analyzeRepos: (username: string) => api.post(`/ai/analyze`, { username }),
 };
 
 export const authApi = {

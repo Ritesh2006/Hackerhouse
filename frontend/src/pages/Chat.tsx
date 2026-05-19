@@ -124,7 +124,7 @@ export default function Chat() {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col h-[100dvh]" style={{ background: '#050914' }}>
+    <div className="fixed inset-0 z-[100] flex flex-col h-[100dvh]" style={{ background: 'var(--color-background)' }}>
       <div className="flex-1 flex flex-col min-h-0 relative">
         
         {/* Header */}
@@ -139,7 +139,7 @@ export default function Chat() {
             </Link>
             <div className="min-w-0">
               <h3 className="font-bold text-white text-sm truncate flex items-center gap-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                HackerHouse Chat <Sparkles size={14} className="text-indigo-400" />
+                HackerHouse Chat <Sparkles size={14} className="text-primary" />
               </h3>
               <p className={`text-[10px] md:text-xs flex items-center gap-1.5 ${wsStatus === 'connected' ? 'text-emerald-400' : wsStatus === 'connecting' ? 'text-amber-400' : 'text-rose-400'}`}>
                 <span className={`w-1.5 h-1.5 rounded-full ${wsStatus === 'connected' ? 'bg-emerald-400 animate-pulse' : wsStatus === 'connecting' ? 'bg-amber-400 animate-bounce' : 'bg-rose-400'}`} />
@@ -159,8 +159,8 @@ export default function Chat() {
         <div className="flex-1 overflow-y-auto px-4 md:px-6 py-6 space-y-4 scrollbar-hide">
           {messages.length === 0 && (
             <div className="flex flex-col items-center justify-center h-full text-center gap-3 py-20">
-              <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/15">
-                <Terminal size={24} className="text-indigo-400" />
+              <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/15">
+                <Terminal size={24} className="text-primary" />
               </div>
               <p className="text-slate-400 text-sm font-semibold">Start your production chat.</p>
               <p className="text-slate-600 text-xs max-w-xs">All developer communications are end-to-end verified and synced with LinkedIn & GitHub metadata.</p>
@@ -180,7 +180,7 @@ export default function Chat() {
                     msg.sender === 'me' ? 'text-white' : 'text-slate-200'
                   }`}
                   style={msg.sender === 'me'
-                    ? { background: 'linear-gradient(135deg, #6366f1, #4f46e5)', borderRadius: '18px 18px 4px 18px', boxShadow: '0 4px 12px rgba(99,102,241,0.2)' }
+                    ? { background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary-light))', borderRadius: '18px 18px 4px 18px', boxShadow: '0 4px 12px var(--color-primary-glow)' }
                     : { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '18px 18px 18px 4px' }
                   }
                 >
@@ -190,7 +190,7 @@ export default function Chat() {
                   <span className="text-slate-600 font-bold">{msg.time}</span>
                   {msg.sender === 'me' && (
                     <>
-                      <span className="text-indigo-400/80 flex items-center gap-0.5"><Shield size={10} /> Sync</span>
+                      <span className="text-primary/80 flex items-center gap-0.5"><Shield size={10} /> Sync</span>
                       {msg.linkedinStatus?.synced && (
                         <span 
                           className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[8px] font-bold text-white shadow-sm transition-all"
@@ -222,7 +222,7 @@ export default function Chat() {
           style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 1.5rem)' }}
         >
           <div className="flex items-center gap-3 bg-white/[0.03] border rounded-2xl px-4 py-2 relative transition-all"
-            style={{ borderColor: focused ? 'rgba(99,102,241,0.45)' : 'rgba(255,255,255,0.08)', boxShadow: focused ? '0 0 20px rgba(99,102,241,0.08)' : 'none' }}>
+            style={{ borderColor: focused ? 'var(--color-primary)' : 'rgba(255,255,255,0.08)', boxShadow: focused ? '0 0 20px var(--color-primary-glow)' : 'none' }}>
             <input
               type="text"
               value={input}
@@ -234,7 +234,7 @@ export default function Chat() {
               className="flex-1 bg-transparent text-sm text-slate-200 placeholder-slate-600 outline-none py-2"
             />
             {focused && (
-              <motion.div layoutId="chatInputFocus" className="absolute inset-0 rounded-2xl pointer-events-none" style={{ boxShadow: '0 0 0 3px rgba(99,102,241,0.12)' }} />
+              <motion.div layoutId="chatInputFocus" className="absolute inset-0 rounded-2xl pointer-events-none" style={{ boxShadow: '0 0 0 3px var(--color-primary-glow)' }} />
             )}
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -242,7 +242,7 @@ export default function Chat() {
               onClick={handleSend}
               disabled={!input.trim()}
               className="w-10 h-10 rounded-xl flex items-center justify-center transition-all disabled:opacity-40 disabled:scale-100"
-              style={{ background: input.trim() ? 'linear-gradient(135deg, #6366f1, #4f46e5)' : 'rgba(255,255,255,0.05)' }}
+              style={{ background: input.trim() ? 'linear-gradient(135deg, var(--color-primary), var(--color-primary-light))' : 'rgba(255,255,255,0.05)' }}
             >
               <Send size={15} className="text-white translate-x-px" />
             </motion.button>

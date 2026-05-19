@@ -66,16 +66,16 @@ export default function HireModal({ isOpen, onClose, developerName, developerId 
       {isOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            onClick={onClose} className="absolute inset-0 bg-[#050914]/80 backdrop-blur-xl" />
+            onClick={onClose} className="absolute inset-0 bg-background/80 backdrop-blur-xl" />
           <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }} transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
             className="relative w-full max-w-lg overflow-hidden border border-white/8 shadow-2xl rounded-[2rem]"
             style={{ background: 'linear-gradient(145deg, rgba(15,22,45,0.95), rgba(10,15,35,0.98))' }}>
-            <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-indigo-500 to-transparent" />
-            <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between bg-indigo-500/5">
+            <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-primary to-transparent" />
+            <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between bg-primary/5">
               <div>
                 <h3 className="text-xl font-black text-white flex items-center gap-2 font-display">
-                  Hire {developerName} <Sparkles size={16} className="text-indigo-400" />
+                  Hire {developerName} <Sparkles size={16} className="text-primary" />
                 </h3>
                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Enterprise Contract Protocol</p>
               </div>
@@ -91,7 +91,7 @@ export default function HireModal({ isOpen, onClose, developerName, developerId 
                     onFocus={() => setFocused('title')} onBlur={() => setFocused(null)}
                     placeholder="e.g. Build a Modern Landing Page" className="input-field" style={{ borderRadius: '14px' }} />
                   {focused === 'title' && (
-                    <motion.div layoutId="modalFocus" className="absolute inset-0 rounded-[14px] pointer-events-none" style={{ boxShadow: '0 0 0 3px rgba(99,102,241,0.15)' }} />
+                    <motion.div layoutId="modalFocus" className="absolute inset-0 rounded-[14px] pointer-events-none" style={{ boxShadow: '0 0 0 3px var(--color-primary-glow)' }} />
                   )}
                 </div>
               </div>
@@ -102,7 +102,7 @@ export default function HireModal({ isOpen, onClose, developerName, developerId 
                     onFocus={() => setFocused('desc')} onBlur={() => setFocused(null)}
                     placeholder="Describe the project goals and requirements..." className="input-field h-28 resize-none py-3" style={{ borderRadius: '14px' }} />
                   {focused === 'desc' && (
-                    <motion.div layoutId="modalFocus" className="absolute inset-0 rounded-[14px] pointer-events-none" style={{ boxShadow: '0 0 0 3px rgba(99,102,241,0.15)' }} />
+                    <motion.div layoutId="modalFocus" className="absolute inset-0 rounded-[14px] pointer-events-none" style={{ boxShadow: '0 0 0 3px var(--color-primary-glow)' }} />
                   )}
                 </div>
               </div>
@@ -115,7 +115,7 @@ export default function HireModal({ isOpen, onClose, developerName, developerId 
                       onFocus={() => setFocused('budget')} onBlur={() => setFocused(null)}
                       placeholder="500" className="input-field pl-10" style={{ borderRadius: '14px' }} />
                     {focused === 'budget' && (
-                      <motion.div layoutId="modalFocus" className="absolute inset-0 rounded-[14px] pointer-events-none" style={{ boxShadow: '0 0 0 3px rgba(99,102,241,0.15)' }} />
+                      <motion.div layoutId="modalFocus" className="absolute inset-0 rounded-[14px] pointer-events-none" style={{ boxShadow: '0 0 0 3px var(--color-primary-glow)' }} />
                     )}
                   </div>
                 </div>
@@ -127,7 +127,7 @@ export default function HireModal({ isOpen, onClose, developerName, developerId 
                       onFocus={() => setFocused('deadline')} onBlur={() => setFocused(null)}
                       className="input-field pl-10 block" style={{ borderRadius: '14px' }} />
                     {focused === 'deadline' && (
-                      <motion.div layoutId="modalFocus" className="absolute inset-0 rounded-[14px] pointer-events-none" style={{ boxShadow: '0 0 0 3px rgba(99,102,241,0.15)' }} />
+                      <motion.div layoutId="modalFocus" className="absolute inset-0 rounded-[14px] pointer-events-none" style={{ boxShadow: '0 0 0 3px var(--color-primary-glow)' }} />
                     )}
                   </div>
                 </div>

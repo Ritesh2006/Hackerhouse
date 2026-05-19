@@ -7,12 +7,12 @@ export default function LoadingScreen() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
       className="fixed inset-0 z-[9999] flex flex-col items-center justify-center"
-      style={{ background: '#050914' }}
+      style={{ background: 'var(--color-background)' }}
     >
       {/* Ambient glow */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.08), transparent 60%)', filter: 'blur(60px)' }} />
+          style={{ background: 'radial-gradient(circle, var(--color-primary-glow), transparent 60%)', filter: 'blur(60px)' }} />
       </div>
 
       <div className="relative flex items-center justify-center">
@@ -21,7 +21,7 @@ export default function LoadingScreen() {
           animate={{ rotate: 360 }}
           transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
           className="absolute w-24 h-24 rounded-full"
-          style={{ border: '2px solid transparent', borderTopColor: 'rgba(99,102,241,0.6)', borderRightColor: 'rgba(99,102,241,0.2)' }}
+          style={{ border: '2px solid transparent', borderTopColor: 'var(--color-primary)', borderRightColor: 'var(--color-primary-glow)' }}
         />
 
         {/* Breathing glow ring */}
@@ -29,7 +29,7 @@ export default function LoadingScreen() {
           animate={{ scale: [1, 1.15, 1], opacity: [0.15, 0.3, 0.15] }}
           transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
           className="absolute w-28 h-28 rounded-full"
-          style={{ border: '1px solid rgba(99,102,241,0.15)' }}
+          style={{ border: '1px solid var(--color-primary-glow)' }}
         />
 
         {/* Logo */}
@@ -38,12 +38,12 @@ export default function LoadingScreen() {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
           className="relative z-10 w-14 h-14 rounded-2xl overflow-hidden"
-          style={{ boxShadow: '0 0 40px rgba(99,102,241,0.35)' }}
+          style={{ boxShadow: '0 0 40px var(--color-primary-glow)' }}
         >
           <img src="/logo.png" alt="HackerHouse" className="w-full h-full object-cover"
             onError={e => {
               (e.target as HTMLImageElement).style.display = 'none';
-              (e.target as HTMLImageElement).parentElement!.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#6366f1,#4f46e5);color:white;font-weight:900;font-size:24px;font-family:Outfit">H</div>';
+              (e.target as HTMLImageElement).parentElement!.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--color-primary),var(--color-primary-light));color:white;font-weight:900;font-size:24px;font-family:Outfit">H</div>';
             }}
           />
         </motion.div>
@@ -63,7 +63,7 @@ export default function LoadingScreen() {
         <motion.p
           animate={{ opacity: [0.3, 0.8, 0.3] }}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          className="text-indigo-400/50 text-[11px] font-semibold tracking-[0.25em] uppercase mt-3"
+          className="text-primary/50 text-[11px] font-semibold tracking-[0.25em] uppercase mt-3"
         >
           Loading workspace
         </motion.p>
@@ -76,7 +76,7 @@ export default function LoadingScreen() {
           animate={{ width: '100%' }}
           transition={{ duration: 1.1, ease: [0.23, 1, 0.32, 1] }}
           className="h-full rounded-full"
-          style={{ background: 'linear-gradient(90deg, #6366f1, #10b981)' }}
+          style={{ background: 'linear-gradient(90deg, var(--color-primary), var(--color-secondary, #10b981))' }}
         />
       </motion.div>
     </motion.div>

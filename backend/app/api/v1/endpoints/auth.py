@@ -33,6 +33,8 @@ async def register(user_in: UserCreate, db=Depends(get_database)):
     user_id = await user_repo.create(user_data)
     
     created_user = await user_repo.get_by_id(user_id)
+    if created_user and "_id" in created_user:
+        created_user["_id"] = str(created_user["_id"])
     return created_user
 
 @router.post("/login", response_model=Token)

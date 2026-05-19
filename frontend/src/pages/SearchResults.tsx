@@ -74,9 +74,9 @@ export default function SearchResults() {
   });
 
   return (
-    <div className="min-h-screen pt-28 pb-20 px-4" style={{ background: '#050914' }}>
+    <div className="min-h-screen pt-28 pb-20 px-4" style={{ background: 'var(--color-background)' }}>
       {/* Ambient background */}
-      <div className="fixed top-0 inset-x-0 h-96 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 60% -20%, rgba(99,102,241,0.1), transparent 60%)' }} />
+      <div className="fixed top-0 inset-x-0 h-96 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 60% -20%, var(--color-primary-glow), transparent 60%)' }} />
 
       <div className="max-w-7xl mx-auto">
         {/* Header */}

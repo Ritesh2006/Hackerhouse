@@ -68,11 +68,11 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 pt-20 pb-16 relative overflow-hidden" style={{ background: '#050914' }}>
+    <div className="min-h-screen flex items-center justify-center px-4 pt-20 pb-16 relative overflow-hidden" style={{ background: 'var(--color-background)' }}>
       <ParticleField />
 
       {/* Background orbs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.12), transparent 70%)', filter: 'blur(40px)', animation: 'breathe 8s ease-in-out infinite' }} />
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, var(--color-primary-glow), transparent 70%)', filter: 'blur(40px)', animation: 'breathe 8s ease-in-out infinite' }} />
       <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.08), transparent 70%)', filter: 'blur(40px)', animation: 'breathe 10s ease-in-out 2s infinite' }} />
 
       <motion.div
@@ -82,11 +82,11 @@ export default function Login() {
         className="w-full max-w-[440px] relative z-10"
       >
         {/* Card */}
-        <div className="relative rounded-[2rem] overflow-hidden" style={{ background: 'linear-gradient(145deg, rgba(15,22,45,0.9), rgba(10,15,35,0.95))', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(99,102,241,0.05), inset 0 1px 0 rgba(255,255,255,0.07)' }}>
+        <div className="relative rounded-[2rem] overflow-hidden" style={{ background: 'linear-gradient(145deg, rgba(15,22,45,0.9), rgba(10,15,35,0.95))', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05), inset 0 1px 0 rgba(255,255,255,0.07)' }}>
 
           {/* Top gradient accent */}
-          <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(99,102,241,0.8), rgba(16,185,129,0.5), transparent)' }} />
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-24 pointer-events-none" style={{ background: 'radial-gradient(ellipse, rgba(99,102,241,0.15), transparent 70%)', filter: 'blur(20px)' }} />
+          <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, var(--color-primary), rgba(16,185,129,0.5), transparent)' }} />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-24 pointer-events-none" style={{ background: 'radial-gradient(ellipse, var(--color-primary-glow), transparent 70%)', filter: 'blur(20px)' }} />
 
           <div className="p-8 sm:p-10">
             {/* Header */}
@@ -96,19 +96,17 @@ export default function Login() {
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.15, type: 'spring', stiffness: 200 }}
                 className="w-16 h-16 rounded-2xl mx-auto mb-5 flex items-center justify-center relative"
-                style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)', boxShadow: '0 8px 32px rgba(99,102,241,0.4)' }}
+                style={{ background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary-light))', boxShadow: '0 8px 32px var(--color-primary-glow)' }}
               >
                 <Sparkles size={28} className="text-white" />
                 <div className="absolute inset-0 rounded-2xl" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.15), transparent)', borderTop: '1px solid rgba(255,255,255,0.3)' }} />
               </motion.div>
-              <motion.h1 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-                className="text-2xl sm:text-3xl font-black text-white mb-2" style={{ fontFamily: 'Outfit, sans-serif', letterSpacing: '-0.02em' }}>
+              <h1 className="text-2xl sm:text-3xl font-black text-white mb-2" style={{ fontFamily: 'Outfit, sans-serif', letterSpacing: '-0.02em' }}>
                 Welcome back
-              </motion.h1>
-              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
-                className="text-slate-400 text-sm">
+              </h1>
+              <p className="text-slate-400 text-sm">
                 Sign in to your <span className="text-gradient font-semibold">HackerHouse</span> account
-              </motion.p>
+              </p>
             </div>
 
             <form onSubmit={handleLogin} className="space-y-4">
@@ -126,7 +124,7 @@ export default function Login() {
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-400 tracking-wide uppercase ml-1">Email</label>
                 <div className="relative group">
-                  <div className={`absolute inset-y-0 left-4 flex items-center pointer-events-none transition-colors duration-200 ${focused === 'email' ? 'text-indigo-400' : 'text-slate-500'}`}>
+                  <div className={`absolute inset-y-0 left-4 flex items-center pointer-events-none transition-colors duration-200 ${focused === 'email' ? 'text-primary' : 'text-slate-500'}`}>
                     <Mail size={16} />
                   </div>
                   <input
@@ -139,7 +137,7 @@ export default function Login() {
                     style={{ borderRadius: '14px' }}
                   />
                   {focused === 'email' && (
-                    <motion.div layoutId="inputFocus" className="absolute inset-0 rounded-[14px] pointer-events-none" style={{ boxShadow: '0 0 0 3px rgba(99,102,241,0.15)' }} />
+                    <motion.div layoutId="inputFocus" className="absolute inset-0 rounded-[14px] pointer-events-none" style={{ boxShadow: '0 0 0 3px var(--color-primary-glow)' }} />
                   )}
                 </div>
               </div>
@@ -148,10 +146,10 @@ export default function Login() {
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center ml-1">
                   <label className="text-xs font-bold text-slate-400 tracking-wide uppercase">Password</label>
-                  <button type="button" className="text-[11px] text-indigo-400 hover:text-indigo-300 font-semibold transition-colors">Forgot?</button>
+                  <button type="button" className="text-[11px] text-primary hover:text-primary-light font-semibold transition-colors">Forgot?</button>
                 </div>
                 <div className="relative group">
-                  <div className={`absolute inset-y-0 left-4 flex items-center pointer-events-none transition-colors duration-200 ${focused === 'password' ? 'text-indigo-400' : 'text-slate-500'}`}>
+                  <div className={`absolute inset-y-0 left-4 flex items-center pointer-events-none transition-colors duration-200 ${focused === 'password' ? 'text-primary' : 'text-slate-500'}`}>
                     <Lock size={16} />
                   </div>
                   <input
@@ -168,7 +166,7 @@ export default function Login() {
                     {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
                   </button>
                   {focused === 'password' && (
-                    <motion.div layoutId="inputFocus" className="absolute inset-0 rounded-[14px] pointer-events-none" style={{ boxShadow: '0 0 0 3px rgba(99,102,241,0.15)' }} />
+                    <motion.div layoutId="inputFocus" className="absolute inset-0 rounded-[14px] pointer-events-none" style={{ boxShadow: '0 0 0 3px var(--color-primary-glow)' }} />
                   )}
                 </div>
               </div>
@@ -219,7 +217,7 @@ export default function Login() {
 
             <p className="mt-7 text-center text-sm text-slate-500">
               No account?{' '}
-              <Link to="/signup" className="text-indigo-400 font-bold hover:text-indigo-300 transition-colors">
+              <Link to="/signup" className="text-primary font-bold hover:text-primary-light transition-colors">
                 Create one free →
               </Link>
             </p>

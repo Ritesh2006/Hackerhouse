@@ -42,6 +42,8 @@ async def get_user(id: str, db=Depends(get_database)):
     user = await user_repo.get_by_id(id)
     
     if user:
+        if "_id" in user:
+            user["_id"] = str(user["_id"])
         # Standardize for frontend consistency
         if "name" not in user and "full_name" in user:
             user["name"] = user["full_name"]

@@ -71,7 +71,7 @@ export default function Navbar() {
           >
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2.5 group shrink-0">
-              <div className="w-9 h-9 rounded-xl overflow-hidden shadow-lg group-hover:scale-110 transition-all duration-300 group-hover:shadow-indigo-500/30">
+              <div className="w-9 h-9 rounded-xl overflow-hidden shadow-lg group-hover:scale-110 transition-all duration-300 group-hover:shadow-primary/30">
                 <img src="/logo.png" alt="HackerHouse" className="w-full h-full object-cover" />
               </div>
               <span className="text-base sm:text-[17px] font-black tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
@@ -105,9 +105,9 @@ export default function Navbar() {
                         className="absolute inset-0 rounded-xl"
                         style={{
                           background: isActive
-                            ? 'linear-gradient(135deg, rgba(99,102,241,0.25), rgba(79,70,229,0.15))'
+                            ? 'linear-gradient(135deg, var(--color-primary-glow), rgba(255,255,255,0.02))'
                             : 'rgba(255,255,255,0.05)',
-                          border: isActive ? '1px solid rgba(99,102,241,0.3)' : '1px solid rgba(255,255,255,0.06)'
+                          border: isActive ? '1px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.06)'
                         }}
                         transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
                       />
@@ -145,10 +145,10 @@ export default function Navbar() {
                   <div className="relative">
                     <button
                       onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                      className="flex w-9 h-9 rounded-xl glass items-center justify-center text-slate-400 hover:text-white transition-all relative hover:border-indigo-500/30"
+                      className="flex w-9 h-9 rounded-xl glass items-center justify-center text-slate-400 hover:text-white transition-all relative hover:border-primary/30"
                     >
                       <Bell size={15} />
-                      <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-indigo-500 ring-2 ring-[#050914]" />
+                      <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-primary ring-2 ring-[#050914]" />
                     </button>
 
                     <AnimatePresence>
@@ -165,11 +165,11 @@ export default function Navbar() {
                           >
                             <div className="flex items-center justify-between pb-3 border-b border-white/5 mb-3">
                               <h4 className="text-white text-xs font-bold uppercase tracking-wider">Inbox Notifications</h4>
-                              <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-bold">2 New</span>
+                              <span className="text-[10px] px-2 py-0.5 rounded bg-primary/20 text-primary-light font-bold">2 New</span>
                             </div>
                             <div className="space-y-3">
                               {mockNotifications.map(notif => (
-                                <div key={notif.id} className={`p-2.5 rounded-xl transition-colors hover:bg-white/5 cursor-pointer ${notif.unread ? 'bg-indigo-500/[0.04]' : ''}`}>
+                                <div key={notif.id} className={`p-2.5 rounded-xl transition-colors hover:bg-white/5 cursor-pointer ${notif.unread ? 'bg-primary/[0.04]' : ''}`}>
                                   <div className="flex items-start justify-between gap-2">
                                     <span className="text-xs font-bold text-white leading-tight">{notif.title}</span>
                                     <span className="text-[9px] text-slate-500 shrink-0 font-medium">{notif.time}</span>
@@ -187,9 +187,9 @@ export default function Navbar() {
                   {/* Profile Link */}
                   <Link
                     to={userId ? `/profile/${userId}` : '#'}
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl glass hover:border-indigo-500/30 transition-all group"
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl glass hover:border-primary/30 transition-all group"
                   >
-                    <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+                    <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-primary-light flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
                       <User size={13} className="text-white" />
                     </div>
                     <span className="text-sm font-semibold text-slate-300 hidden md:block group-hover:text-white transition-colors">Profile</span>
@@ -288,17 +288,17 @@ export default function Navbar() {
                         onClick={() => setIsMobileMenuOpen(false)}
                         className={`flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all active:scale-[0.98] ${
                           isActive
-                            ? 'bg-indigo-500/12 border border-indigo-500/25 text-white'
+                            ? 'bg-primary/12 border border-primary/25 text-white'
                             : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'
                         }`}
                       >
                         <div className="flex items-center gap-4">
-                          <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${isActive ? 'bg-indigo-500/20' : 'bg-white/5'}`}>
-                            <Icon size={17} className={isActive ? 'text-indigo-400' : 'text-slate-400'} />
+                          <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${isActive ? 'bg-primary/20' : 'bg-white/5'}`}>
+                            <Icon size={17} className={isActive ? 'text-primary' : 'text-slate-400'} />
                           </div>
                           <span className="font-semibold text-[15px]">{item.label}</span>
                         </div>
-                        <ChevronRight size={15} className={isActive ? 'text-indigo-400' : 'text-slate-600'} />
+                        <ChevronRight size={15} className={isActive ? 'text-primary' : 'text-slate-600'} />
                       </Link>
                     </motion.div>
                   );
@@ -341,7 +341,7 @@ export default function Navbar() {
                     <Link to={userId ? `/profile/${userId}` : '#'} onClick={() => setIsMobileMenuOpen(false)}
                       className="flex items-center justify-between px-4 py-3.5 rounded-2xl text-slate-300 hover:bg-white/5 transition-all border border-transparent active:scale-[0.98]">
                       <div className="flex items-center gap-4">
-                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
+                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary-light flex items-center justify-center">
                           <User size={17} className="text-white" />
                         </div>
                         <span className="font-semibold text-[15px] text-white">My Profile</span>
@@ -379,16 +379,16 @@ export default function Navbar() {
         {isDocsOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setIsDocsOpen(false)} className="absolute inset-0 bg-[#050914]/80 backdrop-blur-xl" />
+              onClick={() => setIsDocsOpen(false)} className="absolute inset-0 bg-background/80 backdrop-blur-xl" />
             <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }} transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
               className="relative w-full max-w-2xl overflow-hidden border border-white/8 shadow-2xl rounded-[2rem]"
               style={{ background: 'linear-gradient(145deg, rgba(15,22,45,0.96), rgba(10,15,35,0.99))' }}>
-              <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-indigo-500 to-transparent" />
-              <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between bg-indigo-500/5">
+              <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-primary to-transparent" />
+              <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between bg-primary/5">
                 <div>
                   <h3 className="text-xl font-black text-white flex items-center gap-2 font-display">
-                    Interactive Documentation Hub <Sparkles size={16} className="text-indigo-400 animate-pulse" />
+                    Interactive Documentation Hub <Sparkles size={16} className="text-primary animate-pulse" />
                   </h3>
                   <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Developer Discovery Protocols</p>
                 </div>
@@ -420,7 +420,7 @@ export default function Navbar() {
         {isPricingOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setIsPricingOpen(false)} className="absolute inset-0 bg-[#050914]/80 backdrop-blur-xl" />
+              onClick={() => setIsPricingOpen(false)} className="absolute inset-0 bg-background/80 backdrop-blur-xl" />
             <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }} transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
               className="relative w-full max-w-xl overflow-hidden border border-white/8 shadow-2xl rounded-[2rem]"

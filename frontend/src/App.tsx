@@ -41,7 +41,7 @@ function AppInner() {
   const showFooter = !noFooterRoutes.some(r => location.pathname.startsWith(r));
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#050914', color: '#e2e8f0' }}>
+    <div className="min-h-screen flex flex-col" style={{ background: 'var(--color-background)', color: '#e2e8f0' }}>
       <Navbar />
       <main className="flex-1">
         <PageWrapper>
@@ -75,7 +75,7 @@ function App() {
     const updateGlobalTheme = () => {
       const savedTheme = localStorage.getItem('hackerhouse_theme') || 'indigo';
       const savedCustom = localStorage.getItem('hackerhouse_custom_color') || '#6366f1';
-      
+
       let primaryColor = '';
       if (savedTheme === 'custom') {
         primaryColor = savedCustom;
@@ -89,12 +89,75 @@ function App() {
         };
         primaryColor = themes[savedTheme] || '#6366f1';
       }
-      
+
+      const setProp = (name: string, value: string) => document.documentElement.style.setProperty(name, value);
+
       if (primaryColor) {
-        document.documentElement.style.setProperty('--color-primary', primaryColor);
-        document.documentElement.style.setProperty('--color-primary-glow', `${primaryColor}66`);
-        document.documentElement.style.setProperty('--tw-color-indigo-400', primaryColor);
-        document.documentElement.style.setProperty('--tw-color-indigo-500', primaryColor);
+        setProp('--color-primary', primaryColor);
+        setProp('--color-primary-light', `${primaryColor}dd`);
+        setProp('--color-primary-glow', `${primaryColor}66`);
+
+        // Map all Tailwind CSS v4 color variables for families used in gradients/glows
+        const colorFamilies = ['indigo', 'purple', 'violet'];
+
+        for (const family of colorFamilies) {
+          setProp(`--color-${family}-50`, `${primaryColor}15`);
+          setProp(`--color-${family}-100`, `${primaryColor}30`);
+          setProp(`--color-${family}-200`, `${primaryColor}55`);
+          setProp(`--color-${family}-300`, `${primaryColor}aa`);
+          setProp(`--color-${family}-400`, primaryColor);
+          setProp(`--color-${family}-505`, primaryColor); // edge cases
+          setProp(`--color-${family}-500`, primaryColor);
+          setProp(`--color-${family}-600`, primaryColor);
+          setProp(`--color-${family}-700`, primaryColor);
+          setProp(`--color-${family}-800`, primaryColor);
+          setProp(`--color-${family}-900`, primaryColor);
+          setProp(`--color-${family}-950`, primaryColor);
+        }
+      }
+
+      // Background theme handling
+      const savedBgTheme = localStorage.getItem('hackerhouse_bg_theme') || 'default';
+      const savedBgCustom = localStorage.getItem('hackerhouse_custom_bg_color') || '#050914';
+
+      const bgPresets: Record<string, string> = {
+        default: '#050914',
+        midnight: '#02040a',
+        purple: '#090613',
+        forest: '#040b08',
+        charcoal: '#0f1115'
+      };
+
+      let bgColor = '';
+      if (savedBgTheme === 'custom') {
+        bgColor = savedBgCustom;
+      } else {
+        bgColor = bgPresets[savedBgTheme] || '#050914';
+      }
+
+      if (bgColor) {
+        setProp('--color-background', bgColor);
+
+        // Derive surface colors (surface color should be a slightly lighter variation)
+        const getSurfaceColor = (hex: string, amount: number) => {
+          let r = parseInt(hex.slice(1, 3), 16);
+          let g = parseInt(hex.slice(3, 5), 16);
+          let b = parseInt(hex.slice(5, 7), 16);
+          r = Math.min(255, Math.max(0, r + amount));
+          g = Math.min(255, Math.max(0, g + amount + 2));
+          b = Math.min(255, Math.max(0, b + amount + 6));
+          const toHex = (c: number) => {
+            const h = c.toString(16);
+            return h.length === 1 ? '0' + h : h;
+          };
+          return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+        };
+
+        const surfaceColor = getSurfaceColor(bgColor, 5);
+        const surfaceColor2 = getSurfaceColor(bgColor, 10);
+
+        setProp('--color-surface', surfaceColor);
+        setProp('--color-surface-2', surfaceColor2);
       }
     };
 

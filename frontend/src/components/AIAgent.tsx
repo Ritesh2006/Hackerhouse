@@ -81,9 +81,9 @@ const AIAgent = () => {
             {/* Header */}
             <div className="flex items-center justify-between p-4.5 border-b border-white/5 relative z-10 bg-indigo-500/[0.02]">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl p-0.5 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 shadow-lg shadow-indigo-500/25 shrink-0">
+                <div className="w-10 h-10 rounded-2xl p-0.5 bg-gradient-to-br from-primary via-primary-light to-primary-glow shadow-lg shadow-primary/25 shrink-0">
                   <div className="w-full h-full rounded-2xl overflow-hidden bg-[#0c1020] flex items-center justify-center">
-                    <Sparkles size={16} className="text-indigo-400" />
+                    <Sparkles size={16} className="text-primary" />
                   </div>
                 </div>
                 <div>
@@ -157,17 +157,17 @@ const AIAgent = () => {
                   onBlur={() => setInputFocused(false)}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder="Ask anything or search developers..."
-                  className="w-full bg-[#050914] border text-white rounded-2xl py-3 pl-4 pr-12 focus:outline-none transition-all placeholder:text-slate-600 text-xs font-semibold"
-                  style={{ borderColor: inputFocused ? 'rgba(99,102,241,0.4)' : 'rgba(255,255,255,0.08)' }}
+                  className="w-full bg-background border text-white rounded-2xl py-3 pl-4 pr-12 focus:outline-none transition-all placeholder:text-slate-600 text-xs font-semibold"
+                  style={{ borderColor: inputFocused ? 'var(--color-primary)' : 'rgba(255,255,255,0.08)' }}
                 />
                 {inputFocused && (
-                  <motion.div layoutId="agentInputFocus" className="absolute inset-0 rounded-2xl pointer-events-none" style={{ boxShadow: '0 0 0 3px rgba(99,102,241,0.12)' }} />
+                  <motion.div layoutId="agentInputFocus" className="absolute inset-0 rounded-2xl pointer-events-none" style={{ boxShadow: '0 0 0 3px var(--color-primary-glow)' }} />
                 )}
                 <button
                   type="submit"
                   disabled={!inputValue.trim() || isLoading}
                   className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-xl text-white disabled:opacity-30 disabled:scale-100 hover:shadow-lg hover:shadow-indigo-500/30 transition-all"
-                  style={{ background: inputValue.trim() ? 'linear-gradient(135deg, #6366f1, #4f46e5)' : 'rgba(255,255,255,0.05)' }}
+                  style={{ background: inputValue.trim() ? 'linear-gradient(135deg, var(--color-primary), var(--color-primary-light))' : 'rgba(255,255,255,0.05)' }}
                 >
                   <Send size={13} className="translate-x-px" />
                 </button>
@@ -182,7 +182,7 @@ const AIAgent = () => {
         whileHover={{ scale: 1.06, rotate: 3 }}
         whileTap={{ scale: 0.94 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 shadow-2xl shadow-indigo-500/30 flex items-center justify-center text-white relative group overflow-hidden"
+        className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary via-primary-light to-primary-glow shadow-2xl shadow-primary/30 flex items-center justify-center text-white relative group overflow-hidden"
       >
         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
         <AnimatePresence mode="wait">

@@ -12,6 +12,14 @@ const THEMES = [
   { id: 'cyan', name: 'Arctic Cyan', primary: '#06b6d4', bg: 'linear-gradient(135deg, rgba(6,182,212,0.1), transparent)' },
 ];
 
+const BG_PRESETS = [
+  { id: 'default', name: 'Deep Space', value: '#050914' },
+  { id: 'midnight', name: 'Midnight Black', value: '#02040a' },
+  { id: 'purple', name: 'Obsidian Purple', value: '#090613' },
+  { id: 'forest', name: 'Forest Obsidian', value: '#040b08' },
+  { id: 'charcoal', name: 'Steel Charcoal', value: '#0f1115' },
+];
+
 const container = { hidden: {}, visible: { transition: { staggerChildren: 0.07 } } };
 const item = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.45 } } };
 
@@ -76,6 +84,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTheme, setActiveTheme] = useState('indigo');
   const [customHex, setCustomHex] = useState('#6366f1');
+  const [activeBg, setActiveBg] = useState('default');
+  const [customBgHex, setCustomBgHex] = useState('#050914');
   const navigate = useNavigate();
 
   // Load and apply theme globally
@@ -84,6 +94,11 @@ export default function Dashboard() {
     const savedCustom = localStorage.getItem('hackerhouse_custom_color') || '#6366f1';
     setCustomHex(savedCustom);
     applyTheme(savedTheme, savedCustom);
+
+    const savedBgTheme = localStorage.getItem('hackerhouse_bg_theme') || 'default';
+    const savedBgCustom = localStorage.getItem('hackerhouse_custom_bg_color') || '#050914';
+    setCustomBgHex(savedBgCustom);
+    setActiveBg(savedBgTheme);
   }, []);
 
   const applyTheme = (themeId: string, hex?: string) => {
@@ -101,11 +116,73 @@ export default function Dashboard() {
     }
     
     if (primaryColor) {
-      document.documentElement.style.setProperty('--color-primary', primaryColor);
-      document.documentElement.style.setProperty('--color-primary-glow', `${primaryColor}66`);
-      document.documentElement.style.setProperty('--tw-color-indigo-400', primaryColor);
-      document.documentElement.style.setProperty('--tw-color-indigo-500', primaryColor);
+      const setProp = (name: string, value: string) => document.documentElement.style.setProperty(name, value);
       
+      setProp('--color-primary', primaryColor);
+      setProp('--color-primary-light', `${primaryColor}dd`);
+      setProp('--color-primary-glow', `${primaryColor}66`);
+      
+      // Map all Tailwind CSS v4 color variables for families used in gradients/glows
+      const colorFamilies = ['indigo', 'purple', 'violet'];
+      
+      for (const family of colorFamilies) {
+        setProp(`--color-${family}-50`, `${primaryColor}15`);
+        setProp(`--color-${family}-100`, `${primaryColor}30`);
+        setProp(`--color-${family}-200`, `${primaryColor}55`);
+        setProp(`--color-${family}-300`, `${primaryColor}aa`);
+        setProp(`--color-${family}-400`, primaryColor);
+        setProp(`--color-${family}-505`, primaryColor); // edge cases
+        setProp(`--color-${family}-500`, primaryColor);
+        setProp(`--color-${family}-600`, primaryColor);
+        setProp(`--color-${family}-700`, primaryColor);
+        setProp(`--color-${family}-800`, primaryColor);
+        setProp(`--color-${family}-900`, primaryColor);
+        setProp(`--color-${family}-950`, primaryColor);
+      }
+      
+      // Dispatch global theme changed event
+      window.dispatchEvent(new Event('hackerhouse_theme_changed'));
+    }
+  };
+
+  const applyBgColor = (bgId: string, hex?: string) => {
+    setActiveBg(bgId);
+    localStorage.setItem('hackerhouse_bg_theme', bgId);
+
+    let bgColor = '';
+    if (bgId === 'custom' && hex) {
+      bgColor = hex;
+      setCustomBgHex(hex);
+      localStorage.setItem('hackerhouse_custom_bg_color', hex);
+    } else {
+      const preset = BG_PRESETS.find(b => b.id === bgId);
+      if (preset) bgColor = preset.value;
+    }
+
+    if (bgColor) {
+      const setProp = (name: string, value: string) => document.documentElement.style.setProperty(name, value);
+      setProp('--color-background', bgColor);
+      
+      const getSurfaceColor = (hexVal: string, amount: number) => {
+        let r = parseInt(hexVal.slice(1, 3), 16);
+        let g = parseInt(hexVal.slice(3, 5), 16);
+        let b = parseInt(hexVal.slice(5, 7), 16);
+        r = Math.min(255, Math.max(0, r + amount));
+        g = Math.min(255, Math.max(0, g + amount + 2));
+        b = Math.min(255, Math.max(0, b + amount + 6));
+        const toHex = (c: number) => {
+          const h = c.toString(16);
+          return h.length === 1 ? '0' + h : h;
+        };
+        return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+      };
+      
+      const surfaceColor = getSurfaceColor(bgColor, 5);
+      const surfaceColor2 = getSurfaceColor(bgColor, 10);
+      
+      setProp('--color-surface', surfaceColor);
+      setProp('--color-surface-2', surfaceColor2);
+
       // Dispatch global theme changed event
       window.dispatchEvent(new Event('hackerhouse_theme_changed'));
     }
@@ -184,44 +261,90 @@ export default function Dashboard() {
 
           {/* Theme Customizer Panel */}
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}
-            className="glass rounded-[2rem] p-5 border border-white/10 shadow-2xl backdrop-blur-2xl w-full lg:w-auto"
+            className="glass rounded-[2rem] p-5 border border-white/10 shadow-2xl backdrop-blur-2xl w-full lg:w-[480px]"
             style={{ background: 'rgba(12, 17, 34, 0.6)' }}>
-            <div className="flex items-center gap-2 mb-3">
-              <Palette size={14} className="text-indigo-400" />
-              <h3 className="text-white text-xs font-bold uppercase tracking-widest">Theme Customizer</h3>
+            <div className="flex items-center gap-2 mb-4">
+              <Palette size={14} className="text-primary" />
+              <h3 className="text-white text-xs font-bold uppercase tracking-widest">Workspace Customizer</h3>
             </div>
-            <div className="flex flex-wrap items-center gap-2.5">
-              {THEMES.map(theme => (
-                <button
-                  key={theme.id}
-                  onClick={() => applyTheme(theme.id)}
-                  title={theme.name}
-                  className={`w-10 h-10 rounded-xl transition-all flex items-center justify-center relative overflow-hidden group hover:scale-110 ${activeTheme === theme.id ? 'ring-2 ring-white/40 ring-offset-2 ring-offset-[#050914]' : 'ring-1 ring-white/10'}`}
-                  style={{ background: theme.primary }}
-                >
-                  <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  {activeTheme === theme.id && <div className="w-2 h-2 rounded-full bg-white shadow-sm" />}
-                </button>
-              ))}
+            
+            <div className="space-y-4">
+              {/* Primary Color Selector */}
+              <div>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2">Accent Color</p>
+                <div className="flex flex-wrap items-center gap-2.5">
+                  {THEMES.map(theme => (
+                    <button
+                      key={theme.id}
+                      onClick={() => applyTheme(theme.id)}
+                      title={theme.name}
+                      className={`w-9 h-9 rounded-xl transition-all flex items-center justify-center relative overflow-hidden group hover:scale-105 ${activeTheme === theme.id ? 'ring-2 ring-white/40 ring-offset-2 ring-offset-background' : 'ring-1 ring-white/10'}`}
+                      style={{ background: theme.primary }}
+                    >
+                      <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      {activeTheme === theme.id && <div className="w-1.5 h-1.5 rounded-full bg-white shadow-sm" />}
+                    </button>
+                  ))}
 
-              <div className="w-px h-6 bg-white/10 mx-1" />
-              
-              <div className={`relative flex items-center gap-2 px-2 py-1.5 rounded-xl transition-all ${activeTheme === 'custom' ? 'bg-white/10 ring-1 ring-white/20' : 'bg-white/5 hover:bg-white/10'}`}>
-                <div className="relative w-7 h-7 rounded-lg overflow-hidden shrink-0 border border-white/20">
-                  <input
-                    type="color"
-                    value={customHex}
-                    onChange={(e) => applyTheme('custom', e.target.value)}
-                    className="absolute inset-[-10px] w-12 h-12 cursor-pointer"
-                  />
+                  <div className="w-px h-6 bg-white/10 mx-0.5" />
+                  
+                  <div className={`relative flex items-center gap-2 px-2 py-1 rounded-xl transition-all ${activeTheme === 'custom' ? 'bg-white/10 ring-1 ring-white/20' : 'bg-white/5 hover:bg-white/10'}`}>
+                    <div className="relative w-6 h-6 rounded-lg overflow-hidden shrink-0 border border-white/20">
+                      <input
+                        type="color"
+                        value={customHex}
+                        onChange={(e) => applyTheme('custom', e.target.value)}
+                        className="absolute inset-[-10px] w-10 h-10 cursor-pointer"
+                      />
+                    </div>
+                    <input
+                      type="text"
+                      value={customHex}
+                      onChange={(e) => applyTheme('custom', e.target.value)}
+                      placeholder="#HEX"
+                      className="bg-transparent w-16 outline-none text-[11px] text-white font-mono uppercase tracking-wider"
+                    />
+                  </div>
                 </div>
-                <input
-                  type="text"
-                  value={customHex}
-                  onChange={(e) => applyTheme('custom', e.target.value)}
-                  placeholder="#HEX"
-                  className="bg-transparent w-20 outline-none text-xs text-white font-mono uppercase tracking-wider"
-                />
+              </div>
+
+              {/* Background Color Selector */}
+              <div>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2">Background Color</p>
+                <div className="flex flex-wrap items-center gap-2.5">
+                  {BG_PRESETS.map(bg => (
+                    <button
+                      key={bg.id}
+                      onClick={() => applyBgColor(bg.id)}
+                      title={bg.name}
+                      className={`w-9 h-9 rounded-xl transition-all flex items-center justify-center relative overflow-hidden group hover:scale-105 ${activeBg === bg.id ? 'ring-2 ring-white/40 ring-offset-2 ring-offset-background' : 'ring-1 ring-white/10'}`}
+                      style={{ background: bg.value }}
+                    >
+                      <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      {activeBg === bg.id && <div className="w-1.5 h-1.5 rounded-full bg-white shadow-sm" />}
+                    </button>
+                  ))}
+
+                  <div className="w-px h-6 bg-white/10 mx-0.5" />
+
+                  <div className={`relative flex items-center gap-2 px-2 py-1 rounded-xl transition-all ${activeBg === 'custom' ? 'bg-white/10 ring-1 ring-white/20' : 'bg-white/5 hover:bg-white/10'}`}>
+                    <div className="relative w-6 h-6 rounded-lg overflow-hidden shrink-0 border border-white/20">
+                      <input
+                        type="color"
+                        value={customBgHex}
+                        onChange={(e) => applyBgColor('custom', e.target.value)}
+                        className="absolute inset-[-10px] w-10 h-10 cursor-pointer"
+                      />
+                    </div>
+                    <input
+                      type="text"
+                      value={customBgHex}
+                      onChange={(e) => applyBgColor('custom', e.target.value)}
+                      placeholder="#HEX"
+                      className="bg-transparent w-16 outline-none text-[11px] text-white font-mono uppercase tracking-wider"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </motion.div>

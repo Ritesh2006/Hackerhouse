@@ -26,4 +26,6 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
             status_code=401, 
             detail=f"User session valid, but user ID {user_id} no longer exists in database. Please logout and login again."
         )
+    if "_id" in user:
+        user["_id"] = str(user["_id"])
     return user
