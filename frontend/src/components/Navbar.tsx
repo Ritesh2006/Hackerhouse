@@ -1,9 +1,240 @@
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
-import { Search, LayoutDashboard, User, Bell, Home, Menu, X, LogOut, ChevronRight, Zap, BookOpen, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Search, LayoutDashboard, User, Bell, Home, Menu, X, LogOut, ChevronRight, ChevronLeft, Download, Zap, BookOpen, Sparkles, CheckCircle2, Play, Pause, Maximize2, Minimize2, HelpCircle, Info, List } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { finalBaseUrl } from '../lib/api';
 import { useAuthStore } from '../stores/authStore';
+
+const SLIDES = [
+  {
+    title: "HackerHouse: The Engineering Marketplace",
+    subtitle: "Strategic Vision",
+    content: "Welcome to HackerHouse—a premium, SaaS-enabled network mapping platform designed to connect verified developer talent with scaling businesses using real-time repository intelligence and geolocation indices.",
+    bullets: [
+      "Bridges the gap between code quality & matching.",
+      "Integrates real-time AI and location protocols.",
+      "Empowers companies to locate and verify skills.",
+      "Redefines developer portfolios using direct APIs."
+    ],
+    image: "/hero_image.png",
+    notes: "Begin the presentation by introducing the platform name and core value proposition. Highlight that HackerHouse disrupts traditional recruitment by offering direct skill verification and proximity matching.",
+    qa: [
+      {
+        q: "What is the core innovation of HackerHouse?",
+        a: "It combines code repository analysis (GitHub API + Groq AI) with spatial indexing (MongoDB 2dsphere) to match recruiters with qualified local talent instantly."
+      }
+    ]
+  },
+  {
+    title: "Addressing the Core Sourcing Problem",
+    subtitle: "Market Analysis",
+    content: "Traditional developer directories rely on unverified resumes, static profiles, and manual review processes that delay hiring. HackerHouse creates an active, code-verified, geo-searchable marketplace.",
+    bullets: [
+      "Eliminates resume padding with live repo scans.",
+      "Replaces static location fields with active GPS data.",
+      "Accelerates time-to-hire by skipping filtering stages.",
+      "Facilitates direct, context-rich chat verification."
+    ],
+    image: "/features_vector.png",
+    notes: "Talk about recruitment friction: unverified claims and slow response times. Explain how manual screening wastes billions globally.",
+    qa: [
+      {
+        q: "How does the platform prevent fake developer profiles?",
+        a: "By requiring GitHub and LinkedIn OAuth integration, we map profiles to active coding footprints, which are analyzed for authenticity."
+      }
+    ]
+  },
+  {
+    title: "AI-Powered Repository Audits",
+    subtitle: "Technology Stack",
+    content: "Our system integrates the Groq Llama-3.1-8b API to run real-time static code reviews, language profiling, and security auditing directly against public git repositories.",
+    bullets: [
+      "Automates repo evaluations in under 3 seconds.",
+      "Computes trust scores from commit frequencies.",
+      "Parses formatting, structure, and documentation.",
+      "Generates actionable quality feedback on demand."
+    ],
+    image: "/features_vector.png",
+    notes: "Describe how we leverage LLMs for static analysis. Mention that Groq's high throughput allows real-time generation of candidate audits.",
+    qa: [
+      {
+        q: "Why use Groq and Llama-3.1-8b specifically?",
+        a: "Groq offers ultra-low latency inference, enabling us to return complete repository evaluations in under 3 seconds, keeping the UX snappy."
+      }
+    ]
+  },
+  {
+    title: "Precision Geolocation Engine",
+    subtitle: "Features & Architecture",
+    content: "Talent discovery is anchored in location. Using MongoDB's 2dsphere index capability combined with Haversine distance calculations, developers are sorted by exact sub-mile proximity.",
+    bullets: [
+      "Ensures exact distance computing in real-time.",
+      "Enables flexible spatial radius search rings.",
+      "Maintains developer privacy with location offsets.",
+      "Allows remote-first filter expansions on fallback."
+    ],
+    image: "/hero_vector.png",
+    notes: "Explain the backend spatial geometry. Emphasize that coordinates are queried efficiently using index bounds instead of calculating distance on all documents.",
+    qa: [
+      {
+        q: "How are developer coordinates stored in MongoDB?",
+        a: "We use GeoJSON Point format: { type: 'Point', coordinates: [longitude, latitude] } indexable with a '2dsphere' index."
+      }
+    ]
+  },
+  {
+    title: "Real-Time Verified Messaging Channels",
+    subtitle: "Interaction Layer",
+    content: "Secure WebSocket connections build instant channels between employers and talent. Message delivery is logged and managed through a robust repository-service architectural design.",
+    bullets: [
+      "Provides zero-latency full-stack socket syncing.",
+      "Automatically logs conversations for history recovery.",
+      "Grants visual delivery indicators for connections.",
+      "Maintains platform stability with fallback REST APIs."
+    ],
+    image: "/dashboard_banner.png",
+    notes: "Highlight the communication architecture. WebSockets maintain persistent duplex connections. Explain how messages fallback to REST APIs during drops.",
+    qa: [
+      {
+        q: "What protocols safeguard the chat channel?",
+        a: "Connections require JWT token authentication query parameters during handshake. Messages are verified on the backend before broadcast."
+      }
+    ]
+  },
+  {
+    title: "Verified LinkedIn Identity Integrations",
+    subtitle: "Integrations Layer",
+    content: "Ensuring real professional credentials, the LinkedIn integration supports secure OAuth callbacks, retrieves compliant user profiles, and logs message synchronization securely.",
+    bullets: [
+      "Leverages OIDC-compliant userinfo endpoints.",
+      "Includes sandbox fallbacks for local test runs.",
+      "Maintains direct links to verified profiles.",
+      "Allows synced direct messaging on LinkedIn."
+    ],
+    image: "/hero_image.png",
+    notes: "Discuss professional background verification. LinkedIn OIDC is used to capture email, name, and profile photos, adding corporate legitimacy.",
+    qa: [
+      {
+        q: "What is OpenID Connect (OIDC)?",
+        a: "OIDC is a simple identity layer on top of the OAuth 2.0 protocol, allowing clients to verify the identity of the end-user based on authentication performed by an Authorization Server."
+      }
+    ]
+  },
+  {
+    title: "Highly Customizable Visual Workspaces",
+    subtitle: "User Vibe Customization",
+    content: "HackerHouse features a premium theme customizer that updates theme variables instantly. Using HSL-to-hex computations, our graphics shift colors seamlessly to match user aesthetics.",
+    bullets: [
+      "Persists custom theme choices in local storage.",
+      "Applies real-time desaturating monochrome shifts.",
+      "Adapts logo and backgrounds to accent selections.",
+      "Maintains contrast ratios for perfect legibility."
+    ],
+    image: "/dashboard_banner.png",
+    notes: "Show the dynamic styling engine. Explain how changing CSS variables at the root element instantly updates the UI theme.",
+    qa: [
+      {
+        q: "How does the customizer preserve accessibility (A11y)?",
+        a: "We limit user custom colors to high-contrast hues and compute background offsets programmatically, keeping text contrast ratios within WCAG AAA guidelines."
+      }
+    ]
+  },
+  {
+    title: "Trust Scores & Professional Metrics",
+    subtitle: "Matching Layer",
+    content: "Every developer card showcases a verified billing rate, feedback-based rating, and language competence profile. This guarantees transparency in search results.",
+    bullets: [
+      "Maintains hourly rates and rating calculations.",
+      "Deduplicates profiles from github & local db.",
+      "Highlights top-rated developers in search fallbacks.",
+      "Ensures type-safe interfaces prevent UI crashes."
+    ],
+    image: "/features_vector.png",
+    notes: "Explain developer metrics. We map developer experience, rating, and language breakdown in clean cards with hover effects.",
+    qa: [
+      {
+        q: "How is code language distribution calculated?",
+        a: "We fetch repository language statistics via the GitHub API and compute percentage weightings to generate the candidate's language stack profile."
+      }
+    ]
+  },
+  {
+    title: "SoulLink AI Chat Assistant",
+    subtitle: "Navigation Layer",
+    content: "A premium floating assistant uses artificial intelligence to interpret natural language. It assists recruiters in formulating search criteria and retrieving matches.",
+    bullets: [
+      "Processes human questions into search params.",
+      "Answers questions about platform tools.",
+      "Maintains dynamic chat history during use.",
+      "Integrates smoothly with active color schemes."
+    ],
+    image: "/ai_agent_logo.png",
+    notes: "Demonstrate the AI chatbot helper. Highlight the natural language search parsing: it can match queries to skills, billing rates, and location.",
+    qa: [
+      {
+        q: "How is the conversational context preserved?",
+        a: "We maintain stateful history in the frontend state and pass context-enriched conversation prompts to the backend Groq service."
+      }
+    ]
+  },
+  {
+    title: "Hiring Workflows & Secure Agreements",
+    subtitle: "Monetization Layer",
+    content: "The hiring system lets teams trigger direct agreements via a secure modal. Creating a contract allocates resources, binds contacts, and establishes workspace permissions.",
+    bullets: [
+      "Initializes hiring contracts instantly.",
+      "Protects conversations with verified status.",
+      "Displays progress markers and billing states.",
+      "Maintains complete audit trails in database."
+    ],
+    image: "/dashboard_banner.png",
+    notes: "Describe contract onboarding. Highlight states: Proposed, Active, Completed. Mention that this forms the basis for SaaS monetization.",
+    qa: [
+      {
+        q: "What security measures protect contract negotiations?",
+        a: "Only authenticated contract participants can access the associated workspace, WebSocket chat, and billing metadata, enforced by database policy checks."
+      }
+    ]
+  },
+  {
+    title: "Architecture & Deployment Topology",
+    subtitle: "System Architecture",
+    content: "HackerHouse is built as a modular, container-ready SaaS product. Its architecture decouples frontend rendering speed from intensive backend database operations.",
+    bullets: [
+      "Frontend: React 18, Vite 6, Tailwind/CSS variables.",
+      "Backend: FastAPI 0.110, Python 3.11, Pydantic v2.",
+      "Database: MongoDB Atlas with motor async driver.",
+      "Auditing: Groq AI cloud integration model."
+    ],
+    image: "/hero_vector.png",
+    notes: "Present the deployment architecture. Highlight the high performance of FastAPI and decoupled hosting (Vercel + Render + MongoDB Atlas).",
+    qa: [
+      {
+        q: "Why is a decoupled architecture beneficial for scaling?",
+        a: "It allows independent scaling of the frontend (CDN caching) and backend services (CPU-bound API requests) without resource competition."
+      }
+    ]
+  },
+  {
+    title: "Future Roadmap & Technical Evolution",
+    subtitle: "Product Future",
+    content: "HackerHouse is positioned to scale talent search globally. Our roadmap targets predictive AI matches, automated smart contracts, and deep integration with workspace tools.",
+    bullets: [
+      "Adding auto-scheduled video interviews.",
+      "Integrating smart-contract payments.",
+      "Enabling code test sandbox screens.",
+      "Launching Slack and Discord synchronization."
+    ],
+    image: "/hero_image.png",
+    notes: "Wrap up by outlining upcoming features. Emphasize that the platform architecture is built modularly to accommodate these integrations.",
+    qa: [
+      {
+        q: "How will smart-contract payments work?",
+        a: "We plan to bridge milestones to blockchain networks using stablecoins like USDC to automate instant developer payout upon GitHub PR approvals."
+      }
+    ]
+  }
+];
 
 export default function Navbar() {
   const location = useLocation();
@@ -17,6 +248,305 @@ export default function Navbar() {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isDocsOpen, setIsDocsOpen] = useState(false);
   const [isPricingOpen, setIsPricingOpen] = useState(false);
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  // New slide settings
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showSpeakerNotes, setShowSpeakerNotes] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  const handlePrevSlide = () => {
+    setActiveSlide((prev) => (prev > 0 ? prev - 1 : SLIDES.length - 1));
+    setProgress(0);
+  };
+
+  const handleNextSlide = () => {
+    setActiveSlide((prev) => (prev < SLIDES.length - 1 ? prev + 1 : 0));
+    setProgress(0);
+  };
+
+  const downloadPDF = () => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      alert("Please allow popups to download the PDF presentation.");
+      return;
+    }
+    
+    const slidesHTML = SLIDES.map((slide, index) => `
+      <div class="slide-page">
+        <div class="slide-header">
+          <span class="slide-logo">HackerHouse Presentation Deck</span>
+          <span class="slide-num">Slide ${index + 1} of ${SLIDES.length}</span>
+        </div>
+        <div class="slide-container">
+          <div class="slide-content-left">
+            <span class="slide-badge">${slide.subtitle}</span>
+            <h1 class="slide-title">${slide.title}</h1>
+            <div class="slide-text">${slide.content}</div>
+            <div class="slide-bullets">
+              ${slide.bullets.map(b => `<div class="slide-bullet"><span class="bullet-dot">•</span> ${b}</div>`).join('')}
+            </div>
+            <div class="slide-qa-box">
+              <div class="qa-title">Viva Preparation Q&A</div>
+              <div class="qa-q"><strong>Q:</strong> ${slide.qa[0].q}</div>
+              <div class="qa-a"><strong>A:</strong> ${slide.qa[0].a}</div>
+            </div>
+          </div>
+          <div class="slide-content-right">
+            <img src="${slide.image}" class="slide-image" />
+            <div class="slide-notes">
+              <strong>Presenter Notes:</strong> ${slide.notes}
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>HackerHouse — Engineering Verification Network</span>
+          <span>https://hackerhouse.dev</span>
+        </div>
+      </div>
+    `).join('<div class="page-break"></div>');
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>HackerHouse Project Presentation Deck</title>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+            @page {
+              size: A4 landscape;
+              margin: 0;
+            }
+            body {
+              margin: 0;
+              padding: 0;
+              font-family: 'Plus Jakarta Sans', sans-serif;
+              background: #050914;
+              color: #f1f5f9;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+            .slide-page {
+              width: 297mm;
+              height: 210mm;
+              padding: 16mm;
+              box-sizing: border-box;
+              background: radial-gradient(circle at 10% 20%, #0d1225 0%, #050914 90%);
+              display: flex;
+              flex-direction: column;
+              justify-content: space-between;
+              position: relative;
+              overflow: hidden;
+              page-break-inside: avoid;
+              page-break-after: always;
+            }
+            .slide-page::before {
+              content: '';
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 4px;
+              background: linear-gradient(90deg, #6366f1, #a855f7);
+            }
+            .slide-header {
+              display: flex;
+              justify-content: space-between;
+              font-size: 11px;
+              font-weight: 700;
+              color: #94a3b8;
+              text-transform: uppercase;
+              letter-spacing: 0.05em;
+            }
+            .slide-container {
+              display: grid;
+              grid-template-columns: 1.2fr 0.8fr;
+              gap: 20px;
+              flex: 1;
+              margin-top: 15px;
+              margin-bottom: 15px;
+              min-height: 0;
+            }
+            .slide-content-left {
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+            }
+            .slide-content-right {
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;
+              gap: 15px;
+            }
+            .slide-badge {
+              font-size: 10px;
+              font-weight: 700;
+              color: #818cf8;
+              text-transform: uppercase;
+              letter-spacing: 0.12em;
+              margin-bottom: 5px;
+            }
+            .slide-title {
+              font-family: 'Space Grotesk', sans-serif;
+              font-size: 26px;
+              font-weight: 900;
+              margin: 0 0 10px 0;
+              color: #ffffff;
+              line-height: 1.15;
+            }
+            .slide-text {
+              font-size: 13px;
+              color: #cbd5e1;
+              line-height: 1.5;
+              margin-bottom: 15px;
+              font-weight: 400;
+            }
+            .slide-bullets {
+              display: grid;
+              grid-template-columns: 1fr;
+              gap: 8px;
+              margin-bottom: 15px;
+            }
+            .slide-bullet {
+              font-size: 11px;
+              color: #cbd5e1;
+              line-height: 1.4;
+              display: flex;
+              align-items: flex-start;
+            }
+            .bullet-dot {
+              color: #6366f1;
+              font-weight: 900;
+              margin-right: 6px;
+            }
+            .slide-qa-box {
+              background: rgba(255, 255, 255, 0.03);
+              border-left: 3px solid #f59e0b;
+              padding: 8px 12px;
+              border-radius: 4px;
+              font-size: 10px;
+            }
+            .qa-title {
+              font-weight: 700;
+              color: #f59e0b;
+              text-transform: uppercase;
+              letter-spacing: 0.05em;
+              margin-bottom: 3px;
+            }
+            .qa-q {
+              color: #ffffff;
+            }
+            .qa-a {
+              color: #cbd5e1;
+              margin-top: 2px;
+            }
+            .slide-image {
+              width: 100%;
+              max-height: 150px;
+              object-fit: contain;
+              border-radius: 8px;
+              border: 1px solid rgba(255, 255, 255, 0.08);
+              background: rgba(255, 255, 255, 0.02);
+              padding: 4px;
+            }
+            .slide-notes {
+              background: rgba(99, 102, 241, 0.08);
+              border: 1px solid rgba(99, 102, 241, 0.15);
+              padding: 8px 12px;
+              border-radius: 6px;
+              font-size: 10px;
+              color: #a5b4fc;
+              line-height: 1.4;
+              width: 90%;
+            }
+            .slide-footer {
+              display: flex;
+              justify-content: space-between;
+              font-size: 9px;
+              color: #64748b;
+              border-top: 1px solid rgba(255, 255, 255, 0.05);
+              padding-top: 8px;
+            }
+            .page-break {
+              page-break-after: always;
+              break-after: page;
+            }
+            @media print {
+              body {
+                background: #050914;
+              }
+              .slide-page {
+                width: 297mm;
+                height: 210mm;
+                margin: 0;
+                border: none;
+                border-radius: 0;
+                page-break-inside: avoid;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          ${slidesHTML}
+          <script>
+            window.onload = function() {
+              window.print();
+              setTimeout(function() { window.close(); }, 500);
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
+
+  useEffect(() => {
+    if (!isDocsOpen) return;
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        handlePrevSlide();
+      } else if (e.key === 'ArrowRight') {
+        handleNextSlide();
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isDocsOpen, activeSlide]);
+
+  useEffect(() => {
+    if (!isDocsOpen) {
+      setIsPlaying(false);
+      setProgress(0);
+      return;
+    }
+    if (!isPlaying) {
+      setProgress(0);
+      return;
+    }
+
+    const intervalTime = 100;
+    const totalDuration = 7000;
+    const increment = (intervalTime / totalDuration) * 100;
+
+    const timer = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          setActiveSlide((curr) => (curr < SLIDES.length - 1 ? curr + 1 : 0));
+          return 0;
+        }
+        return prev + increment;
+      });
+    }, intervalTime);
+
+    return () => clearInterval(timer);
+  }, [isDocsOpen, isPlaying]);
+
+  useEffect(() => {
+    setProgress(0);
+  }, [activeSlide]);
 
   useMotionValueEvent(scrollY, 'change', (y) => setScrolled(y > 20));
 
@@ -378,36 +908,303 @@ export default function Navbar() {
       <AnimatePresence>
         {isDocsOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setIsDocsOpen(false)} className="absolute inset-0 bg-background/80 backdrop-blur-xl" />
-            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }} transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
-              className="relative w-full max-w-2xl overflow-hidden border border-white/8 shadow-2xl rounded-[2rem]"
-              style={{ background: 'linear-gradient(145deg, rgba(15,22,45,0.96), rgba(10,15,35,0.99))' }}>
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }}
+              onClick={() => { setIsDocsOpen(false); setIsFullscreen(false); }} 
+              className="absolute inset-0 bg-background/85 backdrop-blur-xl" 
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }} 
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }} 
+              transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
+              className={`relative shadow-2xl border border-white/8 transition-all duration-300 flex flex-col overflow-hidden ${
+                isFullscreen 
+                  ? 'fixed inset-0 w-screen h-screen rounded-none max-w-none max-h-none border-none' 
+                  : 'w-full max-w-[95vw] md:max-w-6xl h-[680px] max-h-[90vh] rounded-[2rem]'
+              }`}
+              style={{ background: 'linear-gradient(145deg, rgba(15,22,45,0.96), rgba(10,15,35,0.99))' }}
+            >
               <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-primary to-transparent" />
-              <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between bg-primary/5">
-                <div>
-                  <h3 className="text-xl font-black text-white flex items-center gap-2 font-display">
-                    Interactive Documentation Hub <Sparkles size={16} className="text-primary animate-pulse" />
-                  </h3>
-                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Developer Discovery Protocols</p>
+              
+              {/* Modal Header */}
+              <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-primary/5 shrink-0 z-10">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20">
+                    <BookOpen size={16} className="text-primary animate-pulse" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm md:text-base font-black text-white flex items-center gap-2 font-display">
+                      HackerHouse Presentation Hub <Sparkles size={14} className="text-primary" />
+                    </h3>
+                    <p className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Strategic Pitch & Architecture Deck</p>
+                  </div>
                 </div>
-                <button onClick={() => setIsDocsOpen(false)} className="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 hover:text-white hover:bg-white/5 transition-all">
-                  <X size={18} />
-                </button>
+                
+                {/* Header Controls */}
+                <div className="flex items-center gap-2 md:gap-3">
+                  {/* Autoplay Play/Pause */}
+                  <div className="flex items-center gap-2 bg-white/[0.03] border border-white/5 rounded-xl px-2.5 py-1.5">
+                    <button 
+                      onClick={() => setIsPlaying(!isPlaying)}
+                      className="text-slate-400 hover:text-white transition-colors flex items-center gap-1.5"
+                      title={isPlaying ? "Pause Autoplay" : "Start Autoplay (7s)"}
+                    >
+                      {isPlaying ? (
+                        <>
+                          <Pause size={12} className="text-primary animate-pulse" />
+                          <span className="text-[10px] font-bold hidden sm:inline text-primary">PAUSE</span>
+                        </>
+                      ) : (
+                        <>
+                          <Play size={12} className="text-slate-400" />
+                          <span className="text-[10px] font-bold hidden sm:inline">PLAY</span>
+                        </>
+                      )}
+                    </button>
+                    {isPlaying && (
+                      <div className="w-12 bg-white/10 h-1 rounded-full overflow-hidden hidden sm:block">
+                        <div 
+                          className="bg-primary h-full transition-all duration-100 ease-linear"
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Fullscreen Toggle */}
+                  <button 
+                    onClick={() => setIsFullscreen(!isFullscreen)} 
+                    className="w-8 h-8 rounded-lg bg-white/[0.03] hover:bg-white/10 border border-white/5 flex items-center justify-center text-slate-400 hover:text-white transition-all"
+                    title={isFullscreen ? "Exit Fullscreen" : "Presenter Mode"}
+                  >
+                    {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+                  </button>
+
+                  {/* PDF Download */}
+                  <button 
+                    onClick={downloadPDF} 
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold text-white transition-all bg-primary/20 hover:bg-primary/30 border border-primary/30"
+                    title="Download Landscape Presentation PDF"
+                  >
+                    <Download size={12} />
+                    <span className="hidden sm:inline">PDF</span>
+                  </button>
+
+                  <div className="w-px h-6 bg-white/5" />
+
+                  {/* Close */}
+                  <button 
+                    onClick={() => { setIsDocsOpen(false); setIsFullscreen(false); }} 
+                    className="w-8 h-8 rounded-lg bg-white/[0.03] hover:bg-red-500/20 border border-white/5 hover:border-red-500/20 flex items-center justify-center text-slate-400 hover:text-white transition-all"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
               </div>
-              <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar text-sm leading-relaxed text-slate-300">
-                <div>
-                  <h4 className="font-bold text-white text-base mb-2">1. Infinite Geolocation Discovery</h4>
-                  <p>HackerHouse leverages state-of-the-art geo-queries utilizing case-insensitive geospatial indexing. It discovers nearby talent dynamically with exact real-time mileage distances computed mathematically based on MongoDB's 2dsphere index capability.</p>
+
+              {/* Main Deck Container (Split sidebar + slides) */}
+              <div className="flex-1 flex min-h-0 relative z-10">
+                
+                {/* Left Sidebar Slide Selector (Desktop only) */}
+                <div className="hidden md:flex w-60 border-r border-white/5 bg-black/15 flex-col overflow-y-auto p-4 space-y-1 shrink-0">
+                  <div className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-3 flex items-center gap-1.5">
+                    <List size={10} />
+                    Slide Outline
+                  </div>
+                  {SLIDES.map((slide, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => { setActiveSlide(idx); }}
+                      className={`text-left px-3 py-2 rounded-xl text-xs transition-all border flex items-start gap-2.5 ${
+                        idx === activeSlide
+                          ? 'bg-primary/10 border-primary/20 text-white shadow-sm'
+                          : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                      }`}
+                    >
+                      <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0 mt-0.5 ${
+                        idx === activeSlide ? 'bg-primary text-white' : 'bg-white/5 text-slate-500'
+                      }`}>
+                        {idx + 1}
+                      </span>
+                      <div className="truncate flex-1">
+                        <div className="text-[9px] text-slate-500 uppercase font-bold">{slide.subtitle}</div>
+                        <div className="font-semibold truncate">{slide.title}</div>
+                      </div>
+                    </button>
+                  ))}
                 </div>
-                <div>
-                  <h4 className="font-bold text-white text-base mb-2">2. Global Theme Customization system</h4>
-                  <p>Our dashboard empowers developers with a dynamic theme engine. Selecting predefined palettes or styling with custom HEX color selectors updates the root design tokens on the window object and persists them securely via localStorage across the entire platform experience.</p>
-                </div>
-                <div>
-                  <h4 className="font-bold text-white text-base mb-2">3. GitHub Intelligence Sync</h4>
-                  <p>By connecting your GitHub profile, the system parses public repositories, commit velocity, and language details. This builds a highly optimized trust factor score for top-tier developer discovery.</p>
+
+                {/* Right Slide Stage */}
+                <div className="flex-1 flex flex-col justify-between min-h-0 bg-[#090d1a]/40">
+                  
+                  {/* Slide Viewport */}
+                  <div className="flex-1 overflow-y-auto p-6 md:p-8 min-h-0">
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={activeSlide}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.25, ease: 'easeOut' }}
+                        className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start h-full"
+                      >
+                        {/* Slide Left: Info (7 cols) */}
+                        <div className="lg:col-span-7 flex flex-col space-y-4">
+                          <div>
+                            <span className="text-primary text-xs font-black uppercase tracking-widest bg-primary/10 border border-primary/20 px-2.5 py-0.5 rounded-full inline-block">
+                              Slide {activeSlide + 1} of {SLIDES.length} — {SLIDES[activeSlide].subtitle}
+                            </span>
+                            <h2 className="text-xl md:text-2xl lg:text-3xl font-black text-white mt-2 leading-tight tracking-tight font-display" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                              {SLIDES[activeSlide].title}
+                            </h2>
+                          </div>
+                          
+                          <div className="h-px w-full bg-white/5" />
+                          
+                          <p className="text-slate-300 text-xs md:text-sm leading-relaxed font-medium">
+                            {SLIDES[activeSlide].content}
+                          </p>
+                          
+                          {/* Bullet Points */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+                            {SLIDES[activeSlide].bullets.map((bullet, idx) => (
+                              <div key={idx} className="flex items-start gap-2.5 text-[11px] md:text-xs text-slate-400 font-semibold font-sans">
+                                <CheckCircle2 size={13} className="text-primary shrink-0 mt-0.5" />
+                                <span>{bullet}</span>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Presenter Helper / Viva Q&A Drawer */}
+                          <div className="pt-3">
+                            <div className="rounded-xl border border-white/5 bg-white/[0.01] p-3.5 backdrop-blur-sm">
+                              <div className="flex items-center justify-between border-b border-white/5 pb-2 mb-2">
+                                <div className="flex gap-3 text-[10px] font-black uppercase tracking-wider">
+                                  <button
+                                    onClick={() => setShowSpeakerNotes(false)}
+                                    className={`pb-1 transition-all ${!showSpeakerNotes ? 'text-amber-400 border-b-2 border-amber-400' : 'text-slate-400 hover:text-slate-200'}`}
+                                  >
+                                    College Viva Q&A
+                                  </button>
+                                  <button
+                                    onClick={() => setShowSpeakerNotes(true)}
+                                    className={`pb-1 transition-all ${showSpeakerNotes ? 'text-primary border-b-2 border-primary' : 'text-slate-400 hover:text-slate-200'}`}
+                                  >
+                                    Speaker Presentation Guide
+                                  </button>
+                                </div>
+                                <div className="flex items-center gap-1 text-[9px] text-slate-500 font-bold">
+                                  <HelpCircle size={10} />
+                                  <span>Viva Helper</span>
+                                </div>
+                              </div>
+                              
+                              <div className="text-[11px] leading-relaxed text-slate-300 min-h-[50px] transition-all">
+                                {!showSpeakerNotes ? (
+                                  <div className="space-y-2">
+                                    {SLIDES[activeSlide].qa.map((item, index) => (
+                                      <div key={index}>
+                                        <p className="font-bold text-amber-400/90 flex items-center gap-1">
+                                          <Sparkles size={9} className="text-amber-500 shrink-0" />
+                                          Q: {item.q}
+                                        </p>
+                                        <p className="text-slate-300 mt-0.5 pl-3 border-l border-amber-500/20">{item.a}</p>
+                                      </div>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <p className="italic text-slate-400 flex items-start gap-1.5">
+                                    <Info size={11} className="text-primary shrink-0 mt-0.5" />
+                                    <span>{SLIDES[activeSlide].notes}</span>
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Slide Right: Visual Mockup (5 cols) */}
+                        <div className="lg:col-span-5 flex flex-col items-center justify-center h-full">
+                          <div className="relative group w-full max-w-[340px] aspect-video sm:aspect-auto sm:h-52 lg:h-64 rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black/40 flex items-center justify-center p-4">
+                            {/* Neon glow effect */}
+                            <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 via-transparent to-primary-light/5 opacity-50" />
+                            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-primary-light rounded-2xl blur opacity-20 group-hover:opacity-35 transition duration-500" />
+                            
+                            <motion.img 
+                              key={activeSlide}
+                              initial={{ opacity: 0, scale: 0.95 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              exit={{ opacity: 0, scale: 0.95 }}
+                              transition={{ duration: 0.3 }}
+                              src={SLIDES[activeSlide].image} 
+                              alt={SLIDES[activeSlide].title} 
+                              className="relative z-10 max-w-full max-h-full object-contain drop-shadow-[0_8px_24px_rgba(0,0,0,0.5)] transform group-hover:scale-105 transition-transform duration-500"
+                            />
+                          </div>
+                          
+                          <span className="text-[10px] text-slate-500 italic mt-3 flex items-center gap-1">
+                            <Sparkles size={9} className="text-primary" />
+                            Visual Asset: {SLIDES[activeSlide].image.split('/').pop()}
+                          </span>
+                        </div>
+                      </motion.div>
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Stage Bottom Controls */}
+                  <div className="p-4 md:p-6 border-t border-white/5 bg-black/10 shrink-0">
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                      
+                      {/* Nav Button Controls */}
+                      <div className="flex items-center gap-3">
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={handlePrevSlide}
+                          className="flex items-center gap-1 px-4 py-2 rounded-xl text-xs font-bold border text-white border-white/10 bg-white/5 hover:bg-white/10 hover:text-white transition-all cursor-pointer"
+                        >
+                          <ChevronLeft size={14} /> Previous
+                        </motion.button>
+
+                        <div className="text-xs font-bold text-slate-400 font-mono">
+                          {activeSlide + 1} / {SLIDES.length}
+                        </div>
+
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={handleNextSlide}
+                          className="flex items-center gap-1 px-4 py-2 rounded-xl text-xs font-bold border text-white border-white/10 bg-white/5 hover:bg-white/10 hover:text-white transition-all cursor-pointer"
+                        >
+                          Next <ChevronRight size={14} />
+                        </motion.button>
+                      </div>
+
+                      {/* Dots progress selector */}
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {SLIDES.map((_, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => setActiveSlide(idx)}
+                            className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                              idx === activeSlide 
+                                ? 'w-5 bg-primary shadow-sm shadow-primary/45' 
+                                : 'w-1.5 bg-white/15 hover:bg-white/30'
+                            }`}
+                            title={`Go to Slide ${idx + 1}`}
+                          />
+                        ))}
+                      </div>
+
+                      <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider hidden sm:block">
+                        Use Arrow Keys ◄ / ► to Navigate
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
               </div>
             </motion.div>
