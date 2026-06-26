@@ -73,10 +73,22 @@ export default function Landing() {
       const { latitude: lat, longitude: lon } = pos.coords;
       setCoords({ lat, lon });
       try {
-        const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10`);
+        const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
         const d = await r.json();
-        const city = d.address?.city || d.address?.town || d.address?.state || '';
-        if (city) setLocation(city);
+        const addr = d.address || {};
+        const city = addr.city || addr.town || addr.village || addr.municipality || '';
+        const area = addr.suburb || addr.neighbourhood || addr.quarter || addr.city_district || '';
+        let locName = '';
+        if (area && city && area !== city) {
+          locName = `${area}, ${city}`;
+        } else if (city) {
+          locName = city;
+        } else if (area) {
+          locName = area;
+        } else {
+          locName = d.display_name ? d.display_name.split(',').slice(0, 2).join(', ').trim() : '';
+        }
+        if (locName) setLocation(locName);
       } catch { /* ignore */ } finally { setIsLocating(false); }
     }, () => setIsLocating(false));
   };
@@ -84,7 +96,7 @@ export default function Landing() {
   const fetchSuggestions = async (q: string) => {
     if (q.length < 3) { setSuggestions([]); return; }
     try {
-      const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=5`);
+      const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=5&addressdetails=1`);
       setSuggestions(await r.json());
     } catch { /* ignore */ }
   };
@@ -228,7 +240,24 @@ export default function Landing() {
                         <div
                           key={i}
                           className="px-4 py-3 hover:bg-white/8 cursor-pointer text-[11px] flex items-center gap-2.5 border-b border-white/5 last:border-0"
-                          onClick={() => { setLocation(s.display_name.split(',')[0].trim()); setCoords({ lat: parseFloat(s.lat), lon: parseFloat(s.lon) }); setShowSug(false); }}
+                          onClick={() => {
+                             const addr = s.address || {};
+                             const city = addr.city || addr.town || addr.village || addr.municipality || '';
+                             const area = addr.suburb || addr.neighbourhood || addr.quarter || addr.city_district || '';
+                             let locName = '';
+                             if (area && city && area !== city) {
+                               locName = `${area}, ${city}`;
+                             } else if (city) {
+                               locName = city;
+                             } else if (area) {
+                               locName = area;
+                             } else {
+                               locName = s.display_name ? s.display_name.split(',').slice(0, 2).join(', ').trim() : '';
+                             }
+                             setLocation(locName);
+                             setCoords({ lat: parseFloat(s.lat), lon: parseFloat(s.lon) });
+                             setShowSug(false);
+                           }}
                         >
                           <MapPin size={11} className="text-slate-500 shrink-0" />
                           <div className="truncate text-white font-medium">{s.display_name}</div>

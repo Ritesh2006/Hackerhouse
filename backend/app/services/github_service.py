@@ -157,7 +157,21 @@ async def search_github_users(skill: Optional[str] = None, location: Optional[st
     if skill:
         query_parts.append(skill)
     if location:
-        clean_loc = location.split(',')[0].strip()
+        parts = [p.strip() for p in location.split(',') if p.strip()]
+        clean_loc = parts[0]
+        if len(parts) > 1:
+            countries = {
+                "india", "in", "united states", "usa", "us", "united kingdom", "uk", 
+                "canada", "ca", "germany", "de", "france", "fr", "australia", "au", 
+                "brazil", "br", "russia", "ru", "japan", "jp", "china", "cn"
+            }
+            if parts[-1].lower() in countries:
+                if len(parts) > 2:
+                    clean_loc = parts[-2]
+                else:
+                    clean_loc = parts[0]
+            else:
+                clean_loc = parts[1]
         query_parts.append(f"location:\"{clean_loc}\"")
     
     query = " ".join(query_parts) if query_parts else "type:user"

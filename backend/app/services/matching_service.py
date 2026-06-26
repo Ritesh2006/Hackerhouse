@@ -41,7 +41,12 @@ async def find_matching_developers(
                     }
                 }
             elif location_name:
-                query["location_name"] = {"$regex": location_name, "$options": "i"}
+                parts = [p.strip() for p in location_name.split(',') if p.strip()]
+                if len(parts) > 1:
+                    regex_parts = [{"location_name": {"$regex": part, "$options": "i"}} for part in parts]
+                    query["$or"] = regex_parts
+                else:
+                    query["location_name"] = {"$regex": location_name, "$options": "i"}
 
         logger.info(f"Local query: {query}, apply_location: {apply_location}")
         cursor = db.users.find(query)
@@ -172,7 +177,14 @@ async def find_matching_developers(
     # Correct is_fallback logic
     # True if we had to search globally AND we are searching by location
     has_location = bool(location_name or lat)
-    found_in_location = any(u.get("distance_km") is not None or (u.get("location_name") and location_name and location_name.lower() in u["location_name"].lower()) for u in processed_users)
+    found_in_location = any(
+        u.get("distance_km") is not None or (
+            u.get("location_name") and location_name and any(
+                part.lower() in u["location_name"].lower() or u["location_name"].lower() in part.lower()
+                for part in location_name.split(',') if part.strip()
+            )
+        ) for u in processed_users
+    )
     
     is_fallback = has_location and not found_in_location
 

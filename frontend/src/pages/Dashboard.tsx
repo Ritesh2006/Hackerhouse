@@ -187,7 +187,7 @@ export default function Dashboard() {
       window.dispatchEvent(new Event('hackerhouse_theme_changed'));
     }
   };
-
+    
   useEffect(() => {
     (async () => {
       try {
