@@ -248,6 +248,7 @@ export default function Navbar() {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isDocsOpen, setIsDocsOpen] = useState(false);
   const [isPricingOpen, setIsPricingOpen] = useState(false);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
 
   // New slide settings
@@ -579,9 +580,15 @@ export default function Navbar() {
   useEffect(() => { setIsMobileMenuOpen(false); }, [location.pathname]);
 
   useEffect(() => {
-    document.body.style.overflow = (isMobileMenuOpen || isDocsOpen || isPricingOpen) ? 'hidden' : '';
+    const handleOpenPricing = () => setIsPricingOpen(true);
+    window.addEventListener('hackerhouse_open_pricing', handleOpenPricing);
+    return () => window.removeEventListener('hackerhouse_open_pricing', handleOpenPricing);
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = (isMobileMenuOpen || isDocsOpen || isPricingOpen || isScannerOpen) ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
-  }, [isMobileMenuOpen, isDocsOpen, isPricingOpen]);
+  }, [isMobileMenuOpen, isDocsOpen, isPricingOpen, isScannerOpen]);
 
   return (
     <>
@@ -1245,10 +1252,74 @@ export default function Navbar() {
                     <li className="flex items-center gap-2"><CheckCircle2 size={13} className="text-emerald-400 shrink-0" /> Full GitHub Commits Sync</li>
                     <li className="flex items-center gap-2"><CheckCircle2 size={13} className="text-emerald-400 shrink-0" /> Dynamic Custom theme engine</li>
                   </ul>
-                  <button onClick={() => setIsPricingOpen(false)} className="btn-primary w-full py-3.5 rounded-xl font-bold mt-6 text-sm flex items-center justify-center gap-2">
+                  <button 
+                    onClick={() => {
+                      setIsPricingOpen(false);
+                      setIsScannerOpen(true);
+                    }} 
+                    className="btn-primary w-full py-3.5 rounded-xl font-bold mt-6 text-sm flex items-center justify-center gap-2"
+                  >
                     Start Free 14-day Trial <ChevronRight size={14} />
                   </button>
                 </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ── SCANNER MODAL ── */}
+      <AnimatePresence>
+        {isScannerOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setIsScannerOpen(false)} className="absolute inset-0 bg-background/80 backdrop-blur-xl" />
+            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }} transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
+              className="relative w-full max-w-sm overflow-hidden border border-white/8 shadow-2xl rounded-[2rem]"
+              style={{ background: 'linear-gradient(145deg, rgba(15,22,45,0.96), rgba(10,15,35,0.99))' }}>
+              <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-indigo-500 to-transparent" />
+              <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between bg-indigo-500/5">
+                <div>
+                  <h3 className="text-lg font-black text-white flex items-center gap-2 font-display">
+                    Demo Payment Scanner <Zap size={16} className="text-indigo-400" />
+                  </h3>
+                  <p className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Mock Subscription Activation</p>
+                </div>
+                <button onClick={() => setIsScannerOpen(false)} className="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 hover:text-white hover:bg-white/5 transition-all">
+                  <X size={18} />
+                </button>
+              </div>
+              <div className="p-6 text-center space-y-5">
+                <div className="w-48 h-48 mx-auto bg-white p-3 rounded-2xl flex items-center justify-center shadow-lg border border-white/10">
+                  <svg className="w-full h-full text-slate-900" viewBox="0 0 100 100" fill="currentColor">
+                    <path d="M 5 5 H 35 V 15 H 15 V 35 H 5 Z" />
+                    <path d="M 65 5 H 95 V 35 H 85 V 15 H 65 Z" />
+                    <path d="M 5 65 H 15 V 85 H 35 V 95 H 5 Z" />
+                    <path d="M 85 65 H 95 V 95 H 65 V 85 H 85 Z" />
+                    <rect x="20" y="20" width="15" height="15" />
+                    <rect x="20" y="65" width="15" height="15" />
+                    <rect x="65" y="20" width="15" height="15" />
+                    <rect x="45" y="45" width="10" height="10" />
+                    <rect x="65" y="55" width="10" height="10" />
+                    <rect x="55" y="65" width="10" height="10" />
+                    <rect x="65" y="75" width="15" height="10" />
+                  </svg>
+                </div>
+                <p className="text-slate-400 text-xs leading-relaxed">
+                  Scan this demo QR code to authorize. No actual funds will be charged.
+                </p>
+                <button 
+                  onClick={() => {
+                    localStorage.setItem('hackerhouse_trial_active', 'true');
+                    setIsScannerOpen(false);
+                    alert("Mock payment received! Your 14-day free trial has been activated and the platform is now unlocked.");
+                    window.dispatchEvent(new Event('hackerhouse_trial_changed'));
+                  }}
+                  className="w-full btn-primary py-3 rounded-xl font-bold mt-2 text-sm flex items-center justify-center gap-2"
+                >
+                  Simulate Scan Success & Unlock
+                </button>
               </div>
             </motion.div>
           </div>

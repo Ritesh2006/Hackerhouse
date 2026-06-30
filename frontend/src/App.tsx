@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -35,27 +35,76 @@ function PageWrapper({ children }: { children: React.ReactNode }) {
   );
 }
 
+function TrialLockScreen() {
+  return (
+    <div className="min-h-[70vh] flex items-center justify-center px-4 py-16 relative overflow-hidden">
+      <div className="absolute top-1/4 left-1/4 w-80 h-80 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, var(--color-primary-glow), transparent 70%)', filter: 'blur(40px)' }} />
+      <div className="relative rounded-[2rem] overflow-hidden w-full max-w-md p-8 sm:p-10 text-center z-10"
+        style={{ background: 'linear-gradient(145deg, rgba(15,22,45,0.9), rgba(10,15,35,0.95))', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 32px 80px rgba(0,0,0,0.5)' }}>
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-500 to-transparent" />
+        <div className="w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center relative bg-amber-500/10 border border-amber-500/30 text-amber-400">
+          <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+        </div>
+        <h2 className="text-2xl font-black text-white mb-3" style={{ fontFamily: 'Outfit, sans-serif' }}>
+          Platform Access Locked
+        </h2>
+        <p className="text-slate-400 text-sm leading-relaxed mb-8">
+          HackerHouse requires an active trial or subscription plan. Activate your free 14-day trial to unlock full developer discovery and hiring features.
+        </p>
+        <button
+          onClick={() => {
+            window.dispatchEvent(new Event('hackerhouse_open_pricing'));
+          }}
+          className="w-full btn-primary py-4 rounded-2xl flex items-center justify-center gap-2.5 font-bold text-base bg-amber-500 hover:bg-amber-600 border border-amber-500 text-white"
+        >
+          <span>View Pricing & Start Trial</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function AppInner() {
   const location = useLocation();
+  const [trialActive, setTrialActive] = useState(() => localStorage.getItem('hackerhouse_trial_active') === 'true');
+
+  useEffect(() => {
+    const handleTrialChange = () => {
+      setTrialActive(localStorage.getItem('hackerhouse_trial_active') === 'true');
+    };
+    window.addEventListener('hackerhouse_trial_changed', handleTrialChange);
+    return () => window.removeEventListener('hackerhouse_trial_changed', handleTrialChange);
+  }, []);
+
   const noFooterRoutes = ['/chat'];
   const showFooter = !noFooterRoutes.some(r => location.pathname.startsWith(r));
+
+  const isPublicRoute = ['/', '/login', '/signup', '/github-callback', '/linkedin-callback'].includes(location.pathname) || 
+                        location.pathname.startsWith('/github-callback') || 
+                        location.pathname.startsWith('/linkedin-callback');
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: 'var(--color-background)', color: '#e2e8f0' }}>
       <Navbar />
       <main className="flex-1">
         <PageWrapper>
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/search" element={<SearchResults />} />
-            <Route path="/profile/:id" element={<Profile />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/chat/:contractId" element={<Chat />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/github-callback" element={<GitHubCallback />} />
-            <Route path="/linkedin-callback" element={<LinkedInCallback />} />
-          </Routes>
+          {!trialActive && !isPublicRoute ? (
+            <TrialLockScreen />
+          ) : (
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/search" element={<SearchResults />} />
+              <Route path="/profile/:id" element={<Profile />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/chat/:contractId" element={<Chat />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/github-callback" element={<GitHubCallback />} />
+              <Route path="/linkedin-callback" element={<LinkedInCallback />} />
+            </Routes>
+          )}
         </PageWrapper>
       </main>
       {showFooter && <Footer />}
