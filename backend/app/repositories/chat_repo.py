@@ -1,7 +1,7 @@
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from typing import Optional, List
 from bson import ObjectId
-from datetime import datetime, UTC
+from datetime import datetime, timezone
 
 class ChatRepository:
     def __init__(self, db: AsyncIOMotorDatabase):
@@ -21,7 +21,7 @@ class ChatRepository:
             {"_id": chat_id},
             {
                 "$push": {"messages": message},
-                "$set": {"updated_at": datetime.now(UTC)}
+                "$set": {"updated_at": datetime.now(timezone.utc)}
             }
         )
         return result.modified_count > 0

@@ -57,7 +57,7 @@ async def get_user(id: str, db=Depends(get_database)):
         return user
 
     # Handle Virtual Users (GitHub/LinkedIn) if not in database
-    from datetime import datetime, UTC
+    from datetime import datetime, timezone
     
     if id.startswith("gh_") or id.startswith("li_"):
         logger.info(f"🏗️ Generating virtual profile for {id}")
@@ -81,7 +81,7 @@ async def get_user(id: str, db=Depends(get_database)):
                 "github_url": f"https://github.com/{username}",
                 "location_name": gh_data.get("location") if gh_data else "Global",
                 "is_active": True,
-                "created_at": datetime.now(UTC)
+                "created_at": datetime.now(timezone.utc)
             }
         
         if id.startswith("li_"):
@@ -101,7 +101,7 @@ async def get_user(id: str, db=Depends(get_database)):
                 "avatar_url": li_profile.get("profile_picture") if li_profile else None,
                 "linkedin_url": li_profile.get("linkedin_url") if li_profile and not li_profile.get("is_fallback") else f"https://www.linkedin.com/search/results/all/?keywords={name.replace(' ', '+')}",
                 "is_active": True,
-                "created_at": datetime.now(UTC)
+                "created_at": datetime.now(timezone.utc)
             }
 
     logger.warning(f"❌ User not found in DB or Virtual Registry: {id}")

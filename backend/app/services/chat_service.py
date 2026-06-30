@@ -1,5 +1,5 @@
 from app.repositories.chat_repo import ChatRepository
-from datetime import datetime, UTC
+from datetime import datetime, timezone
 
 class ChatService:
     def __init__(self, chat_repo: ChatRepository):
@@ -38,7 +38,7 @@ class ChatService:
         message = {
             "sender_id": sender_id,
             "text": text,
-            "timestamp": datetime.now(UTC)
+            "timestamp": datetime.now(timezone.utc)
         }
         if linkedin_status:
             message["linkedin_status"] = linkedin_status
