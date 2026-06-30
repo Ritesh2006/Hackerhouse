@@ -72,7 +72,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     localStorage.removeItem('token');
     localStorage.removeItem('user_id');
     localStorage.removeItem('chat_user_id');
+    localStorage.removeItem('hackerhouse_trial_active');
     set({ token: null, userId: null, user: null });
+    window.dispatchEvent(new Event('hackerhouse_trial_changed'));
   },
 
   checkAuth: async () => {

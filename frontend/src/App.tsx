@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Landing from './pages/Landing';
@@ -71,6 +71,8 @@ function TrialLockScreen() {
 
 function AppInner() {
   const location = useLocation();
+  const { token } = useAuthStore();
+  const isLoggedIn = !!token || !!localStorage.getItem('token');
   const [trialActive, setTrialActive] = useState(() => localStorage.getItem('hackerhouse_trial_active') === 'true');
   const [isMaintenance, setIsMaintenance] = useState(false);
 
@@ -108,31 +110,39 @@ function AppInner() {
   const noFooterRoutes = ['/chat'];
   const showFooter = !noFooterRoutes.some(r => location.pathname.startsWith(r));
 
-  const isPublicRoute = ['/', '/login', '/signup', '/github-callback', '/linkedin-callback', '/activate-trial'].includes(location.pathname) || 
-                        location.pathname.startsWith('/github-callback') || 
-                        location.pathname.startsWith('/linkedin-callback');
+  const isAuthPage = ['/login', '/signup'].includes(location.pathname);
+  const isActivatePage = location.pathname.startsWith('/activate-trial');
+
+  if (!isLoggedIn) {
+    if (!isAuthPage && !isActivatePage) {
+      return <Navigate to="/login" replace />;
+    }
+  } else {
+    if (isAuthPage) {
+      return <Navigate to="/dashboard" replace />;
+    }
+    if (!trialActive && !isActivatePage) {
+      return <TrialLockScreen />;
+    }
+  }
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: 'var(--color-background)', color: '#e2e8f0' }}>
       <Navbar />
       <main className="flex-1">
         <PageWrapper>
-          {!trialActive && !isPublicRoute ? (
-            <TrialLockScreen />
-          ) : (
-            <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/search" element={<SearchResults />} />
-              <Route path="/profile/:id" element={<Profile />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/chat/:contractId" element={<Chat />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/github-callback" element={<GitHubCallback />} />
-              <Route path="/linkedin-callback" element={<LinkedInCallback />} />
-              <Route path="/activate-trial" element={<ActivateTrial />} />
-            </Routes>
-          )}
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/search" element={<SearchResults />} />
+            <Route path="/profile/:id" element={<Profile />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/chat/:contractId" element={<Chat />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/github-callback" element={<GitHubCallback />} />
+            <Route path="/linkedin-callback" element={<LinkedInCallback />} />
+            <Route path="/activate-trial" element={<ActivateTrial />} />
+          </Routes>
         </PageWrapper>
       </main>
       {showFooter && <Footer />}
