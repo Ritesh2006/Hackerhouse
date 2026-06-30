@@ -15,6 +15,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { AnimatePresence, motion } from 'framer-motion';
 import GitHubCallback from './pages/GitHubCallback';
 import LinkedInCallback from './pages/LinkedInCallback';
+import ActivateTrial from './pages/ActivateTrial';
 import { useAuthStore } from './stores/authStore';
 
 // Animated page wrapper
@@ -81,7 +82,7 @@ function AppInner() {
   const noFooterRoutes = ['/chat'];
   const showFooter = !noFooterRoutes.some(r => location.pathname.startsWith(r));
 
-  const isPublicRoute = ['/', '/login', '/signup', '/github-callback', '/linkedin-callback'].includes(location.pathname) || 
+  const isPublicRoute = ['/', '/login', '/signup', '/github-callback', '/linkedin-callback', '/activate-trial'].includes(location.pathname) || 
                         location.pathname.startsWith('/github-callback') || 
                         location.pathname.startsWith('/linkedin-callback');
 
@@ -103,6 +104,7 @@ function AppInner() {
               <Route path="/signup" element={<Signup />} />
               <Route path="/github-callback" element={<GitHubCallback />} />
               <Route path="/linkedin-callback" element={<LinkedInCallback />} />
+              <Route path="/activate-trial" element={<ActivateTrial />} />
             </Routes>
           )}
         </PageWrapper>

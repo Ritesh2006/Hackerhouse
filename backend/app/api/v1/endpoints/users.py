@@ -130,3 +130,22 @@ async def link_linkedin(
         
     await user_repo.update(current_user["_id"], update_data)
     return {"status": "success", "linkedin_id": linkedin_id}
+
+trial_sessions = {}
+
+@router.post("/trial/session/{session_id}")
+async def create_trial_session(session_id: str):
+    trial_sessions[session_id] = "pending"
+    return {"status": "created", "session_id": session_id}
+
+@router.get("/trial/session/{session_id}")
+async def get_trial_session(session_id: str):
+    status = trial_sessions.get(session_id, "expired")
+    return {"status": status}
+
+@router.post("/trial/session/{session_id}/activate")
+async def activate_trial_session(session_id: str):
+    if session_id in trial_sessions:
+        trial_sessions[session_id] = "activated"
+        return {"status": "activated"}
+    raise HTTPException(status_code=404, detail="Session not found or expired")

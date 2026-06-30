@@ -34,6 +34,9 @@ export const usersApi = {
   hireDeveloper: (data: any) => api.post('/hire', data),
   getMyProjects: () => api.get('/projects/me'),
   getMyContracts: () => api.get('/contracts/me'),
+  createTrialSession: (sessionId: string) => api.post(`/users/trial/session/${sessionId}`),
+  getTrialSession: (sessionId: string) => api.get(`/users/trial/session/${sessionId}`),
+  activateTrialSession: (sessionId: string) => api.post(`/users/trial/session/${sessionId}/activate`),
 };
 
 export const githubApi = {

@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
 import { Search, LayoutDashboard, User, Bell, Home, Menu, X, LogOut, ChevronRight, ChevronLeft, Download, Zap, BookOpen, Sparkles, CheckCircle2, Play, Pause, Maximize2, Minimize2, HelpCircle, Info, List } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { finalBaseUrl } from '../lib/api';
+import { finalBaseUrl, usersApi } from '../lib/api';
 import { useAuthStore } from '../stores/authStore';
 
 const SLIDES = [
@@ -589,6 +589,38 @@ export default function Navbar() {
     document.body.style.overflow = (isMobileMenuOpen || isDocsOpen || isPricingOpen || isScannerOpen) ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [isMobileMenuOpen, isDocsOpen, isPricingOpen, isScannerOpen]);
+
+  const [trialSessionId, setTrialSessionId] = useState('');
+
+  useEffect(() => {
+    if (!isScannerOpen) return;
+    
+    const sid = 'hh_' + Math.random().toString(36).substring(2, 9);
+    setTrialSessionId(sid);
+    
+    usersApi.createTrialSession(sid).catch(err => console.error("Failed to init trial session:", err));
+    
+    let isMounted = true;
+    const interval = setInterval(async () => {
+      try {
+        const res = await usersApi.getTrialSession(sid);
+        if (res.data?.status === 'activated' && isMounted) {
+          clearInterval(interval);
+          localStorage.setItem('hackerhouse_trial_active', 'true');
+          setIsScannerOpen(false);
+          alert("Scan detected! Your 14-day free trial has been activated and the platform is now unlocked.");
+          window.dispatchEvent(new Event('hackerhouse_trial_changed'));
+        }
+      } catch (err) {
+        console.error("Error polling trial session:", err);
+      }
+    }, 2000);
+    
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [isScannerOpen]);
 
   return (
     <>
@@ -1291,30 +1323,30 @@ export default function Navbar() {
                 </button>
               </div>
               <div className="p-6 text-center space-y-5">
-                <div className="w-48 h-48 mx-auto bg-white p-3 rounded-2xl flex items-center justify-center shadow-lg border border-white/10">
-                  <svg className="w-full h-full text-slate-900" viewBox="0 0 100 100" fill="currentColor">
-                    <path d="M 5 5 H 35 V 15 H 15 V 35 H 5 Z" />
-                    <path d="M 65 5 H 95 V 35 H 85 V 15 H 65 Z" />
-                    <path d="M 5 65 H 15 V 85 H 35 V 95 H 5 Z" />
-                    <path d="M 85 65 H 95 V 95 H 65 V 85 H 85 Z" />
-                    <rect x="20" y="20" width="15" height="15" />
-                    <rect x="20" y="65" width="15" height="15" />
-                    <rect x="65" y="20" width="15" height="15" />
-                    <rect x="45" y="45" width="10" height="10" />
-                    <rect x="65" y="55" width="10" height="10" />
-                    <rect x="55" y="65" width="10" height="10" />
-                    <rect x="65" y="75" width="15" height="10" />
-                  </svg>
+                <div className="w-48 h-48 mx-auto bg-white p-3 rounded-2xl flex items-center justify-center shadow-lg border border-white/10 overflow-hidden">
+                  {trialSessionId ? (
+                    <img 
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`${window.location.origin}/activate-trial?sid=${trialSessionId}`)}`} 
+                      alt="Demo QR Code Scanner" 
+                      className="w-full h-full object-contain" 
+                    />
+                  ) : (
+                    <div className="spinner" />
+                  )}
                 </div>
                 <p className="text-slate-400 text-xs leading-relaxed">
-                  Scan this demo QR code to authorize. No actual funds will be charged.
+                  Scan this demo QR code with your mobile phone to activate your subscription. No real funds will be charged.
                 </p>
                 <button 
-                  onClick={() => {
-                    localStorage.setItem('hackerhouse_trial_active', 'true');
-                    setIsScannerOpen(false);
-                    alert("Mock payment received! Your 14-day free trial has been activated and the platform is now unlocked.");
-                    window.dispatchEvent(new Event('hackerhouse_trial_changed'));
+                  onClick={async () => {
+                    if (trialSessionId) {
+                      await usersApi.activateTrialSession(trialSessionId).catch(err => console.error(err));
+                    } else {
+                      localStorage.setItem('hackerhouse_trial_active', 'true');
+                      setIsScannerOpen(false);
+                      alert("Mock payment received! Your 14-day free trial has been activated and the platform is now unlocked.");
+                      window.dispatchEvent(new Event('hackerhouse_trial_changed'));
+                    }
                   }}
                   className="w-full btn-primary py-3 rounded-xl font-bold mt-2 text-sm flex items-center justify-center gap-2"
                 >
