@@ -1337,21 +1337,6 @@ export default function Navbar() {
                 <p className="text-slate-400 text-xs leading-relaxed">
                   Scan this demo QR code with your mobile phone to activate your subscription. No real funds will be charged.
                 </p>
-                <button 
-                  onClick={async () => {
-                    if (trialSessionId) {
-                      await usersApi.activateTrialSession(trialSessionId).catch(err => console.error(err));
-                    } else {
-                      localStorage.setItem('hackerhouse_trial_active', 'true');
-                      setIsScannerOpen(false);
-                      alert("Mock payment received! Your 14-day free trial has been activated and the platform is now unlocked.");
-                      window.dispatchEvent(new Event('hackerhouse_trial_changed'));
-                    }
-                  }}
-                  className="w-full btn-primary py-3 rounded-xl font-bold mt-2 text-sm flex items-center justify-center gap-2"
-                >
-                  Simulate Scan Success & Unlock
-                </button>
               </div>
             </motion.div>
           </div>
