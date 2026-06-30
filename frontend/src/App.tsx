@@ -16,7 +16,9 @@ import { AnimatePresence, motion } from 'framer-motion';
 import GitHubCallback from './pages/GitHubCallback';
 import LinkedInCallback from './pages/LinkedInCallback';
 import ActivateTrial from './pages/ActivateTrial';
+import Maintenance from './pages/Maintenance';
 import { useAuthStore } from './stores/authStore';
+import { finalBaseUrl } from './lib/api';
 
 // Animated page wrapper
 function PageWrapper({ children }: { children: React.ReactNode }) {
@@ -70,6 +72,7 @@ function TrialLockScreen() {
 function AppInner() {
   const location = useLocation();
   const [trialActive, setTrialActive] = useState(() => localStorage.getItem('hackerhouse_trial_active') === 'true');
+  const [isMaintenance, setIsMaintenance] = useState(false);
 
   useEffect(() => {
     const handleTrialChange = () => {
@@ -78,6 +81,29 @@ function AppInner() {
     window.addEventListener('hackerhouse_trial_changed', handleTrialChange);
     return () => window.removeEventListener('hackerhouse_trial_changed', handleTrialChange);
   }, []);
+
+  useEffect(() => {
+    const checkHealth = async () => {
+      try {
+        const res = await fetch(`${finalBaseUrl}/health`);
+        if (res.ok) {
+          const data = await res.json();
+          setIsMaintenance(data?.status === 'maintenance');
+        } else {
+          setIsMaintenance(true);
+        }
+      } catch {
+        setIsMaintenance(true);
+      }
+    };
+    checkHealth();
+    const interval = setInterval(checkHealth, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
+  if (isMaintenance) {
+    return <Maintenance />;
+  }
 
   const noFooterRoutes = ['/chat'];
   const showFooter = !noFooterRoutes.some(r => location.pathname.startsWith(r));

@@ -56,8 +56,9 @@ async def health_check():
     """Detailed health check for system monitoring."""
     from app.db.database import db
     db_status = "connected" if db.db is not None else "disconnected"
+    status = "maintenance" if settings.MAINTENANCE_MODE or db_status == "disconnected" else "healthy"
     return {
-        "status": "healthy",
+        "status": status,
         "database": db_status,
         "version": settings.VERSION,
         "timestamp": time.time()

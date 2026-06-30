@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "HackerHouse API"
     VERSION: str = "1.0.0"
     API_V1_STR: str = "/api/v1"
+    MAINTENANCE_MODE: bool = False
     
     # MongoDB
     MONGO_URI: str
