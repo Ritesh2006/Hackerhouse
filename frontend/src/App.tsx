@@ -121,9 +121,6 @@ function AppInner() {
     if (isAuthPage) {
       return <Navigate to="/dashboard" replace />;
     }
-    if (!trialActive && !isActivatePage) {
-      return <TrialLockScreen />;
-    }
   }
 
   return (
@@ -131,18 +128,22 @@ function AppInner() {
       <Navbar />
       <main className="flex-1">
         <PageWrapper>
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/search" element={<SearchResults />} />
-            <Route path="/profile/:id" element={<Profile />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/chat/:contractId" element={<Chat />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/github-callback" element={<GitHubCallback />} />
-            <Route path="/linkedin-callback" element={<LinkedInCallback />} />
-            <Route path="/activate-trial" element={<ActivateTrial />} />
-          </Routes>
+          {isLoggedIn && !trialActive && !isActivatePage ? (
+            <TrialLockScreen />
+          ) : (
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/search" element={<SearchResults />} />
+              <Route path="/profile/:id" element={<Profile />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/chat/:contractId" element={<Chat />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/github-callback" element={<GitHubCallback />} />
+              <Route path="/linkedin-callback" element={<LinkedInCallback />} />
+              <Route path="/activate-trial" element={<ActivateTrial />} />
+            </Routes>
+          )}
         </PageWrapper>
       </main>
       {showFooter && <Footer />}
