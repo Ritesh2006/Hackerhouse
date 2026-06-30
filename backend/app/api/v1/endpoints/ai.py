@@ -316,7 +316,7 @@ Make the titles and descriptions highly personalized to their GitHub profile det
                     {"role": "user", "content": user_content}
                 ],
                 model="llama-3.1-8b-instant",
-                temperature=0.7,
+                temperature=0.0,
                 max_tokens=1024,
                 response_format={"type": "json_object"}
             ),
