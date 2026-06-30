@@ -13,4 +13,5 @@ build/
 brain/
 scratch/
 *.log
-
+venv/
+.venv/

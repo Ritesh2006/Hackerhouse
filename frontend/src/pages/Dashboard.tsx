@@ -409,11 +409,11 @@ export default function Dashboard() {
               <div className="divide-y divide-white/5 flex-1">
                 {contracts.map((c, i) => (
                   <div key={i} className="px-6 py-5 flex items-center justify-between hover:bg-white/[0.02] cursor-pointer transition-colors group"
-                    onClick={() => navigate(`/chat/${c.id}`)}>
+                    onClick={() => navigate(`/chat/${c.id || c._id}`)}>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-sm font-bold text-white font-mono group-hover:text-amber-400 transition-colors">#{c.id.substring(0, 8)}</span>
+                        <span className="text-sm font-bold text-white font-mono group-hover:text-amber-400 transition-colors">#{(c.id || c._id).substring(0, 8)}</span>
                       </div>
                       <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{c.status}</p>
                     </div>

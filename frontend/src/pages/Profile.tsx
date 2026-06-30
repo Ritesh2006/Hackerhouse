@@ -95,7 +95,7 @@ export default function Profile() {
             ) : null;
             
             if (existingContract) {
-                setActiveContractId(existingContract.id);
+                setActiveContractId(existingContract.id || existingContract._id);
             }
         } catch (e) {
             console.warn("Failed to fetch contracts:", e);

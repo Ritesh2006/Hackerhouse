@@ -149,7 +149,7 @@ export default function SearchResults() {
         {/* Results */}
         {loading ? <LoadingSkeleton /> : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-            {sorted.map((dev, i) => <DevCard key={dev.id || i} dev={dev} index={i} />)}
+            {sorted.map((dev, i) => <DevCard key={dev.id || dev._id || i} dev={dev} index={i} />)}
             {developers.length === 0 && (
               <div className="col-span-full text-center py-24">
                 <div className="w-20 h-20 rounded-full mx-auto mb-5 flex items-center justify-center"
