@@ -66,37 +66,57 @@ export default function Landing() {
     return () => clearInterval(timer);
   }, []);
 
+  const getShortAddress = (s: any) => {
+    if (!s) return '';
+    const addr = s.address || {};
+    const city = addr.city || addr.town || addr.village || addr.municipality || '';
+    const area = addr.suburb || addr.neighbourhood || addr.quarter || addr.city_district || '';
+    const state = addr.state || '';
+    const country = addr.country || '';
+    
+    let parts = [];
+    if (area) parts.push(area);
+    if (city) parts.push(city);
+    if (state) parts.push(state);
+    if (parts.length === 0 && country) parts.push(country);
+    
+    if (parts.length > 0) {
+      return parts.join(', ');
+    }
+    
+    return s.display_name ? s.display_name.split(',').slice(0, 3).join(', ').trim() : '';
+  };
+
   const detectLocation = () => {
-    if (!navigator.geolocation) return;
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser.");
+      return;
+    }
     setIsLocating(true);
     navigator.geolocation.getCurrentPosition(async pos => {
       const { latitude: lat, longitude: lon } = pos.coords;
       setCoords({ lat, lon });
       try {
-        const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+        const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1&email=hackerhouse@example.com`);
         const d = await r.json();
-        const addr = d.address || {};
-        const city = addr.city || addr.town || addr.village || addr.municipality || '';
-        const area = addr.suburb || addr.neighbourhood || addr.quarter || addr.city_district || '';
-        let locName = '';
-        if (area && city && area !== city) {
-          locName = `${area}, ${city}`;
-        } else if (city) {
-          locName = city;
-        } else if (area) {
-          locName = area;
-        } else {
-          locName = d.display_name ? d.display_name.split(',').slice(0, 2).join(', ').trim() : '';
-        }
+        const locName = getShortAddress(d);
         if (locName) setLocation(locName);
-      } catch { /* ignore */ } finally { setIsLocating(false); }
-    }, () => setIsLocating(false));
+      } catch (err) {
+        console.error("Nominatim reverse geocode error:", err);
+      } finally {
+        setIsLocating(false);
+      }
+    }, (err) => {
+      setIsLocating(false);
+      console.warn("Geolocation lookup failed:", err);
+      alert(`Failed to detect location: ${err.message}. Please search manually.`);
+    }, { enableHighAccuracy: true, timeout: 5000 });
   };
 
   const fetchSuggestions = async (q: string) => {
     if (q.length < 3) { setSuggestions([]); return; }
     try {
-      const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=5&addressdetails=1`);
+      const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=5&addressdetails=1&email=hackerhouse@example.com`);
       setSuggestions(await r.json());
     } catch { /* ignore */ }
   };
@@ -241,26 +261,14 @@ export default function Landing() {
                           key={i}
                           className="px-4 py-3 hover:bg-white/8 cursor-pointer text-[11px] flex items-center gap-2.5 border-b border-white/5 last:border-0"
                           onClick={() => {
-                             const addr = s.address || {};
-                             const city = addr.city || addr.town || addr.village || addr.municipality || '';
-                             const area = addr.suburb || addr.neighbourhood || addr.quarter || addr.city_district || '';
-                             let locName = '';
-                             if (area && city && area !== city) {
-                               locName = `${area}, ${city}`;
-                             } else if (city) {
-                               locName = city;
-                             } else if (area) {
-                               locName = area;
-                             } else {
-                               locName = s.display_name ? s.display_name.split(',').slice(0, 2).join(', ').trim() : '';
-                             }
+                             const locName = getShortAddress(s);
                              setLocation(locName);
                              setCoords({ lat: parseFloat(s.lat), lon: parseFloat(s.lon) });
                              setShowSug(false);
                            }}
                         >
                           <MapPin size={11} className="text-slate-500 shrink-0" />
-                          <div className="truncate text-white font-medium">{s.display_name}</div>
+                          <div className="truncate text-white font-medium">{getShortAddress(s)}</div>
                         </div>
                       ))}
                     </motion.div>
