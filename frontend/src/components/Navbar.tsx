@@ -249,6 +249,16 @@ export default function Navbar() {
   const [isDocsOpen, setIsDocsOpen] = useState(false);
   const [isPricingOpen, setIsPricingOpen] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [trialActive, setTrialActive] = useState(() => localStorage.getItem('hackerhouse_trial_active') === 'true');
+
+  useEffect(() => {
+    const handleTrialChange = () => {
+      setTrialActive(localStorage.getItem('hackerhouse_trial_active') === 'true');
+    };
+    window.addEventListener('hackerhouse_trial_changed', handleTrialChange);
+    return () => window.removeEventListener('hackerhouse_trial_changed', handleTrialChange);
+  }, []);
+
   const [activeSlide, setActiveSlide] = useState(0);
 
   // New slide settings
@@ -1274,26 +1284,47 @@ export default function Navbar() {
                 </button>
               </div>
               <div className="p-6 space-y-6 text-center">
-                <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 relative">
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500/20 border border-amber-500/30 text-amber-300 font-black text-[9px] px-3 py-1 rounded-full uppercase tracking-widest">Most Popular</div>
-                  <h4 className="text-lg font-bold text-white mb-1">Developer Growth Plan</h4>
-                  <div className="text-3xl font-black text-white font-mono mt-3">$49<span className="text-sm font-normal text-slate-500">/mo</span></div>
-                  <p className="text-slate-400 text-xs mt-3">Unlock infinite global searches, location-aware auto detection, and real-time GitHub trust sync metrics.</p>
-                  <ul className="text-xs text-slate-300 text-left space-y-2 max-w-xs mx-auto mt-5">
-                    <li className="flex items-center gap-2"><CheckCircle2 size={13} className="text-emerald-400 shrink-0" /> Dynamic Local Matching Search</li>
-                    <li className="flex items-center gap-2"><CheckCircle2 size={13} className="text-emerald-400 shrink-0" /> Full GitHub Commits Sync</li>
-                    <li className="flex items-center gap-2"><CheckCircle2 size={13} className="text-emerald-400 shrink-0" /> Dynamic Custom theme engine</li>
-                  </ul>
-                  <button 
-                    onClick={() => {
-                      setIsPricingOpen(false);
-                      setIsScannerOpen(true);
-                    }} 
-                    className="btn-primary w-full py-3.5 rounded-xl font-bold mt-6 text-sm flex items-center justify-center gap-2"
-                  >
-                    Start Free 14-day Trial <ChevronRight size={14} />
-                  </button>
-                </div>
+                {trialActive ? (
+                  <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 relative py-8">
+                    <div className="w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+                      <CheckCircle2 size={32} />
+                    </div>
+                    <h4 className="text-xl font-black text-white mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>Congratulations! 🎉</h4>
+                    <p className="text-slate-400 text-xs leading-relaxed mb-6 max-w-sm mx-auto">
+                      Your HackerHouse Developer Growth Plan subscription is fully active! You have full unlimited access to geospatial search, matching metrics, and developer chats.
+                    </p>
+                    <div className="text-[10px] text-emerald-400 font-black uppercase tracking-wider bg-emerald-500/10 py-1.5 px-4 rounded-full inline-block mb-6">
+                      Premium Subscribed
+                    </div>
+                    <button 
+                      onClick={() => setIsPricingOpen(false)}
+                      className="w-full btn-primary py-3.5 rounded-xl font-bold text-sm"
+                    >
+                      Explore Dashboard
+                    </button>
+                  </div>
+                ) : (
+                  <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 relative">
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500/20 border border-amber-500/30 text-amber-300 font-black text-[9px] px-3 py-1 rounded-full uppercase tracking-widest">Most Popular</div>
+                    <h4 className="text-lg font-bold text-white mb-1">Developer Growth Plan</h4>
+                    <div className="text-3xl font-black text-white font-mono mt-3">$49<span className="text-sm font-normal text-slate-500">/mo</span></div>
+                    <p className="text-slate-400 text-xs mt-3">Unlock infinite global searches, location-aware auto detection, and real-time GitHub trust sync metrics.</p>
+                    <ul className="text-xs text-slate-300 text-left space-y-2 max-w-xs mx-auto mt-5">
+                      <li className="flex items-center gap-2"><CheckCircle2 size={13} className="text-emerald-400 shrink-0" /> Dynamic Local Matching Search</li>
+                      <li className="flex items-center gap-2"><CheckCircle2 size={13} className="text-emerald-400 shrink-0" /> Full GitHub Commits Sync</li>
+                      <li className="flex items-center gap-2"><CheckCircle2 size={13} className="text-emerald-400 shrink-0" /> Dynamic Custom theme engine</li>
+                    </ul>
+                    <button 
+                      onClick={() => {
+                        setIsPricingOpen(false);
+                        setIsScannerOpen(true);
+                      }} 
+                      className="btn-primary w-full py-3.5 rounded-xl font-bold mt-6 text-sm flex items-center justify-center gap-2"
+                    >
+                      Start Free 14-day Trial <ChevronRight size={14} />
+                    </button>
+                  </div>
+                )}
               </div>
             </motion.div>
           </div>
